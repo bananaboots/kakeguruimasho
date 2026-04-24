@@ -101,9 +101,9 @@ Push to `main` as usual. GitHub Actions rebuilds and redeploys Pages.
 > - `VITE_CLERK_PUBLISHABLE_KEY`
 > - `VITE_PARTYKIT_HOST`
 >
-> Then update `.github/workflows/deploy.yml` to forward those into the
-> `npm run build` step as env vars. (Not wired up yet — see the TODO
-> at the bottom of this file.)
+> `.github/workflows/deploy.yml` already forwards both into the `npm run
+> build` step, so once the secrets are set the next push to `main` ships
+> cloud sync to Pages.
 
 ### 6. Test real-time sync
 
@@ -187,8 +187,6 @@ sign out and back in.
 
 ## TODO
 
-- [ ] Forward `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST` to
-      `.github/workflows/deploy.yml` so the Pages build picks them up.
 - [ ] Phase 7: move `history_events` to `Y.Array`; rebuild `AppState`
       as a derived view for proper offline-merge semantics.
 - [ ] Add a "sync status" indicator in the top bar (connected / offline
