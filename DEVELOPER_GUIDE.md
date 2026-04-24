@@ -64,12 +64,18 @@ src/
 │   ├── slices/               One slice per AppState subtree
 │   ├── selectors.ts          Derived values
 │   └── persist.ts            IDB storage adapter
+├── sync/                     Optional cloud sync (Phase 7)
+│   ├── SyncGate.tsx          Clerk provider + sign-in gate; passthrough when env unset
+│   ├── provider.ts           useSyncConnection() — owns the Y.Doc, wires y-indexeddb + y-partykit
+│   └── bridge.ts             Round-trips AppState through the Yjs doc ↔ Zustand store
 ├── db/                       idb-v8 wrapper: open, schema, export, import, snapshots
 ├── types/                    All shared TypeScript types (owned by 3A)
 ├── lib/                      rng, time, id, haptics, storage-persist
 ├── ui/                       shadcn-style primitives (button, dialog, tabs, ...)
 ├── data/defaults.ts          First-run seed data (habits, rewards, bag, wheel)
 └── styles/                   Tailwind + design tokens
+party/
+└── sync.ts                   PartyKit server (Yjs relay + Clerk JWT gate)
 e2e/                          Playwright smoke + a11y specs
 ```
 
@@ -81,13 +87,17 @@ Paths under `src/types/**` and `src/state/**` are the single source of truth for
 
 ```bash
 npm install
-npm run dev        # Vite dev server with HMR, http://localhost:5173
-npm run build      # tsc --build + vite build → dist/
-npm run preview    # serve dist/ locally to smoke-test the production bundle
-npm run lint       # ESLint flat config (src + e2e)
-npm test           # Vitest (unit + component)
-npm run e2e        # Playwright (smoke + axe-core a11y)
+npm run dev         # Vite dev server with HMR, http://localhost:5173
+npm run build       # tsc --build + vite build → dist/
+npm run preview     # serve dist/ locally to smoke-test the production bundle
+npm run lint        # ESLint flat config (src + e2e)
+npm test            # Vitest (unit + component)
+npm run e2e         # Playwright (smoke + axe-core a11y)
+npm run sync:dev    # PartyKit dev server for the Yjs relay (if you're hacking on party/sync.ts)
+npm run sync:deploy # Deploy party/sync.ts to your PartyKit project
 ```
+
+Cloud sync is fully optional. To enable it in local dev, create `.env` at the repo root with `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST`. With either unset, `SyncGate` short-circuits and the app behaves exactly like the legacy single-device build. See [`CLOUD_SYNC_SETUP.md`](CLOUD_SYNC_SETUP.md) for the Clerk + PartyKit bring-up steps.
 
 > **Note:** `npm test` maps to Vitest via the default `vitest` binary if not defined explicitly in `package.json` scripts. The scripts block currently ships `dev`, `build`, `lint`, `preview`, `e2e` — add a `"test": "vitest"` entry if you want one-word access. Vitest config lives in `vite.config.ts` (same config as the dev server).
 

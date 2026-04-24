@@ -47,6 +47,8 @@ Either way, Pages is now wired to the deploy workflow that lives in `.github/wor
 3. When it finishes, visit `https://<your-user>.github.io/kakeguruimasho/`.
 4. You should see onboarding. If the page is blank, jump to Troubleshooting below.
 
+> **Optional — cloud sync at build time.** The deploy workflow forwards `VITE_CLERK_PUBLISHABLE_KEY` and `VITE_PARTYKIT_HOST` from GitHub Actions repository secrets into the Pages build. If either is unset the deployed site runs in single-device mode (no sign-in screen); if both are set, the same build gains real-time cross-device sync. See [`CLOUD_SYNC_SETUP.md`](CLOUD_SYNC_SETUP.md) for how to stand up the Clerk + PartyKit tier-free accounts and where to paste the values.
+
 Verify the PWA is registered:
 
 - Open Chrome/Safari devtools → Application → Service Workers. You should see `workbox` registered and active.

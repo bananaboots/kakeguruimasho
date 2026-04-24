@@ -256,7 +256,7 @@ Data loss is the worst failure mode for this app — the whole system relies on 
 4. **Manual export button** → downloads full state as timestamped JSON file
 5. **Manual import button** → accepts JSON, validates schema, confirms overwrite
 6. **Schema versioning** in stored data; provide migration function for schema changes
-7. **CRDT sync layer.** State lives in a per-user Yjs doc persisted to IndexedDB (via `y-indexeddb`). A hosted relay (PartyKit or equivalent) fans updates out to the user's other signed-in devices. Offline edits merge deterministically on reconnect; local IndexedDB remains authoritative when the network is down.
+7. **CRDT sync layer (opt-in).** When `VITE_CLERK_PUBLISHABLE_KEY` and `VITE_PARTYKIT_HOST` are set at build time, the app mounts `<ClerkProvider>` around the UI, gates on sign-in, and wires a per-user `Y.Doc` to both `y-indexeddb` (local cache) and a `y-partykit` relay (`party/sync.ts`). One room per Clerk user id; the PartyKit worker rejects connections whose JWT `sub` claim doesn't match. Today's scaffold serializes `AppState` into one `Y.Map` entry — real-time sync works across devices, but concurrent offline edits resolve last-write-wins at the entry level until Phase 7 promotes individual slices (especially `history_events`) to native Yjs types. With the env vars unset, the app runs exactly like the legacy single-device build — no Clerk, no websocket, no sign-in gate. IndexedDB remains the authoritative local source of truth either way; `Settings → Export` is still mandatory as a belt-and-suspenders backup.
 
 Architecture agent must define the data schema and document it in an `ARCHITECTURE.md` file.
 

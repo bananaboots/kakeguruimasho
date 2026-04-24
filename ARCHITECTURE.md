@@ -33,8 +33,13 @@ All versions pinned to current-stable as of **April 2026**. Anything below marke
 | Format | Prettier | `^3.4.0` | Spec §7.1. |
 | Date math | native `Date` + `Intl` | — | Day-boundary logic (A5, A8) needs zero extra KB. Reject date-fns/Luxon unless a complex TZ case appears post-launch. |
 | RNG | `crypto.getRandomValues` via wrapper | — | PLANNING §4 — avoid `Math.random`. Wrapper lives in `src/lib/rng.ts` for seeding in tests. |
+| Cloud sync — CRDT | `yjs` + `y-indexeddb` | `^13.6.0` / `^9.0.0` | Optional. One `Y.Doc` per signed-in user; `y-indexeddb` mirrors it locally so offline-first still works. Scaffold today serializes full `AppState` as one JSON blob into a `Y.Map` entry — proper per-slice Yjs types is Phase 7. |
+| Cloud sync — relay | `y-partykit` + `partykit` | `^0.0.33` / `^0.0.115` | Hosted PartyKit worker (`party/sync.ts`) handles the Yjs websocket protocol; `onBeforeConnect` verifies a Clerk JWT and rejects anyone whose `sub` claim doesn't match the room id. Free tier (Cloudflare Workers, 100k req/day). |
+| Cloud sync — auth | `@clerk/clerk-react` + `@clerk/backend` | `^5.61.0` / `^3.3.0` | Client SDK + the backend verifier used inside the PartyKit worker. Free tier covers 10k MAU. Publishable key ships in the bundle; secret key lives only on the PartyKit relay. |
 
-**Explicitly rejected:** Redux Toolkit (heavier than Zustand for this scope), Dexie (bundle), date-fns (not needed for v1), Radix UI primitives directly (shadcn wraps them), react-spring (Framer Motion already chosen).
+Sync is fully gated on `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST` being set at build time. When either is missing, `SyncGate` is a passthrough and the app runs exactly like the legacy single-device build — no Clerk mount, no websocket, no sign-in screen. See `src/sync/provider.ts` for the gate logic and `CLOUD_SYNC_SETUP.md` for the setup walkthrough.
+
+**Explicitly rejected:** Redux Toolkit (heavier than Zustand for this scope), Dexie (bundle), date-fns (not needed for v1), Radix UI primitives directly (shadcn wraps them), react-spring (Framer Motion already chosen), Supabase/Firebase Realtime (neither supports proper CRDT merge semantics out of the box; picked Yjs for the Phase 7 path even though today's scaffold is LWW).
 
 **Uncertain (verify at bootstrap):** Framer Motion v12 major pin — if a v13 exists by bootstrap time, stay on v12 unless required. Tailwind v4 is new — if 3A hits breaking-config issues, fall back to `^3.4.0` is acceptable (no architectural impact).
 
@@ -49,7 +54,10 @@ kakeguruimasho/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml                       # [6] lint + test + build on PR
-│       └── deploy.yml                   # [6] build + publish gh-pages on main
+│       └── deploy.yml                   # [6] build + publish gh-pages on main (forwards VITE_CLERK_PUBLISHABLE_KEY + VITE_PARTYKIT_HOST)
+├── party/
+│   └── sync.ts                          # [Phase 7] PartyKit Yjs relay; Clerk JWT gate on onBeforeConnect
+├── partykit.json                        # [Phase 7] PartyKit project config
 ├── public/
 │   ├── icons/                           # [3J] apple-touch-icon sizes + favicon
 │   ├── splash/                          # [3J] pwa-asset-generator output
@@ -125,6 +133,10 @@ kakeguruimasho/
 │   │   │   └── settings.slice.ts        # [3A]
 │   │   ├── selectors.ts                 # [3A] derived values (jar total → $, hand groupings)
 │   │   └── persist.ts                   # [3A] Zustand IDB storage adapter
+│   ├── sync/                            # [Phase 7] optional cloud sync layer
+│   │   ├── SyncGate.tsx                 # wraps <App> in ClerkProvider + sign-in gate; passthrough when env unset
+│   │   ├── provider.ts                  # useSyncConnection() hook; owns the Y.Doc
+│   │   └── bridge.ts                    # round-trips AppState through Y.Map 'app'.state entry → actions.hydrate()
 │   ├── db/
 │   │   ├── schema.ts                    # [3A] store names, index names, version constant
 │   │   ├── open.ts                      # [3A] idb.openDB + upgrade router
@@ -199,7 +211,14 @@ export type HabitId  = string & { readonly __brand: "HabitId" };
 export type RewardId = string & { readonly __brand: "RewardId" };
 export type ClipId   = string & { readonly __brand: "ClipId" };
 export type EventId  = string & { readonly __brand: "EventId" };
-export type MilestoneId = "mini" | "mid" | "moonshot";
+// Phase 7: relaxed from the 'mini' | 'mid' | 'moonshot' union to a branded
+// string so users can add arbitrary intermediate milestones. The three
+// canonical ids ('mini' / 'mid' / 'moonshot') still always exist on every
+// jar; only the literal MOONSHOT_MILESTONE_ID triggers reset-on-claim.
+export type MilestoneId = string & { readonly __brand: "MilestoneId" };
+export const MINI_MILESTONE_ID     = "mini"     as MilestoneId;
+export const MID_MILESTONE_ID      = "mid"      as MilestoneId;
+export const MOONSHOT_MILESTONE_ID = "moonshot" as MilestoneId;
 
 export type ISOTimestamp = string & { readonly __brand: "ISOTimestamp" };
 export type LocalDate    = string & { readonly __brand: "LocalDate" }; // "YYYY-MM-DD" in device-local TZ (A8)
@@ -236,9 +255,10 @@ export type MilestoneClaim = {
 export type JarState = {
   jarId: JarId;
   total: number;                                          // running $, never resets on mini/mid claim (D1)
-  milestones: Record<MilestoneId, Milestone>;             // all three are always present, edited by user
+  milestones: Record<MilestoneId, Milestone>;             // three canonical always present; users can add more (Phase 7)
   claimed: Record<MilestoneId, MilestoneClaim>;           // D1: set non-null on user claim action
   // Moonshot claim triggers full-jar-reset flow (see AppState.pendingJarResets).
+  // resetJar() loops Object.keys(claimed) so user-added checkpoints clear too.
 };
 ```
 
@@ -634,11 +654,13 @@ Routing: `HashRouter` (spec §7, PLANNING Appendix). All paths mount under `/kak
     │                    ├── <BonusTimerCountdown />
     │                    └── <DiscountHabitPicker />
     └── /settings     → <Settings>                  // [3I]
+                         ├── <RewardsLinkCard />    // deep-links to /rewards T1/T2/T3 editor
                          ├── <WheelConfigEditor />
                          ├── <BagCompositionEditor />
                          ├── <HygieneCutoffEditor />
                          ├── <SfxHapticsToggles />
                          ├── <ExportImportPanel />
+                         ├── <HelpScreen />
                          └── <ResetAllDanger />     // triple-confirm
 ```
 
@@ -682,6 +704,9 @@ const actions = {
   expireBonusTimer(timerId: BonusTimerId): void,
   claimMilestone(jarId: JarId, milestone: MilestoneId): void,
   resetJar(jarId: JarId): void,                           // moonshot-triggered, D1
+  addMilestone(jarId: JarId, input: { label: string; target: number }): MilestoneId,  // Phase 7
+  removeMilestone(jarId: JarId, milestoneId: MilestoneId): void,                     // Phase 7; no-op on default ids
+  updateMilestones(jarId: JarId, patch: Record<MilestoneId, { label: string; target: number }>): void, // Phase 7; one audit event
   tickDailyStreak(jarId: JarId, date: LocalDate): void,
   // ...etc
 };

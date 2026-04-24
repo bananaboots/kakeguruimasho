@@ -50,6 +50,30 @@ Architect should ensure `WheelConfig` schema has a `mercyChance: number` field f
 
 ---
 
+## D6. Custom intermediate milestones — Phase 7 → **branded string, three canonical retained, Moonshot still the only reset**
+
+User asked to be able to add extra milestones to a jar beyond Mini / Mid / Moonshot.
+
+Decision: relax `MilestoneId` from the `'mini' | 'mid' | 'moonshot'` union to a branded string. The three canonical ids stay in every jar (exposed as `MINI_MILESTONE_ID` / `MID_MILESTONE_ID` / `MOONSHOT_MILESTONE_ID` constants). Users can add any number of extra checkpoints via `+ Add milestone` in `MilestoneEditor`; each gets a generated `MilestoneId` and shows up as a tick + unlock button at its target.
+
+Only the literal `MOONSHOT_MILESTONE_ID` still triggers the reset-on-claim flow (D1 is unchanged). Custom milestones are history-only — claiming one stamps `milestone_claimed { reset: false }` and leaves the jar total untouched. This keeps the D1 contract intact and avoids a UX landmine where a user labels an $80 checkpoint "Big One" and then it silently zeroes the jar.
+
+No migration needed: existing persisted state with `milestones.mini / .mid / .moonshot` keys is structurally compatible since the keys are already strings at runtime.
+
+---
+
+## D7. Cloud sync — Phase 7 → **opt-in, env-gated, Yjs + PartyKit + Clerk**
+
+Spec originally mandated "no backend, no accounts, no API keys." User requested real-time cross-device sync.
+
+Decision: introduce an optional sync layer gated entirely on build-time env vars. When `VITE_CLERK_PUBLISHABLE_KEY` and `VITE_PARTYKIT_HOST` are both set, the app mounts `<ClerkProvider>`, gates on sign-in, and wires a `Y.Doc` to `y-indexeddb` locally + `y-partykit` remotely. One room per Clerk user id; the worker verifies the JWT's `sub` matches on connect. When either env var is unset, `SyncGate` is a passthrough and the app is byte-for-byte the legacy single-device experience.
+
+Scaffold trades merge correctness for time-to-ship: `AppState` is serialized as one JSON blob into a `Y.Map` entry, so real-time sync works but concurrent offline edits are last-write-wins at the entry level. Proper per-slice CRDT mapping (starting with `history_events` → `Y.Array`) is tracked as Phase 7 follow-up. SPEC.md §7 updated accordingly; `SPEC.md` non-negotiable "no backend" clause removed.
+
+Free-tier provider picks: Clerk (10k MAU free), PartyKit on Cloudflare Workers (100k req/day free). Together: $0/month for personal/family scale. See `CLOUD_SYNC_SETUP.md` for the full setup walkthrough.
+
+---
+
 ## Status of non-blocking recommendations from PLANNING.md §1
 
 The DEFER items retain their `PLANNING.md` recommendations as the architect's defaults unless overridden here:

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Real-time cross-device sync (opt-in).** Sign in once, same jar on every device. Yjs doc persisted to IndexedDB via `y-indexeddb`, relayed through a PartyKit worker (`party/sync.ts`), JWT-gated by Clerk. One room per user id. Fully gated on build-time `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST` — with either unset the app behaves exactly like the legacy single-device build (no sign-in gate). Full setup in `CLOUD_SYNC_SETUP.md`.
+- **Custom intermediate jar milestones.** `MilestoneId` relaxed from the `'mini' \| 'mid' \| 'moonshot'` union to a branded string. The three canonical milestones still always exist; users can now add any number of extra checkpoints via `+ Add milestone` in `MilestoneEditor`. Store gains `addMilestone` / `removeMilestone` / `updateMilestones` actions. Only the literal `MOONSHOT_MILESTONE_ID` triggers the jar-reset-on-claim flow — extras are history-only.
+- **Rewards entry point in Settings.** New `RewardsLinkCard` panel shows active-reward counts per T1 / T2 / T3 and deep-links to the existing `/rewards` route (which had full tier CRUD but was unreachable from the UI).
+- **CI wiring for cloud sync.** `.github/workflows/deploy.yml` now forwards `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST` from GitHub Actions secrets into the Pages build.
+
+### Changed
+
+- **SPEC.md §7 / §8** dropped the "No backend. No API keys. No user accounts." non-negotiable. User accounts + sync relay are now permitted and expected (kept to free-tier providers). Offline-first is still mandatory and export/import still required as a belt-and-suspenders backup.
+
+### Deferred to Phase 7
+
+- Move `history_events` into a `Y.Array` and rebuild `AppState` as a derived view so concurrent offline edits merge granularly. Today the Yjs doc holds `AppState` as one JSON blob in a `Y.Map` entry, which is last-write-wins at the entry level — fine for one-user-at-a-time use, not for two-device simultaneous offline edits.
+- Sync status indicator in the top bar (connected / offline / syncing…).
+
 ## [1.0.0] — 2026-04-23
 
 Initial release. The full SpoonFedStudy "Slot Machine Habit System" methodology as an installable, offline-first PWA.
