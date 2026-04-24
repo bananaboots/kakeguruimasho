@@ -21,6 +21,7 @@ import { HashRouter } from 'react-router-dom';
 import App from './App.tsx';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { ToastProvider } from './ui/toast.tsx';
+import { SyncGate } from './sync/SyncGate.tsx';
 import './index.css';
 import './ui/ui.css';
 import './shell.css';
@@ -63,7 +64,9 @@ function mount(): void {
       <ErrorBoundary>
         <HashRouter>
           <ToastProvider>
-            <App />
+            <SyncGate>
+              <App />
+            </SyncGate>
           </ToastProvider>
         </HashRouter>
       </ErrorBoundary>

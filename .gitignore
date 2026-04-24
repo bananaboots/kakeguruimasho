@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Local env (contains Clerk/PartyKit keys); ship .env.example instead.
+.env
+.env.*
+!.env.example
+
+# PartyKit build output
+.partykit
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
