@@ -15,6 +15,9 @@ import {
   DEFAULT_JAR_ID,
   asClipId,
   asISO,
+  MINI_MILESTONE_ID,
+  MID_MILESTONE_ID,
+  MOONSHOT_MILESTONE_ID,
 } from '../../types/ids.ts';
 
 function fresh(): AppState {
@@ -127,15 +130,15 @@ describe('jars slice', () => {
             ...s.jars[DEFAULT_JAR_ID]!,
             total: 25,
             milestones: {
-              mini: { id: 'mini', label: 'mini', target: 20 },
-              mid: { id: 'mid', label: 'mid', target: 50 },
-              moonshot: { id: 'moonshot', label: 'moon', target: 100 },
+              [MINI_MILESTONE_ID]: { id: MINI_MILESTONE_ID, label: 'mini', target: 20 },
+              [MID_MILESTONE_ID]: { id: MID_MILESTONE_ID, label: 'mid', target: 50 },
+              [MOONSHOT_MILESTONE_ID]: { id: MOONSHOT_MILESTONE_ID, label: 'moon', target: 100 },
             },
           },
         },
       };
-      const next = claimMilestone(simulated, DEFAULT_JAR_ID, 'mini', asISO('2026-04-23T12:00:00.000Z'));
-      expect(next.jars[DEFAULT_JAR_ID]!.claimed.mini).not.toBeNull();
+      const next = claimMilestone(simulated, DEFAULT_JAR_ID, MINI_MILESTONE_ID, asISO('2026-04-23T12:00:00.000Z'));
+      expect(next.jars[DEFAULT_JAR_ID]!.claimed[MINI_MILESTONE_ID]).not.toBeNull();
       expect(next.jars[DEFAULT_JAR_ID]!.total).toBe(25); // unchanged per D1
     });
 
@@ -151,8 +154,8 @@ describe('jars slice', () => {
           },
         },
       };
-      const next = claimMilestone(simulated, DEFAULT_JAR_ID, 'mid', asISO('2026-04-23T12:00:00.000Z'));
-      expect(next.jars[DEFAULT_JAR_ID]!.claimed.mid).not.toBeNull();
+      const next = claimMilestone(simulated, DEFAULT_JAR_ID, MID_MILESTONE_ID, asISO('2026-04-23T12:00:00.000Z'));
+      expect(next.jars[DEFAULT_JAR_ID]!.claimed[MID_MILESTONE_ID]).not.toBeNull();
       expect(next.jars[DEFAULT_JAR_ID]!.total).toBe(55);
     });
 
@@ -171,18 +174,18 @@ describe('jars slice', () => {
       const afterClaim = claimMilestone(
         simulated,
         DEFAULT_JAR_ID,
-        'moonshot',
+        MOONSHOT_MILESTONE_ID,
         asISO('2026-04-23T12:00:00.000Z'),
       );
-      expect(afterClaim.jars[DEFAULT_JAR_ID]!.claimed.moonshot).not.toBeNull();
+      expect(afterClaim.jars[DEFAULT_JAR_ID]!.claimed[MOONSHOT_MILESTONE_ID]).not.toBeNull();
       expect(afterClaim.jars[DEFAULT_JAR_ID]!.total).toBe(200);
 
       // resetJar (moonshot-triggered): zero total AND clear claims.
       const afterReset = resetJar(afterClaim, DEFAULT_JAR_ID);
       expect(afterReset.jars[DEFAULT_JAR_ID]!.total).toBe(0);
-      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.mini).toBeNull();
-      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.mid).toBeNull();
-      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.moonshot).toBeNull();
+      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MINI_MILESTONE_ID]).toBeNull();
+      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MID_MILESTONE_ID]).toBeNull();
+      expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MOONSHOT_MILESTONE_ID]).toBeNull();
     });
   });
 });

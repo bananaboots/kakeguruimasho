@@ -1,0 +1,9 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "kakeguruimasho-sync",
+  "main": "party/sync.ts",
+  "compatibilityDate": "2024-09-25",
+  "vars": {
+    "CLERK_SECRET_KEY": ""
+  }
+}

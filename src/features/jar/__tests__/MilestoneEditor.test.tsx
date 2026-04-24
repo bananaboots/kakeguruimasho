@@ -11,7 +11,12 @@ import {
   setPersistenceEnabled,
 } from '../../../state/store.ts';
 import { seedInitialAppState } from '../../../data/defaults.ts';
-import { DEFAULT_JAR_ID } from '../../../types/ids.ts';
+import {
+  DEFAULT_JAR_ID,
+  MINI_MILESTONE_ID,
+  MID_MILESTONE_ID,
+  MOONSHOT_MILESTONE_ID,
+} from '../../../types/ids.ts';
 
 describe('<MilestoneEditor />', () => {
   beforeEach(() => {
@@ -61,12 +66,12 @@ describe('<MilestoneEditor />', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
 
     const jar = getAppStore().getState().jars[DEFAULT_JAR_ID]!;
-    expect(jar.milestones.mini.target).toBe(10);
-    expect(jar.milestones.mid.target).toBe(50);
-    expect(jar.milestones.moonshot.target).toBe(200);
-    expect(jar.milestones.mini.label).toBe('Small treat');
-    expect(jar.milestones.mid.label).toBe('Nice dinner');
-    expect(jar.milestones.moonshot.label).toBe('Hawaii');
+    expect(jar.milestones[MINI_MILESTONE_ID]!.target).toBe(10);
+    expect(jar.milestones[MID_MILESTONE_ID]!.target).toBe(50);
+    expect(jar.milestones[MOONSHOT_MILESTONE_ID]!.target).toBe(200);
+    expect(jar.milestones[MINI_MILESTONE_ID]!.label).toBe('Small treat');
+    expect(jar.milestones[MID_MILESTONE_ID]!.label).toBe('Nice dinner');
+    expect(jar.milestones[MOONSHOT_MILESTONE_ID]!.label).toBe('Hawaii');
   });
 
   it('requires labels on all three milestones', async () => {
@@ -85,7 +90,7 @@ describe('<MilestoneEditor />', () => {
     // store was NOT mutated rather than the alert text.
     await user.click(screen.getByRole('button', { name: /save/i }));
     const jar = getAppStore().getState().jars[DEFAULT_JAR_ID]!;
-    expect(jar.milestones.mid.label).toBe('');
-    expect(jar.milestones.mid.target).toBe(0);
+    expect(jar.milestones[MID_MILESTONE_ID]!.label).toBe('');
+    expect(jar.milestones[MID_MILESTONE_ID]!.target).toBe(0);
   });
 });

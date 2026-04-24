@@ -11,6 +11,7 @@ import {
   ExportImportPanel,
   ResetAllDanger,
   HelpScreen,
+  RewardsLinkCard,
 } from '../features/settings/index.ts';
 import { useAppStore } from '../state/store.ts';
 
@@ -24,6 +25,7 @@ export default function Settings() {
         </h1>
       </header>
       <div className="settings">
+        <RewardsLinkCard />
         <WheelConfigEditor jarId={activeJarId} />
         <BagCompositionEditor />
         <HygieneCutoffEditor />

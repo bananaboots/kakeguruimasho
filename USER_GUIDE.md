@@ -113,6 +113,8 @@ When you cross a Mini or Mid threshold, you get an unlock animation and a "claim
 
 When you cross Moonshot and claim it, the jar resets to $0 and the app asks if you want to reuse the same milestones or pick new ones. Then you go again.
 
+**Want more than three?** From the Jar screen tap **Edit milestones** and use **+ Add milestone** at the bottom. Extra milestones are pure checkpoints — they show up as ticks on the jar and unlock a claim button when you cross them, but they don't reset the jar. Only Moonshot does that. Extras can be removed anytime; the three canonical ones (Mini / Mid / Moonshot) can be edited but not removed.
+
 ---
 
 ## 7. Streaks
@@ -166,7 +168,7 @@ Why it matters:
 
 ### Export regularly
 
-Even with the PWA installed, you're on a single device with no cloud sync. **Export your data to a JSON file** every week or two (Settings → Export). If your phone dies, gets wiped, or iOS evicts the database, import restores everything exactly.
+Cloud sync is available if the deployment was built with auth wired up: sign in with email, and the same jar follows you to any device in real time (your phone + laptop will update each other within a second). When you're offline, the app keeps working on the local copy and merges back when you reconnect. If the env vars weren't set at build time the app just runs in single-device mode and you never see the sign-in screen — nothing changes for you. Either way, **export your data to a JSON file** every week or two (Settings → Export) as a belt-and-suspenders backup. If your phone dies, gets wiped, or iOS evicts the database, import restores everything exactly.
 
 ---
 
@@ -180,7 +182,7 @@ No clip. Streak ends. You keep whatever reward you earned from the original main
 - **JACKPOT** (2%) = instant T3 **regardless of what you cashed in**, PLUS a free bonus wheel spin. You don't need to have unlocked T3 — Jackpot bypasses the gating rules entirely.
 
 **Can I edit my rewards?**
-Yes. Rewards → T1 / T2 / T3 tabs → add, edit, archive, done. Pre-populated with a starter set you can keep, tweak, or wipe. The three reward rules are displayed next to the editor so you remember to vet new entries.
+Yes. Quickest path: Settings → **Reward menus** → Edit. That takes you to the same T1 / T2 / T3 tabs as the post-spin picker, plus the reward rules sidebar. Add, rename, archive. Pre-populated with a starter set you can keep, tweak, or wipe. Curating the menu **before** a spin lands is the whole point of the feature — so when the wheel stops on T3 you're not scrambling to invent something, you're just picking from your list.
 
 **Can I edit my habits?**
 Yes. Habits → edit, archive, add new. Five are seeded by default (Walk, Workout, Cleaning, Focused Work, Hygiene bundle). The Walk habit takes step counts and gives you one clip per 2,500 steps — enter 10,000 steps and get 4 clips at once.

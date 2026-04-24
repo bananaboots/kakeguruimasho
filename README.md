@@ -29,6 +29,8 @@ npm run dev
 
 Then open the URL Vite prints (usually `http://localhost:5173`). The first run triggers onboarding.
 
+Cloud sync is optional. Without env vars the app runs in legacy single-device mode with no sign-in gate. To enable real-time cross-device sync, set `VITE_CLERK_PUBLISHABLE_KEY` + `VITE_PARTYKIT_HOST` in `.env` — full walkthrough in [`CLOUD_SYNC_SETUP.md`](CLOUD_SYNC_SETUP.md).
+
 ## Build + deploy
 
 ```bash
@@ -42,6 +44,8 @@ Pushing to `main` triggers the GitHub Actions workflow which builds and publishe
 
 - React 19 + TypeScript (strict) on Vite 7
 - Zustand for state, IndexedDB (via `idb`) for durable persistence
+- Yjs + `y-indexeddb` + `y-partykit` for optional real-time sync; Clerk for auth (all env-gated)
+- PartyKit (Cloudflare Workers) for the sync relay — `party/sync.ts`
 - Tailwind CSS v4 + shadcn-style primitives
 - Framer Motion for the wheel + jar animations
 - `vite-plugin-pwa` for service worker + installable manifest
@@ -53,6 +57,8 @@ Pushing to `main` triggers the GitHub Actions workflow which builds and publishe
 - [`USER_GUIDE.md`](USER_GUIDE.md) — plain-language walkthrough for the owner/player
 - [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) — fork/modify/run locally
 - [`DEPLOYMENT.md`](DEPLOYMENT.md) — GitHub Pages + iOS install
+- [`CLOUD_SYNC_SETUP.md`](CLOUD_SYNC_SETUP.md) — Clerk + PartyKit setup for optional cross-device sync
+- [`DESIGN_BRIEF.md`](DESIGN_BRIEF.md) — handoff prompt for the wheel / jar / paperclip visual redesign
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — data schema, state topology, module boundaries
 - [`DECISIONS.md`](DECISIONS.md) — authoritative answers to spec open questions

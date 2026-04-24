@@ -16,7 +16,12 @@ import {
 } from '../../../state/store.ts';
 import { selectJarTotal } from '../../../state/selectors.ts';
 import { seedInitialAppState } from '../../../data/defaults.ts';
-import { DEFAULT_JAR_ID } from '../../../types/ids.ts';
+import {
+  DEFAULT_JAR_ID,
+  MINI_MILESTONE_ID,
+  MID_MILESTONE_ID,
+  MOONSHOT_MILESTONE_ID,
+} from '../../../types/ids.ts';
 import type { AppState } from '../../../types/app-state.ts';
 
 function seedWithMilestonesAndTotal(total: number): void {
@@ -35,9 +40,9 @@ function seedWithMilestonesAndTotal(total: number): void {
         ...jar,
         total,
         milestones: {
-          mini: { id: 'mini', label: 'Small treat', target: 10 },
-          mid: { id: 'mid', label: 'Nice dinner', target: 50 },
-          moonshot: { id: 'moonshot', label: 'Hawaii', target: 100 },
+          [MINI_MILESTONE_ID]: { id: MINI_MILESTONE_ID, label: 'Small treat', target: 10 },
+          [MID_MILESTONE_ID]: { id: MID_MILESTONE_ID, label: 'Nice dinner', target: 50 },
+          [MOONSHOT_MILESTONE_ID]: { id: MOONSHOT_MILESTONE_ID, label: 'Hawaii', target: 100 },
         },
       },
     },
@@ -64,7 +69,7 @@ describe('<MilestoneClaimModal />', () => {
     render(
       <MilestoneClaimModal
         jarId={DEFAULT_JAR_ID}
-        milestone="mini"
+        milestone={MINI_MILESTONE_ID}
         open={true}
         onClose={onClose}
       />,
@@ -72,13 +77,13 @@ describe('<MilestoneClaimModal />', () => {
 
     // Pre-condition: no claim stamp, total is 42.
     const before = getAppStore().getState();
-    expect(before.jars[DEFAULT_JAR_ID]!.claimed.mini).toBeNull();
+    expect(before.jars[DEFAULT_JAR_ID]!.claimed[MINI_MILESTONE_ID]).toBeNull();
     expect(selectJarTotal(before, DEFAULT_JAR_ID)).toBe(42);
 
     await user.click(screen.getByTestId('milestone-claim-claim'));
 
     const after = getAppStore().getState();
-    expect(after.jars[DEFAULT_JAR_ID]!.claimed.mini).not.toBeNull();
+    expect(after.jars[DEFAULT_JAR_ID]!.claimed[MINI_MILESTONE_ID]).not.toBeNull();
     // D1: total unchanged.
     expect(selectJarTotal(after, DEFAULT_JAR_ID)).toBe(42);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -91,7 +96,7 @@ describe('<MilestoneClaimModal />', () => {
     render(
       <MilestoneClaimModal
         jarId={DEFAULT_JAR_ID}
-        milestone="mid"
+        milestone={MID_MILESTONE_ID}
         open={true}
         onClose={() => {}}
       />,
@@ -99,7 +104,7 @@ describe('<MilestoneClaimModal />', () => {
     await user.click(screen.getByTestId('milestone-claim-claim'));
 
     const after = getAppStore().getState();
-    expect(after.jars[DEFAULT_JAR_ID]!.claimed.mid).not.toBeNull();
+    expect(after.jars[DEFAULT_JAR_ID]!.claimed[MID_MILESTONE_ID]).not.toBeNull();
     expect(selectJarTotal(after, DEFAULT_JAR_ID)).toBe(75);
   });
 
@@ -112,7 +117,7 @@ describe('<MilestoneClaimModal />', () => {
     render(
       <MilestoneClaimModal
         jarId={DEFAULT_JAR_ID}
-        milestone="moonshot"
+        milestone={MOONSHOT_MILESTONE_ID}
         open={true}
         onClose={onClose}
         onMoonshotReset={onReset}
@@ -122,7 +127,7 @@ describe('<MilestoneClaimModal />', () => {
     // Step 1: first tap stamps claimed.moonshot but does NOT reset.
     await user.click(screen.getByTestId('milestone-claim-claim'));
     const afterClaim = getAppStore().getState();
-    expect(afterClaim.jars[DEFAULT_JAR_ID]!.claimed.moonshot).not.toBeNull();
+    expect(afterClaim.jars[DEFAULT_JAR_ID]!.claimed[MOONSHOT_MILESTONE_ID]).not.toBeNull();
     expect(selectJarTotal(afterClaim, DEFAULT_JAR_ID)).toBe(120);
     expect(onClose).not.toHaveBeenCalled();
     expect(onReset).not.toHaveBeenCalled();
@@ -134,9 +139,9 @@ describe('<MilestoneClaimModal />', () => {
     await user.click(screen.getByTestId('milestone-claim-reset'));
     const afterReset = getAppStore().getState();
     expect(selectJarTotal(afterReset, DEFAULT_JAR_ID)).toBe(0);
-    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.mini).toBeNull();
-    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.mid).toBeNull();
-    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed.moonshot).toBeNull();
+    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MINI_MILESTONE_ID]).toBeNull();
+    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MID_MILESTONE_ID]).toBeNull();
+    expect(afterReset.jars[DEFAULT_JAR_ID]!.claimed[MOONSHOT_MILESTONE_ID]).toBeNull();
     expect(onReset).toHaveBeenCalledTimes(1);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -148,7 +153,7 @@ describe('<MilestoneClaimModal />', () => {
     render(
       <MilestoneClaimModal
         jarId={DEFAULT_JAR_ID}
-        milestone="moonshot"
+        milestone={MOONSHOT_MILESTONE_ID}
         open={true}
         onClose={() => {}}
       />,
@@ -158,6 +163,6 @@ describe('<MilestoneClaimModal />', () => {
     // User abandons before confirming reset.
     const after = getAppStore().getState();
     expect(selectJarTotal(after, DEFAULT_JAR_ID)).toBe(110);
-    expect(after.jars[DEFAULT_JAR_ID]!.claimed.moonshot).not.toBeNull();
+    expect(after.jars[DEFAULT_JAR_ID]!.claimed[MOONSHOT_MILESTONE_ID]).not.toBeNull();
   });
 });

@@ -46,6 +46,13 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Forwarded to Vite at build time. Safe to bake into the bundle:
+          # Clerk's publishable key and the PartyKit host are both public.
+          # If either is unset the app falls back to legacy single-device
+          # mode with no sign-in gate — CI still succeeds.
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_PARTYKIT_HOST: ${{ secrets.VITE_PARTYKIT_HOST }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -226,8 +226,11 @@ function describe(
   }
 }
 
-function prettyMilestone(id: 'mini' | 'mid' | 'moonshot'): string {
-  return id.charAt(0).toUpperCase() + id.slice(1);
+function prettyMilestone(id: string): string {
+  if (id === 'mini' || id === 'mid' || id === 'moonshot') {
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
+  return 'Milestone';
 }
 
 function prettyStreak(kind: 'daily' | 'hygiene' | 'bonus-chain'): string {

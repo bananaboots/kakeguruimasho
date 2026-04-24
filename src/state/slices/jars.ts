@@ -5,6 +5,8 @@
 import type { AppState, CashInResult } from '../../types/app-state.ts';
 import type { Clip, ClipColor } from '../../types/clip.ts';
 import type { ClipId, ISOTimestamp, JarId, MilestoneId } from '../../types/ids.ts';
+import { isDefaultMilestone } from '../../types/ids.ts';
+import type { Milestone, MilestoneClaim } from '../../types/jar.ts';
 
 // --- Internal helpers ---
 
@@ -165,9 +167,18 @@ export function claimMilestone(
 
 /**
  * D1: reset jar to $0, clear all claimed flags. Called only after moonshot.
+ * Iterates the milestone set dynamically so custom milestones added by the
+ * user are cleared too.
  */
 export function resetJar(state: AppState, jarId: JarId): AppState {
   const jar = expectJar(state, jarId);
+  const claimed: Record<MilestoneId, MilestoneClaim> = {} as Record<
+    MilestoneId,
+    MilestoneClaim
+  >;
+  for (const id of Object.keys(jar.milestones) as MilestoneId[]) {
+    claimed[id] = null;
+  }
   return {
     ...state,
     jars: {
@@ -175,7 +186,79 @@ export function resetJar(state: AppState, jarId: JarId): AppState {
       [jarId]: {
         ...jar,
         total: 0,
-        claimed: { mini: null, mid: null, moonshot: null },
+        claimed,
+      },
+    },
+  };
+}
+
+/**
+ * Add a new intermediate milestone to the jar. Returns the new state with
+ * both `milestones[id]` populated and `claimed[id]` initialized to null so
+ * the selectUnclaimedUnlocks derivation stays consistent.
+ */
+export function addMilestone(
+  state: AppState,
+  jarId: JarId,
+  milestone: Milestone,
+): AppState {
+  const jar = expectJar(state, jarId);
+  return {
+    ...state,
+    jars: {
+      ...state.jars,
+      [jarId]: {
+        ...jar,
+        milestones: { ...jar.milestones, [milestone.id]: milestone },
+        claimed: { ...jar.claimed, [milestone.id]: null },
+      },
+    },
+  };
+}
+
+/**
+ * Remove an intermediate milestone. The three default milestones
+ * (mini/mid/moonshot) cannot be removed — attempts to do so are a no-op.
+ */
+export function removeMilestone(
+  state: AppState,
+  jarId: JarId,
+  milestoneId: MilestoneId,
+): AppState {
+  if (isDefaultMilestone(milestoneId)) return state;
+  const jar = expectJar(state, jarId);
+  if (!(milestoneId in jar.milestones)) return state;
+  const nextMilestones = { ...jar.milestones };
+  delete nextMilestones[milestoneId];
+  const nextClaimed = { ...jar.claimed };
+  delete nextClaimed[milestoneId];
+  return {
+    ...state,
+    jars: {
+      ...state.jars,
+      [jarId]: {
+        ...jar,
+        milestones: nextMilestones,
+        claimed: nextClaimed,
+      },
+    },
+  };
+}
+
+/** Replace a subset of milestone labels / targets in one shot. Used by the editor. */
+export function updateMilestones(
+  state: AppState,
+  jarId: JarId,
+  patch: Record<MilestoneId, Milestone>,
+): AppState {
+  const jar = expectJar(state, jarId);
+  return {
+    ...state,
+    jars: {
+      ...state.jars,
+      [jarId]: {
+        ...jar,
+        milestones: { ...jar.milestones, ...patch },
       },
     },
   };

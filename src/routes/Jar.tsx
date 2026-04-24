@@ -20,6 +20,7 @@ import {
 } from '../features/jar/index.ts';
 import { Button } from '../ui/button.tsx';
 import { useAppStore } from '../state/store.ts';
+import { DEFAULT_MILESTONE_IDS } from '../types/ids.ts';
 
 export default function Jar() {
   const activeJarId = useAppStore((s) => s.activeJarId);
@@ -27,10 +28,10 @@ export default function Jar() {
 
   const firstRun = useMemo(() => {
     if (!milestones) return false;
-    return (
-      milestones.mini.target === 0 ||
-      milestones.mid.target === 0 ||
-      milestones.moonshot.target === 0
+    // First-run means any of the three canonical milestones is unconfigured
+    // (target still zero). Extra checkpoints added later don't count.
+    return DEFAULT_MILESTONE_IDS.some(
+      (id) => (milestones[id]?.target ?? 0) === 0,
     );
   }, [milestones]);
 

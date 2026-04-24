@@ -24,6 +24,7 @@ import { Button } from '../../ui/button.tsx';
 import { useAppStore } from '../../state/store.ts';
 import { selectJarTotal } from '../../state/selectors.ts';
 import type { JarId, MilestoneId } from '../../types/ids.ts';
+import { MOONSHOT_MILESTONE_ID } from '../../types/ids.ts';
 import type { Milestone } from '../../types/jar.ts';
 import { formatDollars } from './format.ts';
 import { MilestoneClaimModal } from './MilestoneClaimModal.tsx';
@@ -43,7 +44,15 @@ const INNER_Y = RIM_Y + 2;
 const INNER_W = VB_W - WALL_X * 2;
 const INNER_H = BASE_Y - INNER_Y - 2;
 
-const MILESTONE_ORDER: MilestoneId[] = ['mini', 'mid', 'moonshot'];
+/** Sort milestones by ascending dollar target so ticks render bottom-to-top. */
+function orderedMilestoneIds(
+  milestones: Record<MilestoneId, Milestone> | undefined,
+): MilestoneId[] {
+  if (!milestones) return [];
+  return (Object.keys(milestones) as MilestoneId[])
+    .filter((id) => milestones[id])
+    .sort((a, b) => milestones[a]!.target - milestones[b]!.target);
+}
 
 export interface JarVisualProps {
   jarId: JarId;
@@ -69,46 +78,45 @@ export function JarVisual({
   // under the right conditions produces an "infinite loop" warning +
   // setState-loop crash in production (caught by Phase 4 E2E).
   const claimed = useAppStore((s) => s.jars[jarId]?.claimed);
+  const orderedIds = useMemo(() => orderedMilestoneIds(milestones), [milestones]);
   const unclaimed = useMemo(() => {
     if (!milestones || !claimed) return [] as MilestoneId[];
-    const order: MilestoneId[] = ['mini', 'mid', 'moonshot'];
-    return order.filter((id) => {
+    return orderedIds.filter((id) => {
       const m = milestones[id];
       const c = claimed[id];
-      return m.target > 0 && total >= m.target && c === null;
+      return m !== undefined && m.target > 0 && total >= m.target && c == null;
     });
-  }, [milestones, claimed, total]);
+  }, [milestones, claimed, total, orderedIds]);
 
   const [claimOpen, setClaimOpen] = useState<MilestoneId | null>(
     initialClaimOpen,
   );
 
-  // Max is Moonshot target if > 0, else the max of configured milestones, else
-  // 1 (so the svg math doesn't divide by zero).
+  // Max is Moonshot target if > 0, else the max of configured milestones,
+  // else 1 (so the svg math doesn't divide by zero).
   const max = useMemo(() => {
     if (!milestones) return 1;
-    const m = milestones.moonshot.target;
-    if (m > 0) return m;
-    const fallback = Math.max(
-      milestones.mini.target,
-      milestones.mid.target,
-      milestones.moonshot.target,
-      1,
-    );
-    return fallback;
-  }, [milestones]);
+    const moonshot = milestones[MOONSHOT_MILESTONE_ID]?.target ?? 0;
+    if (moonshot > 0) return moonshot;
+    let best = 1;
+    for (const id of orderedIds) {
+      const t = milestones[id]?.target ?? 0;
+      if (t > best) best = t;
+    }
+    return best;
+  }, [milestones, orderedIds]);
 
   const ratio = Math.max(0, Math.min(1, total / Math.max(1, max)));
 
   // Figure out the label of the next unclaimed milestone to display.
   const next = useMemo<Milestone | null>(() => {
     if (!milestones) return null;
-    for (const id of MILESTONE_ORDER) {
+    for (const id of orderedIds) {
       const m = milestones[id];
-      if (m.target > 0 && total < m.target) return m;
+      if (m && m.target > 0 && total < m.target) return m;
     }
     return null;
-  }, [milestones, total]);
+  }, [milestones, total, orderedIds]);
 
   const valueText = next
     ? `${formatDollars(total)} of ${formatDollars(next.target)} toward ${next.label || next.id}`
@@ -205,29 +213,33 @@ export function JarVisual({
           strokeWidth={2}
         />
 
-        {/* Milestone ticks (D1: all three live on one cumulative jar). */}
+        {/* Milestone ticks (D1: all live on one cumulative jar, ordered by target). */}
         {milestones
-          ? MILESTONE_ORDER.map((id) => {
+          ? orderedIds.map((id) => {
               const m = milestones[id];
-              if (m.target <= 0) return null;
+              if (!m || m.target <= 0) return null;
+              const variant = id === MOONSHOT_MILESTONE_ID ? 'moonshot' : 'custom';
               const r = Math.max(0, Math.min(1, m.target / Math.max(1, max)));
               const y = INNER_Y + INNER_H * (1 - r);
               return (
-                <g key={id} className={`jar-visual__tick-group jar-visual__tick-group--${id}`}>
+                <g
+                  key={id}
+                  className={`jar-visual__tick-group jar-visual__tick-group--${variant}`}
+                >
                   <line
                     x1={INNER_X - 4}
                     x2={INNER_X + INNER_W + 4}
                     y1={y}
                     y2={y}
-                    className={`jar-visual__tick jar-visual__tick--${id}`}
+                    className={`jar-visual__tick jar-visual__tick--${variant}`}
                   />
                   {!condensed ? (
                     <text
                       x={INNER_X + INNER_W + 8}
                       y={y + 3}
-                      className={`jar-visual__tick-label jar-visual__tick-label--${id}`}
+                      className={`jar-visual__tick-label jar-visual__tick-label--${variant}`}
                     >
-                      {id}
+                      {labelFor(id, m.label)}
                     </text>
                   ) : null}
                 </g>
@@ -250,18 +262,21 @@ export function JarVisual({
 
         {unclaimed.length > 0 ? (
           <div className="jar-visual__unlocks" role="group" aria-label="Unclaimed milestones">
-            {unclaimed.map((id) => (
-              <Button
-                key={id}
-                variant={id === 'moonshot' ? 'gold' : 'primary'}
-                size="sm"
-                className={`jar-visual__unlock-btn ${id === 'moonshot' ? 'jar-visual__unlock-btn--moonshot' : ''}`}
-                onClick={() => handleOpenClaim(id)}
-                data-testid={`jar-visual-claim-${id}`}
-              >
-                {labelFor(id, milestones?.[id]?.label)} unlocked
-              </Button>
-            ))}
+            {unclaimed.map((id) => {
+              const isMoonshot = id === MOONSHOT_MILESTONE_ID;
+              return (
+                <Button
+                  key={id}
+                  variant={isMoonshot ? 'gold' : 'primary'}
+                  size="sm"
+                  className={`jar-visual__unlock-btn ${isMoonshot ? 'jar-visual__unlock-btn--moonshot' : ''}`}
+                  onClick={() => handleOpenClaim(id)}
+                  data-testid={`jar-visual-claim-${id}`}
+                >
+                  {labelFor(id, milestones?.[id]?.label)} unlocked
+                </Button>
+              );
+            })}
           </div>
         ) : null}
       </div>
@@ -291,5 +306,11 @@ export function JarVisual({
 
 function labelFor(id: MilestoneId, label: string | undefined): string {
   if (label && label.trim().length > 0) return label;
-  return id.charAt(0).toUpperCase() + id.slice(1);
+  // The three canonical ids ('mini' / 'mid' / 'moonshot') look fine
+  // title-cased. Custom ids are UUID-ish strings, so fall back to a
+  // generic "Milestone" label if the user hasn't named them yet.
+  if (id === 'mini' || id === 'mid' || id === MOONSHOT_MILESTONE_ID) {
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
+  return 'Milestone';
 }
