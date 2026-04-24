@@ -1,0 +1,340 @@
+/*
+ * jar.css — Styles for the Jar & Streak feature (3G).
+ * Mobile-first. Relies on 3J design tokens (src/styles/tokens.css).
+ */
+
+/* ------------------------------------------------------------------ */
+/* JarVisual                                                           */
+/* ------------------------------------------------------------------ */
+
+.jar-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.jar-visual--condensed {
+  padding: var(--space-2);
+  gap: var(--space-2);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.jar-visual__svg {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+  flex: 0 0 auto;
+}
+
+.jar-visual--condensed .jar-visual__svg {
+  max-width: 96px;
+}
+
+.jar-visual__summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-1);
+}
+
+.jar-visual--condensed .jar-visual__summary {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.jar-visual__total {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.jar-visual--condensed .jar-visual__total {
+  font-size: var(--text-lg);
+}
+
+.jar-visual__next {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.jar-visual__unlocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: center;
+}
+
+.jar-visual__unlock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.jar-visual__unlock-btn--moonshot {
+  /* gold-accent hint for moonshot */
+  background: var(--color-gold);
+  color: #111;
+  border-color: var(--color-gold);
+}
+
+/* Milestone ticks along the jar fill */
+.jar-visual__tick {
+  stroke: var(--color-border-strong);
+  stroke-width: 2;
+}
+
+.jar-visual__tick--mini {
+  stroke: var(--color-text-muted);
+}
+
+.jar-visual__tick--mid {
+  stroke: var(--color-accent);
+}
+
+.jar-visual__tick--moonshot {
+  stroke: var(--color-gold);
+  stroke-width: 3;
+}
+
+.jar-visual__tick-label {
+  fill: var(--color-text-faint);
+  font-size: 10px;
+  font-family: var(--font-sans);
+}
+
+.jar-visual__tick-label--moonshot {
+  fill: var(--color-gold);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/* MilestoneEditor                                                     */
+/* ------------------------------------------------------------------ */
+
+.milestone-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.milestone-editor__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.milestone-editor__row-fields {
+  display: grid;
+  grid-template-columns: 1fr minmax(6rem, 8rem);
+  gap: var(--space-2);
+}
+
+.milestone-editor__legend {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.milestone-editor__error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.milestone-editor__actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+/* ------------------------------------------------------------------ */
+/* MilestoneClaimModal                                                 */
+/* ------------------------------------------------------------------ */
+
+.milestone-claim {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: min(360px, 90vw);
+}
+
+.milestone-claim__headline {
+  margin: 0;
+  font-size: var(--text-xl);
+}
+
+.milestone-claim__label {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.milestone-claim__actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+/* ------------------------------------------------------------------ */
+/* ActivityFeed                                                        */
+/* ------------------------------------------------------------------ */
+
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.activity-feed__empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.activity-feed__day {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.activity-feed__day-heading {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+.activity-feed__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.activity-feed__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+}
+
+.activity-feed__item--subtle {
+  opacity: 0.75;
+}
+
+.activity-feed__item-icon {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+  display: inline-flex;
+}
+
+.activity-feed__item-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.activity-feed__item-time {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+/* ------------------------------------------------------------------ */
+/* StreakDisplay                                                       */
+/* ------------------------------------------------------------------ */
+
+.streak-display {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.streak-display::-webkit-scrollbar {
+  display: none;
+}
+
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex: 0 0 auto;
+  min-height: var(--tap-target-min);
+  min-width: 0;
+}
+
+.streak-chip--active-today {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent) inset;
+}
+
+.streak-chip__icon {
+  color: var(--color-accent);
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.streak-chip__body {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.streak-chip__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: capitalize;
+}
+
+.streak-chip__values {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.streak-chip__longest {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-weight: 400;
+  margin-left: 0.25rem;
+}

@@ -1,0 +1,114 @@
+/*
+ * bag-composition-view.css — Styles for <BagCompositionView />.
+ * Mobile-first: tiles auto-fit starting at a comfortable 56px minimum and
+ * grow to fill wider screens. Uses 3J design tokens only — no hard-coded
+ * colors beyond transparent/overlay.
+ */
+
+.bag-composition {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bag-composition__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bag-composition__title {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.bag-composition__total {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bag-composition__total-label {
+  color: var(--color-text-faint);
+}
+
+.bag-composition__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+  gap: var(--space-2);
+}
+
+.bag-composition__tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  min-height: var(--tap-target-min); /* SPEC §4 tap target, even though non-interactive */
+}
+
+.bag-composition__swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.bag-composition__count {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.bag-composition__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  text-transform: capitalize;
+  line-height: 1;
+}
+
+/* Gold tile — the whole point of §5.3 / SPEC §12 "make gold feel special". */
+.bag-composition__tile--gold {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 215, 0, 0.12),
+    rgba(255, 215, 0, 0.04)
+  );
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 1px var(--color-gold-glow) inset;
+}
+
+.bag-composition__swatch--gold {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #fff4a8,
+    var(--color-gold) 55%,
+    #c9a400 100%
+  );
+  border-color: var(--color-gold);
+  box-shadow: 0 0 8px var(--color-gold-glow);
+}
+
+.bag-composition__tile--gold .bag-composition__count,
+.bag-composition__tile--gold .bag-composition__label {
+  color: var(--color-gold);
+}

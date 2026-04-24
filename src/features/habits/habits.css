@@ -1,0 +1,307 @@
+/*
+ * habits.css — styles scoped to the habit feature (3D).
+ * Uses design tokens from src/styles/tokens.css. Mobile-first; one-handed.
+ */
+
+/* -------- HabitList -------- */
+
+.habit-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.habit-list__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.habit-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.habit-list__item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.habit-list__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.habit-list__name {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.habit-list__unit {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.habit-list__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.habit-list__actions .btn--primary {
+  flex: 1 1 auto;
+  min-width: 160px;
+}
+
+.habit-list__empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--space-6) var(--space-3);
+}
+
+/* -------- QuickLogButton grid on Home -------- */
+
+.quicklog-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+
+@media (min-width: 480px) {
+  .quicklog-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.quicklog {
+  width: 100%;
+}
+
+/* -------- StepEntry -------- */
+
+.step-entry__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.step-entry__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.step-entry__preview {
+  min-height: 22px;
+  margin: 0 0 var(--space-4);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+
+.step-entry__preview-hint {
+  color: var(--color-text-muted);
+}
+
+.step-entry__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* Flying clips animation. Render a small row of dots that scale + translate
+ * toward a conceptual "hand" target. CSS-only — no Framer Motion. */
+
+.step-entry__fly-stage {
+  position: relative;
+  height: 56px;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.step-entry__fly-clip {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px rgba(229, 57, 53, 0.45);
+  opacity: 0;
+  animation: step-entry-fly 700ms var(--ease-out) forwards;
+}
+
+@keyframes step-entry-fly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(20vw, -40vh) scale(0.3);
+  }
+}
+
+/* -------- HabitEditor -------- */
+
+.habit-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.habit-editor__label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.habit-editor__kind-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.habit-editor__unit-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.habit-editor__subitems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.habit-editor__subitem-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.habit-editor__subitem-row .input {
+  flex: 1 1 auto;
+}
+
+.habit-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+/* -------- HygieneBundle -------- */
+
+.hygiene-bundle {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hygiene-bundle__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hygiene-bundle__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: 0;
+}
+
+.hygiene-bundle__cutoff {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.hygiene-bundle__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hygiene-bundle__item {
+  border-radius: var(--radius-sm);
+}
+
+.hygiene-bundle__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-target-min);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--color-surface-2);
+}
+
+.hygiene-bundle__row:hover {
+  background: var(--color-surface-3);
+}
+
+.hygiene-bundle__checkbox {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.hygiene-bundle__checkbox:disabled + .hygiene-bundle__label {
+  color: var(--color-text-faint);
+}
+
+.hygiene-bundle__label {
+  font-size: var(--text-base);
+  color: var(--color-text);
+  text-transform: capitalize;
+}
+
+.hygiene-bundle__awarded {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+/* -------- InlineTimer -------- */
+
+.habit-inline-timer {
+  width: 100%;
+}

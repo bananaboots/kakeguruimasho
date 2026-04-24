@@ -1,0 +1,95 @@
+/**
+ * Jar route — mounts <JarVisual>, <MilestoneEditor>, <StreakDisplay>, and
+ * the activity feed preview. The MilestoneClaimModal is mounted INSIDE
+ * <JarVisual> (it opens in response to clicks on unclaimed-unlock buttons).
+ *
+ * Flow:
+ *  - If the jar has unconfigured milestones (target === 0), the editor is
+ *    expanded in "first-run" mode. Otherwise a collapsed "Edit milestones"
+ *    button toggles it.
+ *  - After a Moonshot reset, JarVisual dispatches a `jar:reset-complete`
+ *    CustomEvent on the document; we listen and open the editor.
+ */
+
+import { useEffect, useMemo, useState } from 'react';
+import {
+  JarVisual,
+  MilestoneEditor,
+  ActivityFeed,
+  StreakDisplay,
+} from '../features/jar/index.ts';
+import { Button } from '../ui/button.tsx';
+import { useAppStore } from '../state/store.ts';
+
+export default function Jar() {
+  const activeJarId = useAppStore((s) => s.activeJarId);
+  const milestones = useAppStore((s) => s.jars[activeJarId]?.milestones);
+
+  const firstRun = useMemo(() => {
+    if (!milestones) return false;
+    return (
+      milestones.mini.target === 0 ||
+      milestones.mid.target === 0 ||
+      milestones.moonshot.target === 0
+    );
+  }, [milestones]);
+
+  const [editorOpen, setEditorOpen] = useState<boolean>(firstRun);
+
+  // If firstRun transitions to true (e.g. just reset), pop the editor open.
+  // "Adjust state during render" pattern via a previous-value marker avoids a
+  // setState inside useEffect (react-hooks/set-state-in-effect).
+  const [prevFirstRun, setPrevFirstRun] = useState<boolean>(firstRun);
+  if (prevFirstRun !== firstRun) {
+    setPrevFirstRun(firstRun);
+    if (firstRun) setEditorOpen(true);
+  }
+
+  // Listen for the reset-complete signal the claim modal fires.
+  useEffect(() => {
+    const handler = (): void => setEditorOpen(true);
+    document.addEventListener('jar:reset-complete', handler);
+    return (): void => document.removeEventListener('jar:reset-complete', handler);
+  }, []);
+
+  return (
+    <section className="route" aria-labelledby="jar-title">
+      <header className="route__header">
+        <h1 id="jar-title" className="route__title">
+          Jar
+        </h1>
+        <p className="route__subtitle">Long-game progress toward your milestones.</p>
+      </header>
+
+      <StreakDisplay jarId={activeJarId} />
+
+      <JarVisual jarId={activeJarId} />
+
+      {editorOpen ? (
+        firstRun ? (
+          <MilestoneEditor
+            jarId={activeJarId}
+            forceFirstRun
+            onSave={() => setEditorOpen(false)}
+          />
+        ) : (
+          <MilestoneEditor
+            jarId={activeJarId}
+            onSave={() => setEditorOpen(false)}
+            onCancel={() => setEditorOpen(false)}
+          />
+        )
+      ) : (
+        <Button
+          variant="secondary"
+          onClick={() => setEditorOpen(true)}
+          data-testid="jar-edit-milestones"
+        >
+          Edit milestones
+        </Button>
+      )}
+
+      <ActivityFeed jarId={activeJarId} days={7} />
+    </section>
+  );
+}

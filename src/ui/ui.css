@@ -1,0 +1,379 @@
+/*
+ * ui.css — styles for the vendored shadcn primitives.
+ * Single sheet so tree-shaking concerns don't fragment the cascade.
+ * Imported once from `src/main.tsx`.
+ */
+
+/* ============================================================ Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-align: center;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  padding-inline: var(--space-4);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn--size-sm {
+  min-height: 36px; /* intentional: sub-44 only when inside a grouped list of ≥3 items where the parent ensures 44pt row height */
+  padding-inline: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.btn--size-md {
+  font-size: var(--text-base);
+}
+
+.btn--size-lg {
+  min-height: 52px;
+  padding-inline: var(--space-5);
+  font-size: var(--text-lg);
+}
+
+.btn--size-icon {
+  width: var(--tap-target-min);
+  height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+  padding: 0;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+.btn--primary:active:not(:disabled) {
+  background: var(--color-accent-pressed);
+}
+
+.btn--secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+.btn--secondary:hover:not(:disabled) {
+  background: var(--color-surface-3);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text);
+}
+.btn--ghost:hover:not(:disabled) {
+  background: var(--color-surface-2);
+}
+
+.btn--danger {
+  background: var(--color-danger);
+  color: var(--color-accent-contrast);
+}
+
+.btn--gold {
+  background: var(--color-gold);
+  color: #1a1a1a;
+  box-shadow: 0 0 24px var(--color-gold-glow);
+}
+
+.btn--unstyled {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  min-width: 0;
+}
+
+/* ============================================================ Dialog */
+.dialog__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 1000;
+  animation: dialog-fade var(--duration-base) var(--ease-out);
+}
+
+.dialog__content {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-modal);
+  padding: var(--space-5);
+  max-width: min(92vw, 480px);
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+  z-index: 1001;
+  animation: dialog-pop var(--duration-base) var(--ease-out);
+}
+
+.dialog__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: 0 0 var(--space-2);
+}
+
+.dialog__description {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+}
+
+.dialog__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+}
+
+@keyframes dialog-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================================ Tabs */
+.tabs__list {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-surface-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+}
+
+.tabs__trigger {
+  flex: 1 1 0;
+  min-height: 40px;
+  padding-inline: var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-weight: 500;
+  background: transparent;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.tabs__trigger[data-state='active'] {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.tabs__trigger:hover:not([data-state='active']) {
+  color: var(--color-text);
+}
+
+.tabs__panel[data-state='inactive'] {
+  display: none;
+}
+
+/* ============================================================ Toast */
+.toast__viewport {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 1100;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+  animation: toast-in var(--duration-base) var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.toast--sticky {
+  border-color: var(--color-accent);
+}
+
+.toast__body {
+  flex: 1 1 auto;
+  font-size: var(--text-sm);
+}
+
+.toast__title {
+  font-weight: 600;
+}
+
+.toast__description {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  margin-top: 2px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================ Input */
+.input {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+}
+
+.input::placeholder {
+  color: var(--color-text-faint);
+}
+
+/* ============================================================ Switch */
+.switch {
+  --switch-w: 44px;
+  --switch-h: 26px;
+  --knob: 20px;
+  position: relative;
+  width: var(--switch-w);
+  height: var(--switch-h);
+  background: var(--color-surface-3);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--duration-fast) var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.switch[data-state='checked'] {
+  background: var(--color-accent);
+}
+
+.switch__knob {
+  width: var(--knob);
+  height: var(--knob);
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--duration-fast) var(--ease-out);
+  transform: translateX(0);
+}
+
+.switch[data-state='checked'] .switch__knob {
+  transform: translateX(calc(var(--switch-w) - var(--knob) - 6px));
+}
+
+/* ============================================================ Slider */
+.slider {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-target-min);
+  touch-action: none;
+}
+
+.slider__track {
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: var(--radius-pill);
+}
+
+.slider__range {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-pill);
+}
+
+.slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================ Popover */
+.popover {
+  position: absolute;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-3);
+  z-index: 950;
+  min-width: 180px;
+  animation: popover-in var(--duration-fast) var(--ease-out);
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

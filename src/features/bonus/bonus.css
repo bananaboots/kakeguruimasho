@@ -1,0 +1,234 @@
+/*
+ * bonus.css — bonus-timer styles (3H).
+ * Uses design tokens from src/styles/tokens.css.
+ */
+
+/* ---------- Sticky banner ---------- */
+
+.bonus-banner {
+  position: sticky;
+  top: 0;
+  z-index: 950; /* above content, below modal/toast viewports */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(
+    90deg,
+    rgba(229, 57, 53, 0.16),
+    rgba(229, 57, 53, 0.06)
+  );
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.bonus-banner:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(229, 57, 53, 0.24),
+    rgba(229, 57, 53, 0.08)
+  );
+}
+
+.bonus-banner__badge {
+  font-weight: 700;
+  color: var(--color-accent);
+  background: rgba(229, 57, 53, 0.18);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+}
+
+.bonus-banner__countdown {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.bonus-banner__habit {
+  color: var(--color-text-muted);
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bonus-banner__more {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  font-size: var(--text-xs);
+  font-weight: 500;
+}
+
+/* ---------- Countdown ---------- */
+
+.bonus-countdown {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.bonus-countdown--compact {
+  gap: var(--space-1);
+}
+
+.bonus-countdown__value {
+  font-weight: 600;
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.bonus-countdown--compact .bonus-countdown__value {
+  font-size: var(--text-sm);
+}
+
+.bonus-countdown__label {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* ---------- /bonus route body ---------- */
+
+.bonus-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.bonus-detail__timer-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bonus-detail__timer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.bonus-detail__timer-title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+.bonus-detail__timer-sub {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.bonus-detail__expired {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.bonus-detail__empty {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.bonus-detail__empty-link {
+  color: var(--color-accent);
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  margin-top: var(--space-2);
+}
+
+/* ---------- Discount habit picker ---------- */
+
+.bonus-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.bonus-picker__prompt {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.bonus-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bonus-picker__item {
+  margin: 0;
+}
+
+.bonus-picker__btn {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.bonus-picker__name {
+  font-weight: 600;
+}
+
+.bonus-picker__unit {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  margin-left: var(--space-2);
+}
+
+.bonus-picker__empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Just a little bit more ---------- */
+
+.bonus-littlemore {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bonus-littlemore__prompt {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.bonus-littlemore__sub {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.bonus-littlemore__cta {
+  width: 100%;
+  margin-top: var(--space-2);
+}

@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  # Also run on pushes to main to catch breaks between PR-merge and deploy.
+  push:
+    branches: [main]
+
+jobs:
+  build-test:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      # Bundle-size gate: the main app chunk must stay under 100 KB gzipped.
+      # See AUDIT.md and ARCHITECTURE §9 for budget justification.
+      - name: Bundle size gate (main chunk <= 100 KB gz)
+        run: |
+          set -euo pipefail
+          main_js=$(ls dist/assets/index-*.js | head -n 1)
+          if [ -z "${main_js}" ]; then
+            echo "ERROR: could not find dist/assets/index-*.js"
+            exit 1
+          fi
+          gz_bytes=$(gzip -c "${main_js}" | wc -c | tr -d ' ')
+          limit=$((100 * 1024))
+          echo "Main bundle: ${main_js}"
+          echo "  gz size:   ${gz_bytes} bytes"
+          echo "  limit:     ${limit} bytes (100 KB)"
+          if [ "${gz_bytes}" -gt "${limit}" ]; then
+            echo "::error::Main bundle ${gz_bytes} B exceeds 100 KB gz budget."
+            exit 1
+          fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

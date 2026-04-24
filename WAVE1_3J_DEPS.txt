@@ -1,0 +1,21 @@
+Dependencies that 3J would add if allowed to modify package.json.
+Per brief, these are NOT installed. The shell works without them thanks to
+pure-React fallbacks in src/ui/**. Install these post-hoc to swap in richer
+Radix/shadcn behavior behind the same API.
+
+# className helpers (used by src/ui/utils.ts cn())
+class-variance-authority
+clsx
+tailwind-merge
+
+# Radix primitives that shadcn wraps. Our current src/ui/** provides a
+# reduced-surface pure-React implementation; swap once deps are available.
+@radix-ui/react-dialog
+@radix-ui/react-tabs
+@radix-ui/react-toast
+@radix-ui/react-slider
+@radix-ui/react-switch
+@radix-ui/react-popover
+@radix-ui/react-slot
+
+# Icon set is already installed (lucide-react). No action needed.

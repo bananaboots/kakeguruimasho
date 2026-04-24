@@ -1,0 +1,183 @@
+/*
+ * rewards.css — Styles for the 3F reward-menu feature.
+ * Mobile-first; all values route through 3J design tokens.
+ */
+
+/* ---------- Reward menu (list view inside a tier tab) ---------- */
+
+.reward-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reward-menu__toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.reward-menu__empty {
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-card);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.reward-menu__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.reward-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--tap-target-min);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.reward-menu__item[data-archived='true'] {
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.reward-menu__label {
+  color: var(--color-text);
+  flex: 1;
+}
+
+.reward-menu__actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* ---------- Reward editor modal ---------- */
+
+.reward-editor__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.reward-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.reward-editor__label-text {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.reward-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+/* ---------- Reward picker modal (post-win) ---------- */
+
+.reward-picker__list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.reward-picker__option {
+  min-height: var(--tap-target-min);
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.reward-picker__option:hover,
+.reward-picker__option:focus {
+  background: var(--color-surface-3);
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.reward-picker__footer,
+.reward-picker__empty-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.reward-picker__empty-actions {
+  justify-content: stretch;
+  flex-direction: column;
+}
+
+/* ---------- Reward-rules sidebar (A19 verbatim copy) ---------- */
+
+.reward-rules {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.reward-rules__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.reward-rules__title {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+
+.reward-rules__list {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reward-rules__item {
+  border-left: 2px solid var(--color-accent);
+  padding-left: var(--space-3);
+}
+
+.reward-rules__heading {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-base);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reward-rules__body {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
