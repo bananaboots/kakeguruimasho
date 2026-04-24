@@ -166,7 +166,7 @@ Why it matters:
 
 ### Export regularly
 
-Even with the PWA installed, you're on a single device with no cloud sync. **Export your data to a JSON file** every week or two (Settings → Export). If your phone dies, gets wiped, or iOS evicts the database, import restores everything exactly.
+Cloud sync is on the roadmap (sign in once, the same jar follows you to any device in real time). Until it ships — and as a belt-and-suspenders backup even after it does — **export your data to a JSON file** every week or two (Settings → Export). If your phone dies, gets wiped, or iOS evicts the database, import restores everything exactly.
 
 ---
 

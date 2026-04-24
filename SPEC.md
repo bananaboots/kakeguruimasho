@@ -20,7 +20,7 @@ Full methodology reference: SpoonFedStudy's "Slot Machine Habit System" PDF + co
 - **Technical level:** Senior React engineer; will fork, modify, and self-host the repo
 - **Use pattern:** Opens app 4–8× per day to log habit completions and spin
 - **Hosting preference:** GitHub Pages (free static hosting)
-- **Cloud sync:** Not required for v1 (single-user, single-device). Export/import for backup *is* required.
+- **Cloud sync:** Real-time cross-device sync is a goal (see §7 and §8). Export/import for backup is still required as an offline fallback.
 - **Location:** San Diego, CA (affects default reward suggestions)
 
 ---
@@ -41,11 +41,12 @@ Full methodology reference: SpoonFedStudy's "Slot Machine Habit System" PDF + co
 - Local persistence (survives browser close, phone restart, PWA reinstall edge cases)
 - Export / import all data as JSON
 - PWA manifest + service worker (installable to home screen, works offline)
+- User accounts (email / magic link) so the same jar follows the user across devices
+- Real-time cross-device sync via a CRDT relay
 
 ### 3.2 Out of scope (v1)
 
-- Multi-user accounts
-- Cross-device sync / cloud backend
+- Multi-tenant / shared jars between different users
 - Push notifications (iOS PWA limitation anyway)
 - Analytics / telemetry
 - Social features / sharing
@@ -226,9 +227,10 @@ Leave blank on first run; prompt user to define during onboarding. Placeholder c
 - **Framework:** React 18+ with TypeScript (strict mode)
 - **Bundler:** Vite
 - **Deployment:** GitHub Pages (static). Build output → `/docs` or `gh-pages` branch
-- **Persistence:** Client-side only. IndexedDB via `idb-keyval` or `Dexie` for durable storage. **`localStorage` is insufficient** for the bag/history data we're tracking and has eviction risk on iOS.
+- **Persistence:** IndexedDB is the local source of truth (via `idb-keyval` or `Dexie`); **`localStorage` is insufficient** for the bag/history data we're tracking and has eviction risk on iOS. A CRDT doc (Yjs) is layered on top so the same state can sync across devices.
 - **PWA:** Installable on iOS home screen. Service worker caches shell + assets for offline use.
-- **No backend.** No API keys. No user accounts.
+- **Cloud services:** User accounts and a real-time sync relay are permitted and expected. Prefer free, hosted providers (e.g. Clerk or Supabase Auth for accounts; PartyKit / Liveblocks / y-sweet for the Yjs relay). No long-lived secrets in the client bundle — only publishable keys.
+- **Offline-first is still mandatory.** The app must boot, read, and write with zero network; sync reconciles on reconnect.
 - **Base path:** Must deploy under `/<repo-name>/` correctly (configure Vite `base` and React Router accordingly, or use `HashRouter` to side-step GH Pages SPA routing pain)
 
 ### 7.1 Recommended (but architecture agent may override with justification)
@@ -254,6 +256,7 @@ Data loss is the worst failure mode for this app — the whole system relies on 
 4. **Manual export button** → downloads full state as timestamped JSON file
 5. **Manual import button** → accepts JSON, validates schema, confirms overwrite
 6. **Schema versioning** in stored data; provide migration function for schema changes
+7. **CRDT sync layer.** State lives in a per-user Yjs doc persisted to IndexedDB (via `y-indexeddb`). A hosted relay (PartyKit or equivalent) fans updates out to the user's other signed-in devices. Offline edits merge deterministically on reconnect; local IndexedDB remains authoritative when the network is down.
 
 Architecture agent must define the data schema and document it in an `ARCHITECTURE.md` file.
 
@@ -502,7 +505,6 @@ Planning agent must propose options and surface these for human decision before 
 ## 14. Out-of-Scope but Worth Recording for v2
 
 - HealthKit / Google Fit integration for automatic step count
-- Cloud sync via Supabase / Firebase (enables multi-device)
 - Optional accountability partner view (read-only share link)
 - iOS native wrapper via Capacitor for real push notifications
 - Apple Watch companion for quick logging
