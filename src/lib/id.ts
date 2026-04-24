@@ -1,6 +1,13 @@
 // UUIDv7-style monotonic ID factory (R5 collision-proofing).
 
-import type { ClipId, EventId, HabitId, RewardId, BonusTimerId } from '../types/ids.ts';
+import type {
+  ClipId,
+  EventId,
+  HabitId,
+  MilestoneId,
+  RewardId,
+  BonusTimerId,
+} from '../types/ids.ts';
 
 // We construct a time-ordered pseudo-UUID rather than pulling a dep.
 // Shape: <8-hex ms-timestamp-low>-<4-hex ms-high>-7<3-hex random>-<variant><3-hex random>-<12-hex random>
@@ -72,4 +79,7 @@ export function newRewardId(): RewardId {
 }
 export function newBonusTimerId(): BonusTimerId {
   return newUuid() as BonusTimerId;
+}
+export function newMilestoneId(): MilestoneId {
+  return newUuid() as MilestoneId;
 }

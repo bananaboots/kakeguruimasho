@@ -55,17 +55,20 @@ export function selectJarTotal(state: AppState, jarId: JarId): number {
 
 /**
  * Returns the milestone IDs whose target has been crossed but which have
- * NOT yet been claimed. Ordered mini → mid → moonshot.
+ * NOT yet been claimed. Ordered by target ascending so the user sees the
+ * earliest-earned checkpoint first.
  */
 export function selectUnclaimedUnlocks(state: AppState, jarId: JarId): MilestoneId[] {
   const jar = state.jars[jarId];
   if (!jar) return [];
-  const order: MilestoneId[] = ['mini', 'mid', 'moonshot'];
-  return order.filter((id) => {
-    const m = jar.milestones[id];
-    const claim = jar.claimed[id];
-    return m.target > 0 && jar.total >= m.target && claim === null;
-  });
+  const ids = Object.keys(jar.milestones) as MilestoneId[];
+  return ids
+    .filter((id) => {
+      const m = jar.milestones[id];
+      const claim = jar.claimed[id];
+      return m !== undefined && m.target > 0 && jar.total >= m.target && claim == null;
+    })
+    .sort((a, b) => (jar.milestones[a]!.target - jar.milestones[b]!.target));
 }
 
 export function selectDailyStreakCompleteToday(state: AppState, jarId: JarId): boolean {

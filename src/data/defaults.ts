@@ -7,6 +7,9 @@ import {
   asRewardId,
   type HabitId,
   type MilestoneId,
+  MINI_MILESTONE_ID,
+  MID_MILESTONE_ID,
+  MOONSHOT_MILESTONE_ID,
 } from '../types/ids.ts';
 import {
   DEFAULT_CLIP_COLORS,
@@ -180,18 +183,19 @@ export function defaultRewards(): {
 export function defaultMilestones(): Record<MilestoneId, Milestone> {
   // §6.7: blank on first run, user fills during onboarding. Targets set to 0
   // so "unlock" never fires spuriously; onboarding must write real targets.
+  // Users can add extra intermediate milestones later via MilestoneEditor.
   return {
-    mini: { id: 'mini', label: '', target: 0 },
-    mid: { id: 'mid', label: '', target: 0 },
-    moonshot: { id: 'moonshot', label: '', target: 0 },
+    [MINI_MILESTONE_ID]: { id: MINI_MILESTONE_ID, label: '', target: 0 },
+    [MID_MILESTONE_ID]: { id: MID_MILESTONE_ID, label: '', target: 0 },
+    [MOONSHOT_MILESTONE_ID]: { id: MOONSHOT_MILESTONE_ID, label: '', target: 0 },
   };
 }
 
 export function defaultJarState(jarId: JarId = DEFAULT_JAR_ID): JarState {
   const claimed: Record<MilestoneId, MilestoneClaim> = {
-    mini: null,
-    mid: null,
-    moonshot: null,
+    [MINI_MILESTONE_ID]: null,
+    [MID_MILESTONE_ID]: null,
+    [MOONSHOT_MILESTONE_ID]: null,
   };
   return {
     jarId,

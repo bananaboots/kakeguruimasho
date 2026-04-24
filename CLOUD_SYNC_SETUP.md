@@ -48,13 +48,20 @@ From the repo root:
 
 ```bash
 # Push the Clerk secret key so the server can verify JWTs.
-# Paste the sk_… value from Clerk when prompted.
-npx partykit secret put CLERK_SECRET_KEY
+# PartyKit will prompt you to paste the sk_… value from Clerk.
+npx partykit env add CLERK_SECRET_KEY -n kakeguruimasho-sync
 
 # Deploy. First run asks for a project name — accept the default
 # (kakeguruimasho-sync) or pick your own.
 npx partykit deploy
 ```
+
+> Heads up: earlier PartyKit releases used `partykit secret put`; the
+> current CLI (≥ 0.0.115) moved it to `partykit env add`. If you see the
+> help text dump instead of a prompt, you're on the newer CLI — use the
+> `env add` form. Never paste the secret directly on the command line or
+> in chat; always let the prompt read it so it doesn't land in shell
+> history or transcripts.
 
 When it finishes, partykit prints a URL like:
 
@@ -163,7 +170,7 @@ add `<user>.github.io/kakeguruimasho` as a satellite domain.
 
 **Websocket errors in the console (401).** The Clerk secret key on
 PartyKit doesn't match the publishable key in the client. Run
-`npx partykit secret put CLERK_SECRET_KEY` again with the right value
+`npx partykit env add CLERK_SECRET_KEY -n kakeguruimasho-sync` again with the right value
 and redeploy.
 
 **App works but data doesn't sync across devices.** Check devtools →

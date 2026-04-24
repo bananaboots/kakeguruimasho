@@ -21,6 +21,7 @@ import {
 import { Button } from '../../ui/button.tsx';
 import { useAppStore, getAppStore } from '../../state/store.ts';
 import type { JarId, MilestoneId } from '../../types/ids.ts';
+import { MOONSHOT_MILESTONE_ID } from '../../types/ids.ts';
 
 export interface MilestoneClaimModalProps {
   jarId: JarId;
@@ -63,7 +64,7 @@ export function MilestoneClaimModal({
 
   const label = milestoneData?.label?.trim() || prettyMilestoneId(milestone);
 
-  const isMoonshot = milestone === 'moonshot';
+  const isMoonshot = milestone === MOONSHOT_MILESTONE_ID;
 
   const handleClaimNonMoonshot = useCallback(() => {
     const { actions } = getAppStore().getState();
@@ -74,7 +75,7 @@ export function MilestoneClaimModal({
   const handleMoonshotClaim = useCallback(() => {
     // D1 step 1: stamp claimed.moonshot.
     const { actions } = getAppStore().getState();
-    actions.claimMilestone(jarId, 'moonshot');
+    actions.claimMilestone(jarId, MOONSHOT_MILESTONE_ID);
     setMoonshotStep('confirm-reset');
   }, [jarId]);
 
@@ -163,5 +164,8 @@ export function MilestoneClaimModal({
 }
 
 function prettyMilestoneId(id: MilestoneId): string {
-  return id.charAt(0).toUpperCase() + id.slice(1);
+  if (id === 'mini' || id === 'mid' || id === MOONSHOT_MILESTONE_ID) {
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
+  return 'Milestone';
 }

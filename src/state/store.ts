@@ -36,7 +36,9 @@ import {
   newBonusTimerId,
   newClipId,
   newEventId,
+  newMilestoneId,
 } from '../lib/id.ts';
+import { MOONSHOT_MILESTONE_ID } from '../types/ids.ts';
 import type { Habit } from '../types/habit.ts';
 import type { Settings } from '../types/settings.ts';
 import type { WheelConfig } from '../types/wheel.ts';
@@ -99,8 +101,9 @@ export type Actions = {
   // ---- Jar ----
   /**
    * Mark a milestone as claimed (user redeemed the real-world thing).
-   * Claiming Mini or Mid is a tick-mark; only claiming Moonshot triggers
-   * the jar reset flow (DECISIONS.md D1).
+   * Claiming mini/mid or any custom checkpoint is a tick-mark; only
+   * claiming the `MOONSHOT_MILESTONE_ID` triggers the jar reset flow
+   * (DECISIONS.md D1).
    */
   claimMilestone: (jarId: JarId, milestone: MilestoneId) => void;
   /**
@@ -108,6 +111,27 @@ export type Actions = {
    * claim. Emits a `jar_reset` history event for audit.
    */
   resetJar: (jarId: JarId) => void;
+  /**
+   * Add an extra intermediate milestone to a jar. The generated
+   * `MilestoneId` is returned so callers can reference the newly-added
+   * checkpoint. Emits a `settings_changed` history event.
+   */
+  addMilestone: (jarId: JarId, input: { label: string; target: number }) => MilestoneId;
+  /**
+   * Remove a user-added intermediate milestone. The three default
+   * milestones (mini/mid/moonshot) are protected and the call is a
+   * no-op if you pass one of their ids.
+   */
+  removeMilestone: (jarId: JarId, milestoneId: MilestoneId) => void;
+  /**
+   * Replace labels and targets for a set of milestones in one shot.
+   * Used by MilestoneEditor's Save button; keeps the audit event
+   * count down to one for an editor session.
+   */
+  updateMilestones: (
+    jarId: JarId,
+    patch: Record<MilestoneId, { label: string; target: number }>,
+  ) => void;
 
   // ---- Bonus timers ----
   /**
@@ -348,7 +372,7 @@ export function createAppStore(initial?: AppState): UseBoundStore<StoreApi<Store
               kind: 'milestone_claimed',
               jarId,
               milestone,
-              reset: milestone === 'moonshot',
+              reset: milestone === MOONSHOT_MILESTONE_ID,
             }),
           ];
           return { state: next, events };
@@ -367,6 +391,81 @@ export function createAppStore(initial?: AppState): UseBoundStore<StoreApi<Store
                 jarId,
                 from,
                 reason: 'moonshot-claimed',
+              }),
+            ],
+          };
+        });
+      },
+
+      addMilestone(jarId, input) {
+        const id = newMilestoneId();
+        const milestone = { id, label: input.label, target: input.target };
+        commitWithHistory((s) => {
+          const next = jarsSlice.addMilestone(s, jarId, milestone);
+          return {
+            state: next,
+            events: [
+              stampEvent({
+                kind: 'settings_changed',
+                jarId,
+                path: `jars.${jarId}.milestones.${id}`,
+                before: null,
+                after: milestone,
+              }),
+            ],
+          };
+        });
+        return id;
+      },
+
+      removeMilestone(jarId, milestoneId) {
+        commitWithHistory((s) => {
+          const before = s.jars[jarId]?.milestones[milestoneId] ?? null;
+          const next = jarsSlice.removeMilestone(s, jarId, milestoneId);
+          if (next === s) {
+            return { state: s, events: [] };
+          }
+          return {
+            state: next,
+            events: [
+              stampEvent({
+                kind: 'settings_changed',
+                jarId,
+                path: `jars.${jarId}.milestones.${milestoneId}`,
+                before,
+                after: null,
+              }),
+            ],
+          };
+        });
+      },
+
+      updateMilestones(jarId, patch) {
+        commitWithHistory((s) => {
+          const jar = s.jars[jarId];
+          if (!jar) return { state: s, events: [] };
+          const beforeByKey: Record<string, unknown> = {};
+          const afterByKey: Record<string, unknown> = {};
+          const nextPatch: Record<MilestoneId, { id: MilestoneId; label: string; target: number }> =
+            {} as Record<MilestoneId, { id: MilestoneId; label: string; target: number }>;
+          for (const key of Object.keys(patch) as MilestoneId[]) {
+            const existing = jar.milestones[key];
+            if (!existing) continue;
+            beforeByKey[key] = existing;
+            const merged = { id: key, label: patch[key]!.label, target: patch[key]!.target };
+            afterByKey[key] = merged;
+            nextPatch[key] = merged;
+          }
+          const next = jarsSlice.updateMilestones(s, jarId, nextPatch);
+          return {
+            state: next,
+            events: [
+              stampEvent({
+                kind: 'settings_changed',
+                jarId,
+                path: `jars.${jarId}.milestones`,
+                before: beforeByKey,
+                after: afterByKey,
               }),
             ],
           };

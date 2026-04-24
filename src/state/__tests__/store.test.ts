@@ -7,7 +7,13 @@ import {
 } from '../store.ts';
 import { seedInitialAppState, DEFAULT_HABIT_IDS } from '../../data/defaults.ts';
 import { seededRng } from '../../test/seeded-rng.ts';
-import { DEFAULT_JAR_ID, DEFAULT_JAR_ID as DEFAULT_JAR } from '../../types/ids.ts';
+import {
+  DEFAULT_JAR_ID,
+  DEFAULT_JAR_ID as DEFAULT_JAR,
+  MINI_MILESTONE_ID,
+  MID_MILESTONE_ID,
+  MOONSHOT_MILESTONE_ID,
+} from '../../types/ids.ts';
 
 describe('store: composite actions', () => {
   beforeEach(() => {
@@ -92,20 +98,20 @@ describe('store: composite actions', () => {
             ...initial.jars[DEFAULT_JAR]!,
             total: 10,
             milestones: {
-              mini: { id: 'mini' as const, label: 'a', target: 5 },
-              mid: { id: 'mid' as const, label: 'b', target: 50 },
-              moonshot: { id: 'moonshot' as const, label: 'c', target: 100 },
+              [MINI_MILESTONE_ID]: { id: MINI_MILESTONE_ID, label: 'a', target: 5 },
+              [MID_MILESTONE_ID]: { id: MID_MILESTONE_ID, label: 'b', target: 50 },
+              [MOONSHOT_MILESTONE_ID]: { id: MOONSHOT_MILESTONE_ID, label: 'c', target: 100 },
             },
           },
         },
       };
       const store = createAppStore(withTotal);
-      store.getState().actions.claimMilestone(DEFAULT_JAR_ID, 'mini');
+      store.getState().actions.claimMilestone(DEFAULT_JAR_ID, MINI_MILESTONE_ID);
       expect(store.getState().jars[DEFAULT_JAR]!.total).toBe(10);
-      expect(store.getState().jars[DEFAULT_JAR]!.claimed.mini).not.toBeNull();
+      expect(store.getState().jars[DEFAULT_JAR]!.claimed[MINI_MILESTONE_ID]).not.toBeNull();
       store.getState().actions.resetJar(DEFAULT_JAR_ID);
       expect(store.getState().jars[DEFAULT_JAR]!.total).toBe(0);
-      expect(store.getState().jars[DEFAULT_JAR]!.claimed.mini).toBeNull();
+      expect(store.getState().jars[DEFAULT_JAR]!.claimed[MINI_MILESTONE_ID]).toBeNull();
     });
   });
 
