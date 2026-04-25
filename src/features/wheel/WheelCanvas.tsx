@@ -27,8 +27,14 @@ import {
   BONUS_WHEEL_SEGMENT_ORDER,
   MAIN_WHEEL_SEGMENT_ORDER,
 } from './wheel.engine.ts';
-import { MAIN_WHEEL_SLICE_SEQUENCE, mainTierToVisualSlice, type MainSliceTier } from './wheel-slices.ts';
-import { BONUS_WHEEL_SLICE_SEQUENCE, bonusSegmentToVisualSlice, type BonusSlicePrize } from './wheel-slices.ts';
+import {
+  BONUS_WHEEL_SLICE_SEQUENCE,
+  MAIN_WHEEL_SLICE_SEQUENCE,
+  bonusSegmentToVisualSlice,
+  mainTierToVisualSlice,
+  type BonusSlicePrize,
+  type MainSliceTier,
+} from './wheel-slices.ts';
 import { Chrysanthemum } from './Chrysanthemum.tsx';
 import { PlumBlossom } from './PlumBlossom.tsx';
 import { BrassPointer } from './BrassPointer.tsx';
@@ -56,7 +62,6 @@ const SLICE_TIER_META: Record<MainSliceTier, MainSliceTierMeta> = {
 type BonusPrizeMeta = {
   base: string;
   shade: string;
-  short: string;
   big: string;
   /** Maps to engine BonusSegment for data-segment preservation. */
   engineSegment: BonusSegment;
@@ -64,11 +69,11 @@ type BonusPrizeMeta = {
 };
 
 const BONUS_PRIZE_META: Record<BonusSlicePrize, BonusPrizeMeta> = {
-  sm:   { base: '#704a76', shade: '#523557', short: '25%',  big: '二五', engineSegment: 'PCT_25', rare: false },
-  md:   { base: '#3a6680', shade: '#284b62', short: '50%',  big: '五十', engineSegment: 'PCT_50', rare: false },
-  lg:   { base: '#a8302a', shade: '#7a1f1c', short: '75%',  big: '七五', engineSegment: 'PCT_75', rare: true  },
-  x2:   { base: '#3a7458', shade: '#28553e', short: '×2',   big: '倍',   engineSegment: 'EXTRA',  rare: true  },
-  free: { base: 'var(--color-gold)', shade: 'var(--color-gold-deep)', short: 'FREE', big: '無料', engineSegment: 'FREE', rare: true },
+  sm:   { base: '#704a76', shade: '#523557', big: '二五', engineSegment: 'PCT_25', rare: false },
+  md:   { base: '#3a6680', shade: '#284b62', big: '五十', engineSegment: 'PCT_50', rare: false },
+  lg:   { base: '#a8302a', shade: '#7a1f1c', big: '七五', engineSegment: 'PCT_75', rare: true  },
+  x2:   { base: '#3a7458', shade: '#28553e', big: '倍',   engineSegment: 'EXTRA',  rare: true  },
+  free: { base: 'var(--color-gold)', shade: 'var(--color-gold-deep)', big: '無料', engineSegment: 'FREE', rare: true },
 };
 
 // ---- Props ----
