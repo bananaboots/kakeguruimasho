@@ -25,10 +25,11 @@ Reference: `pachinko-screens.jsx` line numbers cited inline.
       design's tier-ladder rows (tier badge + description + ○/●/✕ unlock
       indicator). Source: `pachinko-screens.jsx:539`.~~ Shipped
       2026-04-25 — also restyled GoldInstantT3Button as a gold tier row.
-- [ ] **PachinkoReveal extras** — radiating gold rays (24 SVG lines from
+- [x] ~~**PachinkoReveal extras** — radiating gold rays (24 SVG lines from
       center), confetti (paper / plum / balls — 30 elements), and a
       radial burst-of-light gradient. The chrysanthemum + 大当たり banner
-      already landed. Source: `pachinko-screens.jsx:744`.
+      already landed. Source: `pachinko-screens.jsx:744`.~~ Shipped
+      2026-04-25.
 - [ ] **Slot-reels alt** for `PachinkoSpinWheel mode="reels"` — completely
       unbuilt; the design offers it as a per-theme runtime alternative to
       the wheel.
