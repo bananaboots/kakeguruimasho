@@ -33,3 +33,6 @@ export type { MotifProps } from './Motif.tsx';
 
 export { Velvet } from './Velvet.tsx';
 export type { VelvetProps } from './Velvet.tsx';
+
+export { RitualGlyph } from './RitualGlyph.tsx';
+export type { RitualGlyphKind, RitualGlyphProps } from './RitualGlyph.tsx';

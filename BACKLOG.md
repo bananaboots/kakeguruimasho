@@ -36,10 +36,12 @@ Reference: `pachinko-screens.jsx` line numbers cited inline.
 
 ### Bonus
 
-- [ ] **Bonus screen full re-skin** — apply pachinko chassis to
+- [x] ~~**Bonus screen full re-skin** — apply pachinko chassis to
       `BonusTimerDetail.tsx`, add hourglass glyph, gold-gradient time bar,
       and 2×2 discount-ritual picker grid. Source:
-      `pachinko-screens.jsx:859`.
+      `pachinko-screens.jsx:859`.~~ Shipped 2026-04-25 — also added a
+      reusable `RitualGlyph` parlour primitive (walk / dumb / hourglass /
+      broom).
 
 ### Home / Habits / Jar widgets
 
