@@ -33,6 +33,7 @@ import { applyRewardMutation } from './reward-actions.ts';
 import { newRewardId } from '../../lib/id.ts';
 import { nowISO } from '../../lib/time.ts';
 import { RewardEditor } from './RewardEditor.tsx';
+import { RevealStage } from '../spin/RevealStage.tsx';
 
 export interface RewardPickerModalProps {
   tier: Tier;
@@ -109,6 +110,7 @@ export function RewardPickerModal({
               <DialogDescription>
                 Tap one to claim it. This goes into your history log.
               </DialogDescription>
+              <RevealStage tier={tier} />
               <ul
                 role="listbox"
                 aria-label={`${tier} rewards`}
