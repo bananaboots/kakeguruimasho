@@ -115,8 +115,9 @@ test.describe('Kakeguruimasho smoke', () => {
     await expect(page.getByTestId('spin-flow')).toBeVisible({ timeout: 10_000 });
 
     // Skip cash-in (0-match) and spin. The SpinButton is enabled by default
-    // because we're in idle phase.
-    const spinBtn = page.getByRole('button', { name: 'Spin' });
+    // because we're in idle phase. Label is theme-driven ("Pull the Lever"
+    // on Vintage Pachinko); use the stable testid instead.
+    const spinBtn = page.getByTestId('spin-button');
     await expect(spinBtn).toBeEnabled();
     await spinBtn.click();
 

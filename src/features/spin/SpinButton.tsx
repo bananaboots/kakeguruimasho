@@ -4,10 +4,15 @@
  * Disabled until the user has either made a match selection or explicitly
  * skipped cash-in. The parent owns the "confirmed" state; this component is
  * dumb: it renders + forwards the click.
+ *
+ * Default label pulls from the active theme's `copy.spinCta`
+ * ("Pull the Lever" for Vintage Pachinko, etc.). The parent can still
+ * override with `label="Spinning…"` during the cash-in freeze.
  */
 
 import type { ReactElement } from 'react';
 
+import { useTheme } from '../../styles/theme-context.ts';
 import './spin.css';
 
 export type SpinButtonProps = {
@@ -18,7 +23,7 @@ export type SpinButtonProps = {
    * its copy.
    */
   disabled?: boolean;
-  /** Label override — lets the parent say "Spinning…" during cashInFrozen. */
+  /** Label override — when omitted, uses the active theme's `copy.spinCta`. */
   label?: string;
   className?: string;
 };
@@ -26,9 +31,11 @@ export type SpinButtonProps = {
 export function SpinButton({
   onSpin,
   disabled = false,
-  label = 'Spin',
+  label,
   className,
 }: SpinButtonProps): ReactElement {
+  const { themeMeta } = useTheme();
+  const resolvedLabel = label ?? themeMeta.copy.spinCta;
   return (
     <button
       type="button"
@@ -38,7 +45,7 @@ export function SpinButton({
       data-testid="spin-button"
       aria-disabled={disabled || undefined}
     >
-      <span className="spin-button__label">{label}</span>
+      <span className="spin-button__label">{resolvedLabel}</span>
     </button>
   );
 }

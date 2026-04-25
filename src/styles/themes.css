@@ -1,0 +1,239 @@
+/*
+ * themes.css — Per-theme CSS variable maps.
+ *
+ * Loaded after tokens.css. The provider sets `data-theme` on <html>; the
+ * matching block below overrides the parlour token group.
+ *
+ * Vintage Pachinko is the active hero; the rest are scaffolded with
+ * pragmatic palettes so screens stay legible if the user flips before the
+ * bespoke art pass lands.
+ */
+
+:root {
+  /* Defaults match Vintage Pachinko so an unset data-theme still looks intentional. */
+  --color-bg: #1a0606;
+  --color-bg-grad:
+    radial-gradient(120% 80% at 50% 0%, #4a0e08 0%, #2a0604 50%, #100302 100%);
+  --color-felt: #3a0908;
+  --color-felt-deep: #1f0504;
+  --color-surface: #220706;
+  --color-surface-2: #2e0a08;
+  --color-surface-3: #3a1110;
+  --color-border: rgba(232, 198, 130, 0.28);
+  --color-border-strong: rgba(232, 198, 130, 0.55);
+
+  --color-ink: #f0e2bc;
+  --color-ink-muted: #c9a878;
+  --color-ink-faint: #7a6240;
+
+  --color-gold: #e8c682;
+  --color-gold-deep: #a8843e;
+  --color-gold-glow: rgba(232, 198, 130, 0.5);
+
+  --color-accent: #e8c682;
+  --color-accent-hover: #f0d088;
+  --color-accent-pressed: #c4a868;
+  --color-accent-contrast: #1a0606;
+
+  --color-win: #f0d088;
+  --color-near-miss: #c47a3a;
+  --color-success: #6a9658;
+  --color-danger: #b04030;
+  --color-warning: #d8a040;
+
+  --clip-red: #a8302a;
+  --clip-blue: #3a6680;
+  --clip-green: #3a7458;
+  --clip-yellow: #caa248;
+  --clip-purple: #704a76;
+  --clip-pink: #a85068;
+
+  --font-display: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Serif Text', 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'VT323', ui-monospace, 'SF Mono', monospace;
+
+  /* VT323 reads small per em; let layout multiply when it switches in. */
+  --mono-scale: 1.35;
+
+  /* ---- Legacy token aliases ---------------------------------------
+   * Existing feature CSS (jar.css, spin.css, etc.) authors against the
+   * pre-theme token names. Aliasing them here means the whole app
+   * re-skins on theme swap without touching every stylesheet.
+   * Going forward, prefer the parlour names directly (--color-felt,
+   * --color-ink, --color-gold).
+   */
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-ink-muted);
+  --color-text-faint: var(--color-ink-faint);
+
+  --color-success: #6a9658;
+  --color-danger: #b04030;
+  --color-warning: var(--color-near-miss);
+}
+
+[data-theme='pachinko'] {
+  /* The defaults above are pachinko — kept here for clarity if base shifts later. */
+  --color-bg: #1a0606;
+  --color-bg-grad:
+    radial-gradient(120% 80% at 50% 0%, #4a0e08 0%, #2a0604 50%, #100302 100%);
+  --color-felt: #3a0908;
+  --color-felt-deep: #1f0504;
+  --color-surface: #220706;
+  --color-surface-2: #2e0a08;
+  --color-surface-3: #3a1110;
+  --color-border: rgba(232, 198, 130, 0.28);
+  --color-border-strong: rgba(232, 198, 130, 0.55);
+  --color-ink: #f0e2bc;
+  --color-ink-muted: #c9a878;
+  --color-ink-faint: #7a6240;
+  --color-gold: #e8c682;
+  --color-gold-deep: #a8843e;
+  --color-gold-glow: rgba(232, 198, 130, 0.5);
+  --color-accent: #e8c682;
+  --color-accent-hover: #f0d088;
+  --color-accent-pressed: #c4a868;
+  --color-accent-contrast: #1a0606;
+  --font-display: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'DM Serif Text', Georgia, serif;
+  --font-mono: 'VT323', ui-monospace, monospace;
+  --mono-scale: 1.35;
+}
+
+[data-theme='house'] {
+  --color-bg: #120a0c;
+  --color-bg-grad:
+    radial-gradient(140% 90% at 50% 0%, #3a1418 0%, #1a0b0d 45%, #0b0607 100%);
+  --color-felt: #4a1722;
+  --color-felt-deep: #2a0d13;
+  --color-surface: #1a0f11;
+  --color-surface-2: #26161a;
+  --color-surface-3: #321b22;
+  --color-border: rgba(214, 175, 110, 0.28);
+  --color-border-strong: rgba(214, 175, 110, 0.55);
+  --color-ink: #f3e3c2;
+  --color-ink-muted: #c8a877;
+  --color-ink-faint: #7d6548;
+  --color-gold: #d6af6e;
+  --color-gold-deep: #a8834d;
+  --color-gold-glow: rgba(230, 188, 110, 0.45);
+  --color-accent: #d6af6e;
+  --color-accent-hover: #e8c27a;
+  --color-accent-pressed: #b8915a;
+  --color-accent-contrast: #1a0f11;
+}
+
+[data-theme='riding'] {
+  --color-bg: #0d1108;
+  --color-bg-grad:
+    radial-gradient(120% 90% at 50% 0%, #1c2a16 0%, #0e150a 50%, #060903 100%);
+  --color-felt: #1c2a16;
+  --color-felt-deep: #0e1508;
+  --color-surface: #161e10;
+  --color-surface-2: #1f2a18;
+  --color-surface-3: #2a3622;
+  --color-border: rgba(216, 178, 122, 0.3);
+  --color-border-strong: rgba(216, 178, 122, 0.58);
+  --color-ink: #f3e6c8;
+  --color-ink-muted: #c2a578;
+  --color-ink-faint: #7a6840;
+  --color-gold: #d8b27a;
+  --color-gold-deep: #9a7a40;
+  --color-gold-glow: rgba(216, 178, 122, 0.45);
+  --color-accent: #b22a2a;
+  --color-accent-hover: #c43838;
+  --color-accent-pressed: #8e2020;
+  --color-accent-contrast: #f3e6c8;
+}
+
+[data-theme='imperial'] {
+  --color-bg: #160404;
+  --color-bg-grad:
+    radial-gradient(120% 80% at 50% 0%, #6a1010 0%, #2a0606 50%, #100303 100%);
+  --color-felt: #480a0a;
+  --color-felt-deep: #260404;
+  --color-surface: #1c0606;
+  --color-surface-2: #2a0808;
+  --color-surface-3: #3a0e0e;
+  --color-border: rgba(228, 178, 82, 0.32);
+  --color-border-strong: rgba(228, 178, 82, 0.6);
+  --color-ink: #f0dca8;
+  --color-ink-muted: #c89e58;
+  --color-ink-faint: #82622a;
+  --color-gold: #e4b252;
+  --color-gold-deep: #a8782a;
+  --color-gold-glow: rgba(228, 178, 82, 0.5);
+  --color-accent: #e4b252;
+  --color-accent-hover: #eec060;
+  --color-accent-pressed: #c4942a;
+  --color-accent-contrast: #160404;
+}
+
+[data-theme='ukiyoe'] {
+  --color-bg: #06091a;
+  --color-bg-grad:
+    radial-gradient(130% 80% at 30% 0%, #1c2858 0%, #0a1230 50%, #050816 100%);
+  --color-felt: #1a2858;
+  --color-felt-deep: #0c1430;
+  --color-surface: #0e1628;
+  --color-surface-2: #16203c;
+  --color-surface-3: #1f2a4c;
+  --color-border: rgba(228, 130, 158, 0.32);
+  --color-border-strong: rgba(228, 130, 158, 0.58);
+  --color-ink: #ece2d8;
+  --color-ink-muted: #b0a8b8;
+  --color-ink-faint: #6a6680;
+  --color-gold: #e08aa8;
+  --color-gold-deep: #a85878;
+  --color-gold-glow: rgba(228, 138, 168, 0.5);
+  --color-accent: #e08aa8;
+  --color-accent-hover: #eaa0c0;
+  --color-accent-pressed: #c46888;
+  --color-accent-contrast: #06091a;
+}
+
+[data-theme='celestial'] {
+  --color-bg: #070a1a;
+  --color-bg-grad:
+    radial-gradient(120% 80% at 50% 0%, #1c2a5a 0%, #0c1432 50%, #04081a 100%);
+  --color-felt: #1a2348;
+  --color-felt-deep: #0a1228;
+  --color-surface: #0e1428;
+  --color-surface-2: #161e3a;
+  --color-surface-3: #1e294c;
+  --color-border: rgba(218, 178, 92, 0.32);
+  --color-border-strong: rgba(218, 178, 92, 0.58);
+  --color-ink: #ece2c4;
+  --color-ink-muted: #b8a888;
+  --color-ink-faint: #6a5e48;
+  --color-gold: #dab26c;
+  --color-gold-deep: #a08240;
+  --color-gold-glow: rgba(218, 178, 108, 0.45);
+  --color-accent: #dab26c;
+  --color-accent-hover: #e6c488;
+  --color-accent-pressed: #b8945a;
+  --color-accent-contrast: #070a1a;
+}
+
+[data-theme='speakeasy'] {
+  --color-bg: #080a08;
+  --color-bg-grad:
+    radial-gradient(120% 80% at 50% 0%, #1a3028 0%, #0a1610 50%, #040805 100%);
+  --color-felt: #103024;
+  --color-felt-deep: #081810;
+  --color-surface: #0c1410;
+  --color-surface-2: #142018;
+  --color-surface-3: #1c2c22;
+  --color-border: rgba(200, 168, 108, 0.32);
+  --color-border-strong: rgba(200, 168, 108, 0.6);
+  --color-ink: #ede2c4;
+  --color-ink-muted: #baa87c;
+  --color-ink-faint: #6a5e42;
+  --color-gold: #c8a86c;
+  --color-gold-deep: #95793e;
+  --color-gold-glow: rgba(200, 168, 108, 0.5);
+  --color-accent: #c8a86c;
+  --color-accent-hover: #dabc80;
+  --color-accent-pressed: #a48954;
+  --color-accent-contrast: #080a08;
+}

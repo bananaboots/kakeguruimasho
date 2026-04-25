@@ -19,14 +19,22 @@ body,
 
 body {
   background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
+  background-image: var(--color-bg-grad);
+  background-attachment: fixed;
+  color: var(--color-ink);
+  font-family: var(--font-body);
   font-size: var(--text-base);
-  line-height: 1.4;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.005em;
 }
 
 /* Remove default button/input chrome but keep fonts inheriting */

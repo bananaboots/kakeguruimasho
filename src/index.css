@@ -1,23 +1,22 @@
 @import './styles/tokens.css';
+@import './styles/themes.css';
 @import 'tailwindcss';
 @import './styles/globals.css';
 
 /*
- * Tailwind v4 @theme bridge: re-expose our tokens to Tailwind utilities so
- * classes like `bg-surface` / `text-accent` resolve to the same values as the
- * CSS custom properties.
+ * Tailwind v4 @theme bridge. Theme-driven values stay as CSS variables so
+ * `bg-surface` etc. follow whichever theme is active; static structural
+ * tokens are echoed here verbatim.
  */
 @theme {
-  --color-bg: #0a0a0b;
-  --color-surface: #141417;
-  --color-surface-2: #1d1d22;
-  --color-surface-3: #26262c;
-  --color-accent: #e53935;
-  --color-gold: #ffd700;
-  --color-text: #f5f5f7;
-  --color-text-muted: #a1a1aa;
-  --color-border: #2a2a2f;
-  --color-success: #22c55e;
-  --color-near-miss: #fbbf24;
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-surface-3: var(--color-surface-3);
+  --color-accent: var(--color-accent);
+  --color-gold: var(--color-gold);
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-ink-muted);
+  --color-border: var(--color-border);
   --radius-card: 12px;
 }

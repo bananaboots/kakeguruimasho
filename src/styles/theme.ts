@@ -1,42 +1,17 @@
 /**
- * theme.ts — Design tokens mirrored as TS constants.
- * Keep in sync with `src/styles/tokens.css`.
+ * theme.ts — Structural tokens mirrored as TS constants.
  *
- * Use for inline styles (e.g. Framer Motion animate props in Wave 2+) where
- * CSS variables would require extra round-trips. Prefer the CSS tokens where
- * possible so runtime theme switching (future) stays feasible.
+ * Color/font tokens are now theme-driven (see `themes.css` + `themes.ts`).
+ * This mirror only carries the values that don't change per theme — spacing,
+ * radii, motion, layout — for inline-style consumers (Framer Motion durations,
+ * computed widths, etc.) that can't reach into CSS variables conveniently.
+ *
+ * For colors at runtime, read CSS variables via
+ * `getComputedStyle(document.documentElement).getPropertyValue('--color-gold')`
+ * or use the `useTheme()` hook for theme metadata + copy strings.
  */
 
 export const theme = {
-  color: {
-    bg: '#0a0a0b',
-    surface: '#141417',
-    surface2: '#1d1d22',
-    surface3: '#26262c',
-    border: '#2a2a2f',
-    borderStrong: '#3a3a42',
-    text: '#f5f5f7',
-    textMuted: '#a1a1aa',
-    textFaint: '#6b6b73',
-    accent: '#e53935',
-    accentHover: '#f04a46',
-    accentPressed: '#c5302c',
-    accentContrast: '#ffffff',
-    gold: '#ffd700',
-    goldGlow: 'rgba(255, 215, 0, 0.35)',
-    success: '#22c55e',
-    danger: '#ef4444',
-    warning: '#fbbf24',
-    nearMiss: '#fbbf24',
-    clip: {
-      red: '#ef4444',
-      blue: '#3b82f6',
-      green: '#22c55e',
-      yellow: '#eab308',
-      purple: '#a855f7',
-      pink: '#ec4899',
-    },
-  },
   radius: {
     xs: 4,
     sm: 8,
