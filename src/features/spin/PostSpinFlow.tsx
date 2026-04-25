@@ -61,6 +61,13 @@ import { CashInPicker } from './CashInPicker.tsx';
 import { HandView } from './HandView.tsx';
 import { SpinButton } from './SpinButton.tsx';
 import { GoldInstantT3Button } from './GoldInstantT3Button.tsx';
+import { WheelCabinet, ParlourCrest } from './WheelCabinet.tsx';
+import { WheelOddsStrip } from './WheelOddsStrip.tsx';
+import { ParlourLedger } from './ParlourLedger.tsx';
+import { HouseRule } from './HouseRule.tsx';
+import { Chip, GoldChip, Label } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from './clip-colors.ts';
+import type { Clip, ClipColor } from '../../types/clip.ts';
 import {
   INITIAL_STATE,
   highestUnlockedTierForSpin,
@@ -70,6 +77,28 @@ import {
 } from './spin.machine.ts';
 
 import './spin.css';
+
+function describeStake(
+  selection: SpinSelection,
+  hand: Clip[],
+): { label: string; color: ClipColor | 'gold' | null; count: number } | null {
+  const ids = selection.selectedIds;
+  if (ids.length === 0) return null;
+  const picked = hand.filter((c) => ids.includes(c.id));
+  if (picked.length === 0) return null;
+  const first = picked[0]!;
+  if (first.kind === 'gold') {
+    return { label: 'Gold', color: 'gold', count: picked.length };
+  }
+  const color = first.color;
+  const sameColor = picked.every((c) => c.kind === 'regular' && c.color === color);
+  if (!sameColor) return { label: 'Mixed', color: null, count: picked.length };
+  return {
+    label: color.charAt(0).toUpperCase() + color.slice(1),
+    color,
+    count: picked.length,
+  };
+}
 
 export type PostSpinFlowProps = {
   jarId?: JarId;
@@ -444,15 +473,16 @@ export function PostSpinFlow({
   const wheelMounted = pendingSpin !== null && state.phase !== 'bonusSpinning';
   const bonusWheelMounted = pendingBonus !== null;
 
-  // Visual label for the spin button during the flow.
-  const spinButtonLabel =
+  // Visual label for the spin button during the flow. Idle defers to the
+  // theme's `copy.spinCta` so vintage-pachinko reads "Pull the Lever".
+  const spinButtonLabel: string | undefined =
     state.phase === 'cashInFrozen'
       ? 'Spinning…'
       : state.phase === 'mainResolved' || state.phase === 'rewardPicker'
       ? 'Resolving…'
       : state.phase === 'bonusSpinning' || state.phase === 'bonusResolved'
       ? 'Bonus…'
-      : 'Spin';
+      : undefined;
 
   // aria-live region — single polite announcer. Keep announcements short.
   const announcer = (
@@ -464,6 +494,41 @@ export function PostSpinFlow({
     >
       {announcement}
     </div>
+  );
+
+  const stake = describeStake(state.selection, hand);
+  const stakeChips = stake !== null
+    ? Array.from({ length: Math.min(stake.count, 4) }, (_, i) => i)
+    : [];
+
+  const crestMeta = stake !== null ? (
+    <div>
+      <Label size={7}>
+        Stake · {stake.count} × {stake.label}
+      </Label>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: 3,
+          marginTop: 3,
+        }}
+      >
+        {stakeChips.map((i) =>
+          stake.color === 'gold' ? (
+            <GoldChip key={i} size={14} />
+          ) : (
+            <Chip
+              key={i}
+              color={stake.color === null ? '#e8c682' : CLIP_HEX[stake.color]}
+              size={14}
+            />
+          ),
+        )}
+      </div>
+    </div>
+  ) : (
+    <Label size={7}>No stake yet</Label>
   );
 
   return (
@@ -488,24 +553,31 @@ export function PostSpinFlow({
       ) : null}
 
       {wheelMounted && pendingSpin !== null ? (
-        <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
-          {pendingSpin.driftIndex !== null ? (
-            <WheelCanvas
-              targetSegmentIndex={pendingSpin.targetIndex}
-              nearMissDriftIndex={pendingSpin.driftIndex}
-              onAnimationComplete={() => {
-                void handleMainSpinAnimationComplete();
-              }}
-            />
-          ) : (
-            <WheelCanvas
-              targetSegmentIndex={pendingSpin.targetIndex}
-              onAnimationComplete={() => {
-                void handleMainSpinAnimationComplete();
-              }}
-            />
-          )}
-        </div>
+        <WheelCabinet
+          crest={
+            <ParlourCrest title="賭狂魔笙" subtitle="Parlour No. 7" />
+          }
+          meta={crestMeta}
+        >
+          <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
+            {pendingSpin.driftIndex !== null ? (
+              <WheelCanvas
+                targetSegmentIndex={pendingSpin.targetIndex}
+                nearMissDriftIndex={pendingSpin.driftIndex}
+                onAnimationComplete={() => {
+                  void handleMainSpinAnimationComplete();
+                }}
+              />
+            ) : (
+              <WheelCanvas
+                targetSegmentIndex={pendingSpin.targetIndex}
+                onAnimationComplete={() => {
+                  void handleMainSpinAnimationComplete();
+                }}
+              />
+            )}
+          </div>
+        </WheelCabinet>
       ) : null}
 
       {bonusWheelMounted && pendingBonus !== null ? (
@@ -520,13 +592,22 @@ export function PostSpinFlow({
         </div>
       ) : null}
 
+      <WheelOddsStrip jarId={jarId} />
+
       <div className="spin-flow__actions">
-        <SpinButton
-          onSpin={handleStartSpin}
-          disabled={spinButtonDisabled}
-          label={spinButtonLabel}
-        />
+        {spinButtonLabel !== undefined ? (
+          <SpinButton
+            onSpin={handleStartSpin}
+            disabled={spinButtonDisabled}
+            label={spinButtonLabel}
+          />
+        ) : (
+          <SpinButton onSpin={handleStartSpin} disabled={spinButtonDisabled} />
+        )}
       </div>
+
+      <ParlourLedger jarId={jarId} />
+      <HouseRule />
     </div>
   );
 }

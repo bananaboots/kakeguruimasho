@@ -21,12 +21,9 @@
 }
 
 .spin-flow__actions {
-  position: sticky;
-  bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom) + var(--space-2));
   display: flex;
   justify-content: center;
-  padding: var(--space-2) 0;
-  z-index: 2;
+  padding: var(--space-2) 0 0;
 }
 
 .sr-only {
@@ -330,30 +327,26 @@
   color: var(--color-text-muted);
 }
 
-/* ---- SpinButton ---- */
+/* ---- SpinButton (Pachinko Lever) ---- */
 
 .spin-button {
-  min-height: 56px;
-  min-width: 220px;
-  padding: 0 var(--space-6);
-  border-radius: 4px;
-  border: none;
-  background: linear-gradient(
-    180deg,
-    var(--color-gold) 0%,
-    var(--color-gold-deep) 100%
-  );
-  color: var(--color-accent-contrast);
-  font-family: var(--font-mono);
-  font-size: calc(15px * var(--mono-scale));
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  min-height: 64px;
+  padding: 0 16px;
+  border: 1px solid var(--color-gold);
+  border-radius: 0;
+  background: linear-gradient(180deg, #2a0604 0%, #180302 100%);
+  color: var(--color-gold);
+  font-family: inherit;
   cursor: pointer;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
-    0 1px 0 var(--color-bg),
+    inset 0 0 0 1px var(--color-bg),
+    inset 0 0 0 2px var(--color-gold),
+    inset 0 0 0 3px var(--color-bg),
     0 8px 24px var(--color-gold-glow);
   transition:
     transform var(--duration-fast) var(--ease-out),
@@ -361,7 +354,7 @@
 }
 
 .spin-button:not(:disabled):hover {
-  filter: brightness(1.06);
+  filter: brightness(1.08);
 }
 
 .spin-button:not(:disabled):active {
@@ -371,19 +364,249 @@
 
 .spin-button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-gold);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg),
+    inset 0 0 0 2px var(--color-gold),
+    inset 0 0 0 3px var(--color-bg),
+    0 0 0 2px var(--color-bg),
+    0 0 0 4px var(--color-gold);
 }
 
 .spin-button--disabled,
 .spin-button:disabled {
-  opacity: 0.45;
+  opacity: 0.55;
   cursor: not-allowed;
-  box-shadow: none;
-  filter: grayscale(0.4);
+  filter: grayscale(0.5);
+}
+
+.spin-button__knob {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--color-gold),
+    var(--color-gold-deep) 70%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 3px 0 rgba(0, 0, 0, 0.6);
+}
+
+.spin-button__knob-mark {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-bg);
+  line-height: 1;
+}
+
+.spin-button__track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-right: 8px;
+  text-align: left;
 }
 
 .spin-button__label {
-  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  line-height: 1;
+}
+
+.spin-button__rail {
+  height: 4px;
+  background: #0a0202;
+  border-top: 1px solid var(--color-bg);
+  border-bottom: 1px solid var(--color-gold);
+  opacity: 0.7;
+}
+
+/* ---- Wheel cabinet ---- */
+
+.wheel-cabinet {
+  position: relative;
+  margin-top: var(--space-2);
+  padding: 12px 14px 14px;
+  background:
+    radial-gradient(
+      ellipse at 50% 20%,
+      rgba(232, 198, 130, 0.08) 0%,
+      transparent 50%
+    ),
+    linear-gradient(135deg, var(--color-felt), var(--color-felt-deep));
+  border: 1px solid var(--color-gold);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg),
+    inset 0 0 0 2px var(--color-gold),
+    inset 0 0 0 5px var(--color-bg),
+    inset 0 0 40px rgba(0, 0, 0, 0.5);
+}
+
+.wheel-cabinet__crest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  padding: 0 var(--space-1);
+}
+
+.wheel-cabinet__crest-left,
+.wheel-cabinet__crest-right {
+  min-width: 0;
+}
+
+.wheel-cabinet__crest-right {
+  text-align: right;
+}
+
+.wheel-cabinet__crest-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-gold);
+  letter-spacing: 0.3em;
+  line-height: 1;
+}
+
+.wheel-cabinet__inner {
+  position: relative;
+}
+
+/* ---- Wheel odds strip ---- */
+
+.wheel-odds {
+  margin-top: var(--space-2);
+  padding: 6px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.wheel-odds__label {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.2em;
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+}
+
+.wheel-odds__cell {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.wheel-odds__glyph {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.wheel-odds__pct {
+  font-family: var(--font-mono);
+  font-size: calc(9px * var(--mono-scale));
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Parlour ledger ---- */
+
+.parlour-ledger {
+  margin-top: var(--space-3);
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+}
+
+.parlour-ledger__cell {
+  padding: 0 10px;
+  text-align: center;
+  border-left: 1px solid var(--color-border);
+}
+
+.parlour-ledger__cell[data-first] {
+  border-left: none;
+}
+
+.parlour-ledger__key {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.2em;
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
+}
+
+.parlour-ledger__value {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--color-gold);
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.parlour-ledger__sub {
+  font-family: var(--font-mono);
+  font-size: calc(9px * var(--mono-scale) * 0.9);
+  color: var(--color-ink-muted);
+  margin-top: 2px;
+}
+
+/* ---- House rule (footer divider) ---- */
+
+.house-rule {
+  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.house-rule__line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold-deep),
+    transparent
+  );
+  opacity: 0.5;
+}
+
+.house-rule__diamond {
+  width: 5px;
+  height: 5px;
+  background: var(--color-gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.house-rule__text {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.3em;
+  color: var(--color-ink-faint);
+  text-transform: uppercase;
 }
 
 /* ---- GoldInstantT3Button ---- */
