@@ -16,6 +16,8 @@ import { RewardRulesScreen } from './RewardRulesScreen.tsx';
 import { MilestonesScreen } from './MilestonesScreen.tsx';
 import { InstallPromptScreen } from './InstallPromptScreen.tsx';
 import { getAppStore } from '../../state/store.ts';
+import { useTheme } from '../../styles/theme-context.ts';
+import { DecoDivider, Motif } from '../../ui/parlour/index.ts';
 
 const STEP_COUNT = 5;
 
@@ -27,6 +29,7 @@ export interface OnboardingFlowProps {
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps = {}): ReactElement {
   const [step, setStep] = useState(0);
   const navigate = useNavigate();
+  const { themeMeta } = useTheme();
 
   const next = (): void => setStep((s) => Math.min(s + 1, STEP_COUNT - 1));
   const back = (): void => setStep((s) => Math.max(s - 1, 0));
@@ -42,14 +45,32 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps = {}): ReactE
 
   return (
     <section
-      className="onboarding"
+      className="onboarding parlour-grain parlour-halftone"
       aria-labelledby="onboarding-title"
       data-testid="onboarding-flow"
       data-step={step}
     >
-      <h1 id="onboarding-title" className="sr-only">
-        Onboarding
-      </h1>
+      <header className="parlour-masthead">
+        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
+        <h1 id="onboarding-title" className="parlour-masthead__title">
+          Three House Rules
+        </h1>
+        <p className="parlour-masthead__tagline">
+          Set up the bag, the jar, and the rhythm.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 'var(--space-3) auto 0',
+          }}
+        >
+          <Motif size={36} />
+        </div>
+      </header>
+
+      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
+
       <div
         className="onboarding__progress"
         role="progressbar"
