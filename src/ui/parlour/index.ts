@@ -36,3 +36,6 @@ export type { VelvetProps } from './Velvet.tsx';
 
 export { RitualGlyph } from './RitualGlyph.tsx';
 export type { RitualGlyphKind, RitualGlyphProps } from './RitualGlyph.tsx';
+
+export { SectionTitle } from './SectionTitle.tsx';
+export type { SectionTitleProps } from './SectionTitle.tsx';

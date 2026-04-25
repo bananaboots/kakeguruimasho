@@ -10,7 +10,7 @@
  */
 
 import { useAppStore } from '../state/store.ts';
-import { QuickLogButton } from '../features/habits/index.ts';
+import { RitualCard } from '../features/habits/index.ts';
 import {
   JarVisual,
   StreakDisplay,
@@ -18,7 +18,7 @@ import {
 } from '../features/jar/index.ts';
 import { HandSummary } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
 
 export default function Home() {
   const allHabits = useAppStore((s) => s.habits);
@@ -54,10 +54,15 @@ export default function Home() {
 
       <StreakDisplay jarId={activeJarId} />
 
-      <div className="slot" data-slot="[3D] QuickLogButton *5">
+      <SectionTitle
+        jp="行"
+        en="Rituals · Tap to Log"
+        style={{ marginTop: 'var(--space-5)' }}
+      />
+      <div className="slot" data-slot="[3D] RitualCard *N">
         <div className="quicklog-grid" role="group" aria-label="Quick log">
           {habits.map((habit) => (
-            <QuickLogButton key={habit.id} habit={habit} />
+            <RitualCard key={habit.id} habit={habit} />
           ))}
         </div>
       </div>

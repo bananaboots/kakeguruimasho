@@ -52,11 +52,14 @@ The chassis is in place; these are bespoke widgets that go inside it.
 - [ ] **PachinkoTrayCard** — brass-corner tray frame for the hand summary
       with peg-ring divider and "+6 玉" catch counter. Source:
       `pachinko-screens.jsx:296`.
-- [ ] **PachinkoSectionTitle** — kanji + label + gradient rule heading
-      style across Home/Habits/Bonus. Source: `pachinko-screens.jsx:284`.
-- [ ] **PachinkoRitualCard** — per-habit row with glyph + streak badge +
+- [x] ~~**PachinkoSectionTitle** — kanji + label + gradient rule heading
+      style across Home/Habits/Bonus. Source: `pachinko-screens.jsx:284`.~~
+      Shipped 2026-04-25 as `<SectionTitle>` parlour primitive.
+- [x] ~~**PachinkoRitualCard** — per-habit row with glyph + streak badge +
       gold "+" corner button, replaces generic habit list rows.
-      Source: `pachinko-screens.jsx:348`.
+      Source: `pachinko-screens.jsx:348`.~~ Shipped 2026-04-25 as
+      `<RitualCard>` (used on both Home and Habits, preserves
+      `quicklog-${habit.id}` testid).
 - [ ] **PachinkoEveningRite** — 4-tab 夜 row (湯 歯 顔 床) with done /
       pending states for the hygiene bundle. Source:
       `pachinko-screens.jsx:384`.

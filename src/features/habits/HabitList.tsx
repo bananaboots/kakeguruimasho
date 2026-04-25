@@ -14,21 +14,8 @@ import { useCallback, useState } from 'react';
 import { Button } from '../../ui/button.tsx';
 import { useAppStore } from '../../state/store.ts';
 import type { Habit } from '../../types/habit.ts';
-import { QuickLogButton } from './QuickLogButton.tsx';
+import { RitualCard } from './RitualCard.tsx';
 import { HabitEditor } from './HabitEditor.tsx';
-
-function unitSummary(habit: Habit): string {
-  switch (habit.unit.kind) {
-    case 'count':
-      return `${habit.unit.target} ${habit.unit.unit}`;
-    case 'minutes':
-      return `${habit.unit.target} min`;
-    case 'sets':
-      return `${habit.unit.target} sets`;
-    case 'bundle':
-      return `${habit.unit.subItems.length} sub-items · by ${habit.unit.cutoffLocal}`;
-  }
-}
 
 export interface HabitListProps {
   /**
@@ -70,24 +57,18 @@ export function HabitList({ onBundleTap, showAdd = true }: HabitListProps) {
       <ul className="habit-list__items" role="list">
         {habits.map((habit) => (
           <li key={habit.id} className="habit-list__item">
-            <div className="habit-list__meta">
-              <p className="habit-list__name">{habit.name}</p>
-              <p className="habit-list__unit">{unitSummary(habit)}</p>
-            </div>
-            <div className="habit-list__actions">
-              <QuickLogButton
-                habit={habit}
-                {...(onBundleTap ? { onBundleTap } : {})}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing(habit)}
-                aria-label={`Edit ${habit.name}`}
-              >
-                Edit
-              </Button>
-            </div>
+            <RitualCard
+              habit={habit}
+              {...(onBundleTap ? { onBundleTap } : {})}
+            />
+            <button
+              type="button"
+              className="habit-list__edit"
+              onClick={() => setEditing(habit)}
+              aria-label={`Edit ${habit.name}`}
+            >
+              Edit
+            </button>
           </li>
         ))}
       </ul>
