@@ -1,6 +1,6 @@
 /**
- * <CashInPicker /> — RTL coverage for matching detection + disabled states
- * (Wave 3, 3E).
+ * <CashInPicker /> — RTL coverage for the Pachinko tier ladder
+ * (Wave 3, 3E + Vintage Pachinko design).
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -30,102 +30,88 @@ function emptySelection(): SpinSelection {
   return { selectedIds: [] as ReadonlyArray<ClipId>, matchKind: 'none', unlockedTier: 'T1' };
 }
 
-describe('<CashInPicker />', () => {
+describe('<CashInPicker /> tier ladder', () => {
   afterEach(() => {
     cleanup();
   });
 
-  it('renders one row per color present in hand (skips colors with 0)', () => {
-    const hand: Clip[] = [
-      mkClip('r1', 'red'),
-      mkClip('r2', 'red'),
-      mkClip('b1', 'blue'),
-    ];
+  it('renders T1, T2, T3 rows regardless of hand contents', () => {
+    render(
+      <CashInPicker hand={[]} selection={emptySelection()} onChange={() => {}} />,
+    );
+    expect(screen.getByTestId('cash-in-tier-T1')).toBeInTheDocument();
+    expect(screen.getByTestId('cash-in-tier-T2')).toBeInTheDocument();
+    expect(screen.getByTestId('cash-in-tier-T3')).toBeInTheDocument();
+  });
+
+  it('T1 is always enabled; T2/T3 are disabled when no matching color exists', () => {
+    const hand: Clip[] = [mkClip('r1', 'red'), mkClip('b1', 'blue')];
     render(
       <CashInPicker hand={hand} selection={emptySelection()} onChange={() => {}} />,
     );
-    expect(screen.getByTestId('cash-in-pick-red-2')).toBeInTheDocument();
-    expect(screen.getByTestId('cash-in-pick-blue-2')).toBeInTheDocument();
-    // green has 0 clips → row hidden
-    expect(screen.queryByTestId('cash-in-pick-green-2')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cash-in-tier-T1')).toBeEnabled();
+    expect(screen.getByTestId('cash-in-tier-T2')).toBeDisabled();
+    expect(screen.getByTestId('cash-in-tier-T3')).toBeDisabled();
   });
 
-  it('grays out +2 when user has 1, and +3 when user has 2', () => {
-    const hand: Clip[] = [
-      mkClip('b1', 'blue'),
-      // only 1 blue
-      mkClip('r1', 'red'),
-      mkClip('r2', 'red'),
-      // 2 red, not 3
-    ];
+  it('T2 enables when ≥ 2 of any color exist; T3 stays locked at < 3', () => {
+    const hand: Clip[] = [mkClip('r1', 'red'), mkClip('r2', 'red'), mkClip('b1', 'blue')];
     render(
       <CashInPicker hand={hand} selection={emptySelection()} onChange={() => {}} />,
     );
-    expect(screen.getByTestId('cash-in-pick-blue-2')).toBeDisabled();
-    expect(screen.getByTestId('cash-in-pick-blue-3')).toBeDisabled();
-    expect(screen.getByTestId('cash-in-pick-red-2')).toBeEnabled();
-    expect(screen.getByTestId('cash-in-pick-red-3')).toBeDisabled();
+    expect(screen.getByTestId('cash-in-tier-T2')).toBeEnabled();
+    expect(screen.getByTestId('cash-in-tier-T3')).toBeDisabled();
   });
 
-  it('tapping +2 on red calls onChange with a two-match red selection', async () => {
+  it('tapping T2 auto-picks 2 of the most-abundant color (alphabetical tiebreak)', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const hand: Clip[] = [
-      mkClip('r1', 'red'),
-      mkClip('r2', 'red'),
-      mkClip('r3', 'red'),
-    ];
-    render(
-      <CashInPicker hand={hand} selection={emptySelection()} onChange={onChange} />,
-    );
-    await user.click(screen.getByTestId('cash-in-pick-red-2'));
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const next: SpinSelection = onChange.mock.calls[0]![0]!;
-    expect(next.matchKind).toBe('two-match');
-    expect(next.unlockedTier).toBe('T2');
-    expect(next.selectedIds.length).toBe(2);
-  });
-
-  it('tapping +3 on red calls onChange with a three-match red selection (T3 unlock)', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const hand: Clip[] = [
-      mkClip('r1', 'red'),
-      mkClip('r2', 'red'),
-      mkClip('r3', 'red'),
-    ];
-    render(
-      <CashInPicker hand={hand} selection={emptySelection()} onChange={onChange} />,
-    );
-    await user.click(screen.getByTestId('cash-in-pick-red-3'));
-    const next: SpinSelection = onChange.mock.calls[0]![0]!;
-    expect(next.matchKind).toBe('three-match');
-    expect(next.unlockedTier).toBe('T3');
-    expect(next.selectedIds.length).toBe(3);
-  });
-
-  it('tapping a different color REPLACES the selection (no cross-color combos)', async () => {
-    const user = userEvent.setup();
     const hand: Clip[] = [
       mkClip('r1', 'red'),
       mkClip('r2', 'red'),
       mkClip('b1', 'blue'),
       mkClip('b2', 'blue'),
     ];
-    const onChange = vi.fn();
     render(
       <CashInPicker hand={hand} selection={emptySelection()} onChange={onChange} />,
     );
-    await user.click(screen.getByTestId('cash-in-pick-red-2'));
-    await user.click(screen.getByTestId('cash-in-pick-blue-2'));
-    expect(onChange).toHaveBeenCalledTimes(2);
-    const last: SpinSelection = onChange.mock.calls[1]![0]!;
-    expect(last.matchKind).toBe('two-match');
-    // The replacement must contain only blue IDs.
-    expect(last.selectedIds).toEqual([asClipId('b1'), asClipId('b2')]);
+    await user.click(screen.getByTestId('cash-in-tier-T2'));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const next: SpinSelection = onChange.mock.calls[0]![0]!;
+    expect(next.matchKind).toBe('two-match');
+    expect(next.unlockedTier).toBe('T2');
+    // Tied counts → blue wins on alphabetical tiebreak (b < r).
+    expect(next.selectedIds).toEqual([asClipId('b1'), asClipId('b2')]);
   });
 
-  it('tapping Skip resets the selection to none / T1', async () => {
+  it('tapping T3 picks 3 of the most-abundant color; ties broken alphabetically', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const hand: Clip[] = [
+      mkClip('r1', 'red'),
+      mkClip('r2', 'red'),
+      mkClip('r3', 'red'),
+      mkClip('r4', 'red'),
+      mkClip('b1', 'blue'),
+      mkClip('b2', 'blue'),
+      mkClip('b3', 'blue'),
+    ];
+    render(
+      <CashInPicker hand={hand} selection={emptySelection()} onChange={onChange} />,
+    );
+    await user.click(screen.getByTestId('cash-in-tier-T3'));
+    const next: SpinSelection = onChange.mock.calls[0]![0]!;
+    expect(next.matchKind).toBe('three-match');
+    expect(next.unlockedTier).toBe('T3');
+    // Red has more, so T3 picks 3 reds.
+    expect(next.selectedIds).toEqual([
+      asClipId('r1'),
+      asClipId('r2'),
+      asClipId('r3'),
+    ]);
+  });
+
+  it('tapping T1 resets the selection to none / T1', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const hand: Clip[] = [mkClip('r1', 'red'), mkClip('r2', 'red')];
@@ -140,24 +126,46 @@ describe('<CashInPicker />', () => {
         onChange={onChange}
       />,
     );
-    await user.click(screen.getByTestId('cash-in-picker__skip'));
+    await user.click(screen.getByTestId('cash-in-tier-T1'));
     const next: SpinSelection = onChange.mock.calls[0]![0]!;
     expect(next.matchKind).toBe('none');
     expect(next.unlockedTier).toBe('T1');
     expect(next.selectedIds).toHaveLength(0);
   });
 
-  it('gold clips are NOT offered as a cash-in option (A5 / spec §5.5)', () => {
+  it('re-tapping the active tier toggles back to T1', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const hand: Clip[] = [mkClip('r1', 'red'), mkClip('r2', 'red')];
+    render(
+      <CashInPicker
+        hand={hand}
+        selection={{
+          selectedIds: [asClipId('r1'), asClipId('r2')],
+          matchKind: 'two-match',
+          unlockedTier: 'T2',
+        }}
+        onChange={onChange}
+      />,
+    );
+    await user.click(screen.getByTestId('cash-in-tier-T2'));
+    const next: SpinSelection = onChange.mock.calls[0]![0]!;
+    expect(next.matchKind).toBe('none');
+    expect(next.unlockedTier).toBe('T1');
+  });
+
+  it('gold clips are NOT surfaced on the tier ladder (handled by GoldInstantT3Button)', () => {
     const hand: Clip[] = [mkGold('g1'), mkClip('r1', 'red'), mkClip('r2', 'red')];
     render(
       <CashInPicker hand={hand} selection={emptySelection()} onChange={() => {}} />,
     );
-    // There is no gold row/pick button inside the picker.
-    expect(screen.queryByTestId('cash-in-pick-gold-2')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('cash-in-pick-gold-3')).not.toBeInTheDocument();
+    // No gold tier row in the ladder.
+    expect(screen.queryByTestId('cash-in-tier-Gold')).not.toBeInTheDocument();
+    // Gold doesn't unlock T2 unless paired with same-color regulars; only red.
+    expect(screen.getByTestId('cash-in-tier-T2')).toBeEnabled();
   });
 
-  it('A9 disabled: every pick + the skip button are inert when disabled=true', async () => {
+  it('A9 disabled: every tier row is inert when disabled=true', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const hand: Clip[] = [
@@ -174,12 +182,11 @@ describe('<CashInPicker />', () => {
       />,
     );
     expect(screen.getByTestId('cash-in-picker')).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByTestId('cash-in-pick-red-2')).toBeDisabled();
-    expect(screen.getByTestId('cash-in-pick-red-3')).toBeDisabled();
-    expect(screen.getByTestId('cash-in-picker__skip')).toBeDisabled();
-    // userEvent respects disabled — no onChange fires.
-    await user.click(screen.getByTestId('cash-in-pick-red-2'));
-    await user.click(screen.getByTestId('cash-in-picker__skip'));
+    expect(screen.getByTestId('cash-in-tier-T1')).toBeDisabled();
+    expect(screen.getByTestId('cash-in-tier-T2')).toBeDisabled();
+    expect(screen.getByTestId('cash-in-tier-T3')).toBeDisabled();
+    await user.click(screen.getByTestId('cash-in-tier-T2'));
+    await user.click(screen.getByTestId('cash-in-tier-T1'));
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -196,10 +203,11 @@ describe('<CashInPicker />', () => {
         onChange={() => {}}
       />,
     );
-    expect(screen.getByTestId('cash-in-pick-red-2')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('cash-in-tier-T2')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('cash-in-tier-T1')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('status text describes the current unlock', () => {
+  it('status text reflects the locked stake', () => {
     const hand: Clip[] = [mkClip('b1', 'blue'), mkClip('b2', 'blue'), mkClip('b3', 'blue')];
     render(
       <CashInPicker
@@ -212,6 +220,29 @@ describe('<CashInPicker />', () => {
         onChange={() => {}}
       />,
     );
-    expect(screen.getByTestId('cash-in-picker__status')).toHaveTextContent(/Unlocks up to T3/);
+    expect(screen.getByTestId('cash-in-picker__status')).toHaveTextContent(/T3/);
+  });
+
+  it('cost copy surfaces the auto-picked color when ready', () => {
+    const hand: Clip[] = [
+      mkClip('r1', 'red'),
+      mkClip('r2', 'red'),
+      mkClip('r3', 'red'),
+      mkClip('r4', 'red'),
+    ];
+    render(
+      <CashInPicker hand={hand} selection={emptySelection()} onChange={() => {}} />,
+    );
+    expect(screen.getByTestId('cash-in-tier-T2')).toHaveTextContent(/Red/);
+    expect(screen.getByTestId('cash-in-tier-T3')).toHaveTextContent(/Red/);
+  });
+
+  it("cost copy shows what's needed when not yet matchable", () => {
+    const hand: Clip[] = [mkClip('y1', 'yellow')];
+    render(
+      <CashInPicker hand={hand} selection={emptySelection()} onChange={() => {}} />,
+    );
+    expect(screen.getByTestId('cash-in-tier-T2')).toHaveTextContent(/need 1 more Yellow/);
+    expect(screen.getByTestId('cash-in-tier-T3')).toHaveTextContent(/need 2 more Yellow/);
   });
 });

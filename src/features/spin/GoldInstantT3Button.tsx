@@ -51,20 +51,25 @@ export function GoldInstantT3Button({
       type="button"
       onClick={handleTap}
       disabled={disabled}
-      className={cn(
-        'gold-instant-t3',
-        disabled && 'gold-instant-t3--disabled',
-        className,
-      )}
+      className={cn('tier-row', 'tier-row--gold', className)}
       data-testid="gold-instant-t3"
       aria-label="Redeem 1 gold clip for instant Tier 3 reward"
     >
-      <span className="gold-instant-t3__shimmer" aria-hidden="true" />
-      <span className="gold-instant-t3__content">
-        <span className="gold-instant-t3__title">Use gold</span>
-        <span className="gold-instant-t3__subtitle">
-          Instant T3 — skip the wheel ({goldClips.length} gold in hand)
+      <span className="tier-row__badge tier-row__badge--gold" aria-hidden>
+        ★
+      </span>
+      <span className="tier-row__body">
+        <span className="tier-row__desc">Instant T3 — no spin</span>
+        <span className="tier-row__cost">
+          1 Gold Ball ready ({goldClips.length} in hand)
         </span>
+      </span>
+      <span
+        className="tier-row__status"
+        aria-hidden
+        data-state="gold"
+      >
+        ★
       </span>
     </button>
   );

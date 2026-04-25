@@ -172,7 +172,7 @@
   justify-content: center;
 }
 
-/* ---- CashInPicker ---- */
+/* ---- CashInPicker (Pachinko Tier Ladder) ---- */
 
 .cash-in-picker {
   background: var(--color-surface);
@@ -196,18 +196,20 @@
 
 .cash-in-picker__title {
   margin: 0;
-  font-size: var(--text-base);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-gold);
+  letter-spacing: 0.06em;
 }
 
 .cash-in-picker__subtitle {
   margin: 0;
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--color-ink-muted);
 }
 
-.cash-in-picker__rows {
+.tier-ladder {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -216,115 +218,118 @@
   gap: var(--space-2);
 }
 
-.cash-in-picker__row {
+.tier-row {
+  position: relative;
   display: grid;
-  grid-template-columns: 24px 1fr auto;
+  grid-template-columns: 38px 1fr auto;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-surface-2);
+  width: 100%;
+  padding: 10px 12px;
+  min-height: var(--tap-target-min);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  min-height: var(--tap-target-min);
-}
-
-.cash-in-picker__color-label {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.cash-in-picker__color-name {
-  font-size: var(--text-base);
-  color: var(--color-text);
-  text-transform: capitalize;
-}
-
-.cash-in-picker__color-count {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-.cash-in-picker__actions {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.cash-in-picker__pick {
-  min-width: var(--tap-target-min);
-  min-height: var(--tap-target-min);
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border-strong);
-  background: var(--color-surface-3);
-  color: var(--color-text);
-  font-weight: 600;
-  font-size: var(--text-sm);
+  border-radius: 0;
+  color: inherit;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--duration-fast) var(--ease-out),
+  text-align: left;
+  transition:
+    background var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out);
 }
 
-.cash-in-picker__pick:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.cash-in-picker__pick:not(:disabled):hover,
-.cash-in-picker__pick:not(:disabled):focus-visible {
-  background: var(--color-border);
+.tier-row:not(:disabled):hover,
+.tier-row:not(:disabled):focus-visible {
+  border-color: var(--color-border-strong);
   outline: none;
 }
 
-.cash-in-picker__pick:focus-visible {
+.tier-row:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
-.cash-in-picker__pick--active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: var(--color-accent-contrast);
+.tier-row--selected {
+  background: linear-gradient(135deg, var(--color-felt-deep), #1a0403);
+  border-color: var(--color-gold);
+  box-shadow:
+    inset 0 0 0 1px var(--color-bg),
+    inset 0 0 0 2px var(--color-gold);
 }
 
-.cash-in-picker__pick--active:hover {
-  background: var(--color-accent-hover);
-}
-
-.cash-in-picker__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.cash-in-picker__skip {
-  min-height: var(--tap-target-min);
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: transparent;
-  color: var(--color-text-muted);
-  font-weight: 500;
-  font-size: var(--text-sm);
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.cash-in-picker__skip:disabled {
-  opacity: 0.4;
+.tier-row--locked,
+.tier-row:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-.cash-in-picker__skip[aria-pressed='true'] {
-  border-color: var(--color-border-strong);
-  color: var(--color-text);
+.tier-row__badge {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-felt-deep);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-gold);
+  line-height: 1;
+}
+
+.tier-row--selected .tier-row__badge {
+  border-color: var(--color-gold);
+}
+
+.tier-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tier-row__desc {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+
+.tier-row--selected .tier-row__desc {
+  color: var(--color-gold);
+}
+
+.tier-row__cost {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.tier-row__status {
+  font-size: 14px;
+  line-height: 1;
+  color: var(--color-ink-faint);
+}
+
+.tier-row__status[data-state='selected'] {
+  color: var(--color-gold);
+}
+
+.tier-row__status[data-state='locked'] {
+  color: var(--color-ink-faint);
 }
 
 .cash-in-picker__status {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: calc(9px * var(--mono-scale));
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  text-align: center;
 }
 
 /* ---- SpinButton (Pachinko Lever) ---- */
@@ -609,72 +614,41 @@
   text-transform: uppercase;
 }
 
-/* ---- GoldInstantT3Button ---- */
+/* ---- Tier ladder · Gold variant ---- */
 
-.gold-instant-t3 {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  min-height: 56px;
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-gold);
+.tier-row--gold {
   background: linear-gradient(
     135deg,
-    rgba(255, 215, 0, 0.2),
-    rgba(255, 215, 0, 0.05) 60%
+    rgba(232, 198, 130, 0.18),
+    rgba(232, 198, 130, 0.04) 60%
   );
+  border-color: var(--color-gold);
+}
+
+.tier-row--gold:not(:disabled):hover,
+.tier-row--gold:not(:disabled):focus-visible {
+  background: linear-gradient(
+    135deg,
+    rgba(232, 198, 130, 0.28),
+    rgba(232, 198, 130, 0.08) 60%
+  );
+  border-color: var(--color-gold);
+}
+
+.tier-row--gold .tier-row__desc {
   color: var(--color-gold);
-  font-family: inherit;
-  cursor: pointer;
-  overflow: hidden;
-  box-shadow: 0 0 0 1px var(--color-gold-glow) inset,
-    0 8px 24px rgba(255, 215, 0, 0.15);
 }
 
-.gold-instant-t3:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-gold);
-}
-
-.gold-instant-t3--disabled,
-.gold-instant-t3:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.gold-instant-t3__shimmer {
-  position: absolute;
-  inset: 0;
+.tier-row__badge--gold {
   background: radial-gradient(
-    circle at 20% 50%,
-    rgba(255, 244, 168, 0.3),
-    transparent 55%
+    circle at 35% 30%,
+    var(--color-gold),
+    var(--color-gold-deep) 70%
   );
-  pointer-events: none;
+  border-color: var(--color-gold);
+  color: var(--color-bg);
 }
 
-.gold-instant-t3__content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  position: relative;
-  z-index: 1;
-}
-
-.gold-instant-t3__title {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.gold-instant-t3__subtitle {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  font-weight: 500;
+.tier-row__status[data-state='gold'] {
+  color: var(--color-gold);
 }
