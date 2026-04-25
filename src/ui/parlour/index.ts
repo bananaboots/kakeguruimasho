@@ -39,3 +39,9 @@ export type { RitualGlyphKind, RitualGlyphProps } from './RitualGlyph.tsx';
 
 export { SectionTitle } from './SectionTitle.tsx';
 export type { SectionTitleProps } from './SectionTitle.tsx';
+
+export { Lantern } from './Lantern.tsx';
+export type { LanternProps } from './Lantern.tsx';
+
+export { Koi } from './Koi.tsx';
+export type { KoiProps } from './Koi.tsx';

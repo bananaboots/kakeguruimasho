@@ -12,11 +12,11 @@
 import { useAppStore } from '../state/store.ts';
 import { RitualCard } from '../features/habits/index.ts';
 import {
-  JarVisual,
-  StreakDisplay,
   ActivityFeed,
+  PachinkoStreak,
+  PachinkoPotMini,
 } from '../features/jar/index.ts';
-import { HandSummary } from '../features/spin/index.ts';
+import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
 import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
 
@@ -52,7 +52,9 @@ export default function Home() {
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <StreakDisplay jarId={activeJarId} />
+      <PachinkoStreak jarId={activeJarId} />
+
+      <HandTrayCard jarId={activeJarId} />
 
       <SectionTitle
         jp="行"
@@ -65,11 +67,9 @@ export default function Home() {
         ))}
       </div>
 
-      <HandSummary jarId={activeJarId} />
-
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
-      <JarVisual jarId={activeJarId} condensed />
+      <PachinkoPotMini jarId={activeJarId} />
 
       <ActivityFeed jarId={activeJarId} days={7} limit={50} />
     </section>

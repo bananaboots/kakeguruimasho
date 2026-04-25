@@ -20,6 +20,9 @@ export type { GoldInstantT3ButtonProps } from './GoldInstantT3Button.tsx';
 export { HandSummary } from './HandSummary.tsx';
 export type { HandSummaryProps } from './HandSummary.tsx';
 
+export { HandTrayCard } from './HandTrayCard.tsx';
+export type { HandTrayCardProps } from './HandTrayCard.tsx';
+
 export { PostSpinFlow } from './PostSpinFlow.tsx';
 export type { PostSpinFlowProps } from './PostSpinFlow.tsx';
 

@@ -47,11 +47,12 @@ Reference: `pachinko-screens.jsx` line numbers cited inline.
 
 The chassis is in place; these are bespoke widgets that go inside it.
 
-- [ ] **PachinkoStreak** — lantern-flanked ribbon for current/best streak
-      (replaces generic `StreakDisplay`). Source: `pachinko-screens.jsx:253`.
-- [ ] **PachinkoTrayCard** — brass-corner tray frame for the hand summary
+- [x] ~~**PachinkoStreak** — lantern-flanked ribbon for current/best streak
+      (replaces generic `StreakDisplay`). Source: `pachinko-screens.jsx:253`.~~
+      Shipped 2026-04-25.
+- [x] ~~**PachinkoTrayCard** — brass-corner tray frame for the hand summary
       with peg-ring divider and "+6 玉" catch counter. Source:
-      `pachinko-screens.jsx:296`.
+      `pachinko-screens.jsx:296`.~~ Shipped 2026-04-25 as `<HandTrayCard>`.
 - [x] ~~**PachinkoSectionTitle** — kanji + label + gradient rule heading
       style across Home/Habits/Bonus. Source: `pachinko-screens.jsx:284`.~~
       Shipped 2026-04-25 as `<SectionTitle>` parlour primitive.
@@ -63,9 +64,10 @@ The chassis is in place; these are bespoke widgets that go inside it.
 - [ ] **PachinkoEveningRite** — 4-tab 夜 row (湯 歯 顔 床) with done /
       pending states for the hygiene bundle. Source:
       `pachinko-screens.jsx:384`.
-- [ ] **PachinkoPotMini** — koi icon + tier label + progress bar with
+- [x] ~~**PachinkoPotMini** — koi icon + tier label + progress bar with
       quarter-mark ticks for the jar snippet on Home and the full Jar
-      route. Source: `pachinko-screens.jsx:432`.
+      route. Source: `pachinko-screens.jsx:432`.~~ Shipped 2026-04-25 on
+      Home; Jar route still uses the full `<JarVisual>`.
 
 ## Themes
 
