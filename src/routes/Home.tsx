@@ -59,12 +59,10 @@ export default function Home() {
         en="Rituals · Tap to Log"
         style={{ marginTop: 'var(--space-5)' }}
       />
-      <div className="slot" data-slot="[3D] RitualCard *N">
-        <div className="quicklog-grid" role="group" aria-label="Quick log">
-          {habits.map((habit) => (
-            <RitualCard key={habit.id} habit={habit} />
-          ))}
-        </div>
+      <div className="quicklog-grid" role="group" aria-label="Quick log">
+        {habits.map((habit) => (
+          <RitualCard key={habit.id} habit={habit} />
+        ))}
       </div>
 
       <HandSummary jarId={activeJarId} />

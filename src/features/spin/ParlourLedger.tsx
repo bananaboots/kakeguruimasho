@@ -40,19 +40,27 @@ export type ParlourLedgerProps = {
 export function ParlourLedger({ jarId = DEFAULT_JAR_ID }: ParlourLedgerProps) {
   const dailyStreak = useAppStore((s) => s.streaks[jarId]?.daily.current ?? 0);
   const total = useAppStore((s) => selectJarTotal(s, jarId));
-  const lastSpin = useAppStore((s) => {
+  // Subscribe to primitives only — Zustand's strict equality on object selectors
+  // would re-render on every history append. Pull tier and ts as separate
+  // string subscriptions instead.
+  const lastTier = useAppStore((s) => {
     for (let i = s.history.length - 1; i >= 0; i -= 1) {
       const ev = s.history[i];
-      if (ev?.kind === 'main_spin' && ev.jarId === jarId) {
-        return { tier: ev.result.tier, ts: ev.at };
-      }
+      if (ev?.kind === 'main_spin' && ev.jarId === jarId) return ev.result.tier;
+    }
+    return null;
+  });
+  const lastTs = useAppStore((s) => {
+    for (let i = s.history.length - 1; i >= 0; i -= 1) {
+      const ev = s.history[i];
+      if (ev?.kind === 'main_spin' && ev.jarId === jarId) return ev.at;
     }
     return null;
   });
 
-  const lastPullValue = lastSpin ? TIER_GLYPH[lastSpin.tier] : '—';
-  const lastPullSub = lastSpin
-    ? `${TIER_SUB[lastSpin.tier]} · ${relativeAge(lastSpin.ts)}`
+  const lastPullValue = lastTier ? TIER_GLYPH[lastTier] : '—';
+  const lastPullSub = lastTier && lastTs
+    ? `${TIER_SUB[lastTier]} · ${relativeAge(lastTs)}`
     : 'awaiting first pull';
 
   const cells = [

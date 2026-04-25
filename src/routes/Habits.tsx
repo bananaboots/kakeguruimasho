@@ -44,18 +44,14 @@ export default function Habits() {
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <div className="slot" data-slot="[3D] HabitList">
-        <HabitList />
-      </div>
-      <div className="slot" data-slot="[3D] HygieneBundle">
-        {hygiene ? (
-          <HygieneBundle habit={hygiene} />
-        ) : (
-          <p className="route__subtitle">
-            Hygiene bundle archived — recreate via Add habit (kind: bundle).
-          </p>
-        )}
-      </div>
+      <HabitList />
+      {hygiene ? (
+        <HygieneBundle habit={hygiene} />
+      ) : (
+        <p className="route__subtitle">
+          Hygiene bundle archived — recreate via Add habit (kind: bundle).
+        </p>
+      )}
     </section>
   );
 }

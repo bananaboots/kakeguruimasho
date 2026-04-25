@@ -33,15 +33,17 @@ export function HandSummary({ jarId }: HandSummaryProps = {}): ReactElement {
   return (
     <Link
       to="/spin"
-      className="placeholder-card hand-summary-card"
+      className="hand-summary-card"
       data-testid="hand-summary"
       aria-label={label}
     >
-      <strong>
-        Hand: {size} {size === 1 ? 'clip' : 'clips'}
+      <span className="hand-summary-card__count">
+        Hand · {size} {size === 1 ? 'clip' : 'clips'}
         {goldCount > 0 ? ` · ${goldCount} gold` : ''}
-      </strong>
-      <span>{size === 0 ? 'Log a habit to earn one.' : 'Tap to spin.'}</span>
+      </span>
+      <span className="hand-summary-card__cta">
+        {size === 0 ? 'Log a ritual to earn one' : 'Tap to spin'}
+      </span>
     </Link>
   );
 }
