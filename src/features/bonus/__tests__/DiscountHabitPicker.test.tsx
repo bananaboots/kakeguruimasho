@@ -45,8 +45,8 @@ describe('DiscountHabitPicker', () => {
     expect(screen.getByText('Workout')).toBeInTheDocument();
     expect(screen.getByText('Cleaning')).toBeInTheDocument();
     expect(screen.getByText('Focused work')).toBeInTheDocument();
-    // Hygiene bundle excluded.
-    expect(screen.queryByText('Hygiene bundle')).toBeNull();
+    // Self care bundle excluded.
+    expect(screen.queryByText('Self care bundle')).toBeNull();
   });
 
   it('hides archived habits', () => {

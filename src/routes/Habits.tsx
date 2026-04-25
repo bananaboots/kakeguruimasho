@@ -49,7 +49,7 @@ export default function Habits() {
         <HygieneBundle habit={hygiene} />
       ) : (
         <p className="route__subtitle">
-          Hygiene bundle archived — recreate via Add habit (kind: bundle).
+          Self care bundle archived — recreate via Add habit (kind: bundle).
         </p>
       )}
     </section>

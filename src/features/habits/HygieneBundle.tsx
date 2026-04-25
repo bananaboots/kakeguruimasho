@@ -180,54 +180,74 @@ export function HygieneBundle({ habit, jarId = DEFAULT_JAR_ID }: HygieneBundlePr
 
   if (habit.unit.kind !== 'bundle') return null;
 
+  // Tabs are positional — kanji glyph + Latin caption derived from the
+  // sub-item key. Falls back gracefully if the user renames sub-items.
+  const TAB_KANJI: ReadonlyArray<string> = ['湯', '歯', '顔', '床'];
+  const captionFor = (key: string): string => {
+    const lower = key.toLowerCase();
+    if (lower.includes('shower') || lower.includes('bath')) return 'Bath';
+    if (lower.includes('teeth') || lower.includes('brush')) return 'Teeth';
+    if (lower.includes('face') || lower.includes('wash')) return 'Face';
+    if (lower.includes('bed') || lower.includes('sleep')) return 'Bed';
+    return key.length > 6 ? key.slice(0, 6) + '…' : key;
+  };
+
+  const checkedCount = checkedKeys.size;
+
   return (
     <section
-      className="hygiene-bundle"
-      aria-labelledby="hygiene-bundle-title"
+      className="self-care"
+      aria-labelledby="self-care-title"
     >
-      <header className="hygiene-bundle__header">
-        <h2 id="hygiene-bundle-title" className="hygiene-bundle__title">
-          {habit.name}
-        </h2>
-        <p
-          className="hygiene-bundle__cutoff"
-          aria-live="polite"
-        >
+      <header className="self-care__header">
+        <div className="self-care__title-row">
+          <span className="self-care__kanji" aria-hidden>
+            夜
+          </span>
+          <h2 id="self-care-title" className="self-care__title">
+            {habit.name}
+          </h2>
+        </div>
+        <p className="self-care__cutoff" aria-live="polite">
           {awarded ? (
-            <>Done for today. Nice.</>
+            <>{checkedCount} / {subItems.length} · Done for tonight</>
           ) : pastCutoff ? (
-            <>Past cutoff ({cutoffLocal}). Try again tomorrow.</>
+            <>Past {cutoffLocal} · Awards at dawn</>
           ) : (
             <>
-              Bed by {cutoffLocal} — {formatCountdown(Math.max(0, minsLeft))} left
+              {checkedCount} / {subItems.length} · Bed by {cutoffLocal} · {formatCountdown(Math.max(0, minsLeft))} left
             </>
           )}
         </p>
       </header>
 
-      <ul className="hygiene-bundle__list" aria-label="Sub-items">
-        {subItems.map((key) => {
+      <ul className="self-care__tabs" aria-label="Sub-items">
+        {subItems.map((key, i) => {
           const isChecked = checkedKeys.has(key);
+          const kanji = TAB_KANJI[i] ?? '·';
           return (
-            <li key={key} className="hygiene-bundle__item">
-              <label className="hygiene-bundle__row">
-                <input
-                  type="checkbox"
-                  className="hygiene-bundle__checkbox"
-                  checked={isChecked}
-                  disabled={pastCutoff || awarded}
-                  onChange={(e) => toggle(key, e.target.checked)}
-                  aria-label={key}
-                />
-                <span className="hygiene-bundle__label">{key}</span>
-              </label>
+            <li key={key} className="self-care__tab-cell">
+              <button
+                type="button"
+                role="checkbox"
+                className={`self-care__tab ${isChecked ? 'self-care__tab--done' : ''}`}
+                disabled={pastCutoff || awarded}
+                aria-checked={isChecked}
+                aria-label={key}
+                onClick={() => toggle(key, !isChecked)}
+              >
+                <span className="self-care__tab-kanji" aria-hidden>
+                  {kanji}
+                </span>
+                <span className="self-care__tab-caption">{captionFor(key)}</span>
+              </button>
             </li>
           );
         })}
       </ul>
 
       {allChecked && awarded ? (
-        <p className="hygiene-bundle__awarded" role="status" aria-live="polite">
+        <p className="self-care__awarded" role="status" aria-live="polite">
           Clip earned.
         </p>
       ) : null}

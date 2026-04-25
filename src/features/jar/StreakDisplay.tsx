@@ -52,7 +52,7 @@ export function StreakDisplay({ jarId }: StreakDisplayProps): ReactElement {
         },
         {
           id: 'hygiene',
-          label: 'Hygiene streak',
+          label: 'Self care streak',
           icon: Droplets as unknown as IconCmp,
           current: streakState.hygiene.current,
           longest: streakState.hygiene.longest,

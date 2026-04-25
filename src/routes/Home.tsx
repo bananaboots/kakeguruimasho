@@ -10,7 +10,7 @@
  */
 
 import { useAppStore } from '../state/store.ts';
-import { RitualCard } from '../features/habits/index.ts';
+import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
   ActivityFeed,
   PachinkoStreak,
@@ -19,11 +19,17 @@ import {
 import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
 import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
+import { DEFAULT_HABIT_IDS } from '../data/defaults.ts';
 
 export default function Home() {
   const allHabits = useAppStore((s) => s.habits);
   const activeJarId = useAppStore((s) => s.activeJarId);
-  const habits = allHabits.filter((h) => !h.archived);
+  const habits = allHabits.filter(
+    (h) => !h.archived && h.id !== DEFAULT_HABIT_IDS.hygiene,
+  );
+  const selfCare = allHabits.find(
+    (h) => h.id === DEFAULT_HABIT_IDS.hygiene && !h.archived,
+  );
   const { themeMeta } = useTheme();
 
   return (
@@ -66,6 +72,8 @@ export default function Home() {
           <RitualCard key={habit.id} habit={habit} />
         ))}
       </div>
+
+      {selfCare ? <HygieneBundle habit={selfCare} jarId={activeJarId} /> : null}
 
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 

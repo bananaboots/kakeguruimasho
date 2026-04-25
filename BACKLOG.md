@@ -61,9 +61,15 @@ The chassis is in place; these are bespoke widgets that go inside it.
       Source: `pachinko-screens.jsx:348`.~~ Shipped 2026-04-25 as
       `<RitualCard>` (used on both Home and Habits, preserves
       `quicklog-${habit.id}` testid).
-- [ ] **PachinkoEveningRite** — 4-tab 夜 row (湯 歯 顔 床) with done /
+- [x] ~~**PachinkoEveningRite** — 4-tab 夜 row (湯 歯 顔 床) with done /
       pending states for the hygiene bundle. Source:
-      `pachinko-screens.jsx:384`.
+      `pachinko-screens.jsx:384`.~~ Shipped 2026-04-25 by rebuilding
+      `<HygieneBundle>` itself with the 4-tab layout and renaming all
+      user-visible "Hygiene bundle" copy to **"Self care bundle"** per
+      user preference. Internal IDs (`habit_hygiene`,
+      `pendingHygieneBundle`, `streaks.hygiene`) stay legacy to avoid
+      a schema migration. One-shot boot-time rename in `main.tsx`
+      brings existing persisted state forward.
 - [x] ~~**PachinkoPotMini** — koi icon + tier label + progress bar with
       quarter-mark ticks for the jar snippet on Home and the full Jar
       route. Source: `pachinko-screens.jsx:432`.~~ Shipped 2026-04-25 on

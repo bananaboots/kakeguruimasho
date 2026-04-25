@@ -102,7 +102,7 @@ export function defaultHabits(): Habit[] {
     },
     {
       id: DEFAULT_HABIT_IDS.hygiene,
-      name: 'Hygiene bundle',
+      name: 'Self care bundle',
       unit: {
         kind: 'bundle',
         subItems: ['shower', 'brush teeth', 'wash face', 'in bed by cutoff'],
