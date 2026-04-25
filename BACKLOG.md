@@ -15,15 +15,16 @@ Reference: `pachinko-screens.jsx` line numbers cited inline.
 
 ### Spin flow
 
-- [ ] **Spin Wheel chrome** — parlour cabinet frame around the wheel
+- [x] ~~**Spin Wheel chrome** — parlour cabinet frame around the wheel
       (gold/lacquer nested insets, top crest with parlour name + stake
       clips), odds strip (一40 / 二30 / 三20 / 副8 / ★2), `PachinkoLever`
       (knob + track), parlour ledger row (Streak / Pot / Last Pull), and
       "House Honours All Pulls" footer rule with diamond ornaments.
-      Source: `pachinko-screens.jsx:577–702`.
-- [ ] **PachinkoTierRow** — replace plain +2/+3 cash-in buttons with the
+      Source: `pachinko-screens.jsx:577–702`.~~ Shipped 2026-04-25.
+- [x] ~~**PachinkoTierRow** — replace plain +2/+3 cash-in buttons with the
       design's tier-ladder rows (tier badge + description + ○/●/✕ unlock
-      indicator). Source: `pachinko-screens.jsx:539`.
+      indicator). Source: `pachinko-screens.jsx:539`.~~ Shipped
+      2026-04-25 — also restyled GoldInstantT3Button as a gold tier row.
 - [ ] **PachinkoReveal extras** — radiating gold rays (24 SVG lines from
       center), confetti (paper / plum / balls — 30 elements), and a
       radial burst-of-light gradient. The chrysanthemum + 大当たり banner
