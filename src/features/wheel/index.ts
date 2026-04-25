@@ -31,6 +31,8 @@ export {
   type BonusWheelCanvasProps,
 } from './BonusWheelCanvas.tsx';
 
+export { SlotReelsCanvas, type SlotReelsCanvasProps } from './SlotReelsCanvas.tsx';
+
 export {
   MAIN_WHEEL_SPIN_DURATION_SEC,
   BONUS_WHEEL_SPIN_DURATION_SEC,

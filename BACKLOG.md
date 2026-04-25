@@ -30,9 +30,15 @@ Reference: `pachinko-screens.jsx` line numbers cited inline.
       radial burst-of-light gradient. The chrysanthemum + 大当たり banner
       already landed. Source: `pachinko-screens.jsx:744`.~~ Shipped
       2026-04-25.
-- [ ] **Slot-reels alt** for `PachinkoSpinWheel mode="reels"` — completely
+- [x] ~~**Slot-reels alt** for `PachinkoSpinWheel mode="reels"` — completely
       unbuilt; the design offers it as a per-theme runtime alternative to
-      the wheel.
+      the wheel.~~ Shipped 2026-04-25 as `<SlotReelsCanvas>`. Three
+      vertical reel strips with kanji-glyph symbols mapped per
+      `MainWheelTier` (T1 → lantern, T2 → koi, T3 → chrysanthemum,
+      BONUS → plum, JACKPOT → ★). Staggered stops at 0.55 / 0.78 / 1.0
+      of `MAIN_WHEEL_SPIN_DURATION_SEC`. New
+      `settings.spinStyle: 'wheel' | 'reels'` (default `'wheel'`) with
+      a Settings toggle picks the visualisation; engine RNG is shared.
 
 ### Bonus
 

@@ -230,6 +230,7 @@ export function defaultSettings(): Settings {
     workTimerOptIn, // Q3
     pwaRefreshPromptDismissedUntil: null,
     personalName: null,
+    spinStyle: 'wheel',
   };
 }
 

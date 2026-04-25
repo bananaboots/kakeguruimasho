@@ -4,6 +4,8 @@
 import type { HabitId, ISOTimestamp } from './ids.ts';
 import type { BagComposition } from './clip.ts';
 
+export type SpinStyle = 'wheel' | 'reels';
+
 export type Settings = {
   bagComposition: BagComposition; // D2
   sfxEnabled: boolean;
@@ -13,4 +15,7 @@ export type Settings = {
   workTimerOptIn: Record<HabitId, boolean>; // Q3: v1 all false
   pwaRefreshPromptDismissedUntil: ISOTimestamp | null; // Q10/Q13
   personalName: string | null; // optional, for onboarding greet
+  /** Visual style for the main spin. Reels alt mirrors `WheelCanvas`'s
+   * RNG/animation contract — the engine result is identical. */
+  spinStyle: SpinStyle;
 };

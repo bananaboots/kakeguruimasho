@@ -48,6 +48,7 @@ import type { MainSpinResult, WheelConfig } from '../../types/wheel.ts';
 import {
   WheelCanvas,
   BonusWheelCanvas,
+  SlotReelsCanvas,
   spinMainWheel,
   spinBonusWheel,
   mainSegmentIndex,
@@ -134,6 +135,7 @@ export function PostSpinFlow({
   const wheelConfig = useAppStore(
     (s: Store): WheelConfig => s.wheelConfigs[jarId]!,
   );
+  const spinStyle = useAppStore((s) => s.settings.spinStyle);
   const actions = useAppStore((s: Store) => s.actions);
   const { toast } = useToast();
 
@@ -560,7 +562,14 @@ export function PostSpinFlow({
           meta={crestMeta}
         >
           <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
-            {pendingSpin.driftIndex !== null ? (
+            {spinStyle === 'reels' ? (
+              <SlotReelsCanvas
+                targetSegmentIndex={pendingSpin.targetIndex}
+                onAnimationComplete={() => {
+                  void handleMainSpinAnimationComplete();
+                }}
+              />
+            ) : pendingSpin.driftIndex !== null ? (
               <WheelCanvas
                 targetSegmentIndex={pendingSpin.targetIndex}
                 nearMissDriftIndex={pendingSpin.driftIndex}

@@ -8,6 +8,7 @@ import {
   BagCompositionEditor,
   HygieneCutoffEditor,
   SfxHapticsToggles,
+  SpinStyleToggle,
   ExportImportPanel,
   ResetAllDanger,
   HelpScreen,
@@ -48,6 +49,7 @@ export default function Settings() {
 
       <div className="settings">
         <RewardsLinkCard />
+        <SpinStyleToggle />
         <WheelConfigEditor jarId={activeJarId} />
         <BagCompositionEditor />
         <HygieneCutoffEditor />

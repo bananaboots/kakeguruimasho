@@ -64,6 +64,18 @@ function patchLegacyHygieneName(): void {
   }
 }
 
+/**
+ * Fill in optional settings fields added after initial release. Persisted
+ * state from older builds may be missing them; patching here lets us avoid
+ * a schema-version bump for purely additive cosmetic settings.
+ */
+function patchOptionalSettings(): void {
+  const { settings, actions } = getAppStore().getState();
+  if (settings.spinStyle === undefined) {
+    actions.updateSettings({ spinStyle: 'wheel' });
+  }
+}
+
 async function bootRehydrate(): Promise<void> {
   try {
     const persisted = await loadPersistedAppState();
@@ -74,6 +86,7 @@ async function bootRehydrate(): Promise<void> {
     console.error('[boot] rehydrate failed', err);
   }
   patchLegacyHygieneName();
+  patchOptionalSettings();
 }
 
 function mount(): void {
