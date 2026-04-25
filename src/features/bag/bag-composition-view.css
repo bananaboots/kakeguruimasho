@@ -63,14 +63,6 @@
   min-height: var(--tap-target-min); /* SPEC §4 tap target, even though non-interactive */
 }
 
-.bag-composition__swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  flex-shrink: 0;
-}
-
 .bag-composition__count {
   font-size: var(--text-base);
   font-weight: 600;
@@ -95,17 +87,6 @@
   );
   border-color: var(--color-gold);
   box-shadow: 0 0 0 1px var(--color-gold-glow) inset;
-}
-
-.bag-composition__swatch--gold {
-  background: radial-gradient(
-    circle at 30% 30%,
-    #fff4a8,
-    var(--color-gold) 55%,
-    #c9a400 100%
-  );
-  border-color: var(--color-gold);
-  box-shadow: 0 0 8px var(--color-gold-glow);
 }
 
 .bag-composition__tile--gold .bag-composition__count,
