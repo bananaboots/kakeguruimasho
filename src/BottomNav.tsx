@@ -41,18 +41,20 @@ const items: NavItem[] = [
 export function BottomNav() {
   return (
     <nav className="bottom-nav" aria-label="Primary">
-      {items.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.to === '/'}
-          className={({ isActive }) => cn('bottom-nav__item', isActive && 'bottom-nav__item--active')}
-          aria-label={item.label}
-        >
-          <item.icon size={22} aria-hidden="true" />
-          <span className="bottom-nav__label">{item.label}</span>
-        </NavLink>
-      ))}
+      <div className="bottom-nav__inner">
+        {items.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.to === '/'}
+            className={({ isActive }) => cn('bottom-nav__item', isActive && 'bottom-nav__item--active')}
+            aria-label={item.label}
+          >
+            <item.icon size={22} aria-hidden="true" />
+            <span className="bottom-nav__label">{item.label}</span>
+          </NavLink>
+        ))}
+      </div>
     </nav>
   );
 }

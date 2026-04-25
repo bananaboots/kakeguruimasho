@@ -31,6 +31,9 @@ import type { ClipId } from '../../types/ids.ts';
 import type { CashInMatchKind, SpinSelection } from './spin.machine.ts';
 import type { Tier } from '../../types/wheel.ts';
 
+import { Chip } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from './clip-colors.ts';
+
 import './spin.css';
 
 export type CashInPickerProps = {
@@ -55,15 +58,6 @@ const ALL_COLORS: ClipColor[] = [
   'purple',
   'pink',
 ];
-
-const SWATCH_VAR: Record<ClipColor, string> = {
-  red: 'var(--clip-red)',
-  blue: 'var(--clip-blue)',
-  green: 'var(--clip-green)',
-  yellow: 'var(--clip-yellow)',
-  purple: 'var(--clip-purple)',
-  pink: 'var(--clip-pink)',
-};
 
 function groupRegular(hand: Clip[]): ColorCounts {
   const g: ColorCounts = {
@@ -197,11 +191,7 @@ export function CashInPicker({
               className="cash-in-picker__row"
               data-color={color}
             >
-              <span
-                className="cash-in-picker__swatch"
-                style={{ backgroundColor: SWATCH_VAR[color] }}
-                aria-hidden="true"
-              />
+              <Chip color={CLIP_HEX[color]} size={24} ariaLabel={`${color} clip`} />
               <span className="cash-in-picker__color-label">
                 <span className="cash-in-picker__color-name">{color}</span>
                 <span className="cash-in-picker__color-count">({count})</span>

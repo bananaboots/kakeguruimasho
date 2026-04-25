@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+# Pre-commit gate. Two layers:
+#
+# 1. lint-staged — ESLint on the staged JS/TS files only (fast).
+# 2. Project typecheck — `tsc --noEmit` runs across the whole project,
+#    because TypeScript is project-aware (a change in one file can break
+#    a type elsewhere). This is what CI runs.
+#
+# If either fails the commit is aborted. Skip with `git commit --no-verify`
+# when you're committing a WIP / fixing a hook itself.
+
+set -e
+
+npx lint-staged
+npm run typecheck

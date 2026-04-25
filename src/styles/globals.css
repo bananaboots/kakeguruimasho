@@ -12,9 +12,21 @@
 html,
 body,
 #root {
-  height: 100%;
   margin: 0;
   padding: 0;
+}
+
+html {
+  /* Modern viewport unit: shrinks/grows with mobile chrome (URL bar). */
+  min-height: 100dvh;
+}
+
+body,
+#root {
+  /* Let the body grow with content. iOS Safari's touch scroll requires the
+   * body to be content-height, not capped at viewport height — `height: 100%`
+   * here used to break scroll inside the page. */
+  min-height: 100dvh;
 }
 
 body {

@@ -21,10 +21,13 @@ import {
 import { Button } from '../ui/button.tsx';
 import { useAppStore } from '../state/store.ts';
 import { DEFAULT_MILESTONE_IDS } from '../types/ids.ts';
+import { useTheme } from '../styles/theme-context.ts';
+import { DecoDivider, Motif } from '../ui/parlour/index.ts';
 
 export default function Jar() {
   const activeJarId = useAppStore((s) => s.activeJarId);
   const milestones = useAppStore((s) => s.jars[activeJarId]?.milestones);
+  const { themeMeta } = useTheme();
 
   const firstRun = useMemo(() => {
     if (!milestones) return false;
@@ -54,13 +57,30 @@ export default function Jar() {
   }, []);
 
   return (
-    <section className="route" aria-labelledby="jar-title">
-      <header className="route__header">
-        <h1 id="jar-title" className="route__title">
-          Jar
+    <section
+      className="route route--jar parlour-grain parlour-halftone"
+      aria-labelledby="jar-title"
+    >
+      <header className="parlour-masthead">
+        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
+        <h1 id="jar-title" className="parlour-masthead__title">
+          The Pot
         </h1>
-        <p className="route__subtitle">Long-game progress toward your milestones.</p>
+        <p className="parlour-masthead__tagline">
+          Long-game progress toward your milestones.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 'var(--space-3) auto 0',
+          }}
+        >
+          <Motif size={36} />
+        </div>
       </header>
+
+      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
       <StreakDisplay jarId={activeJarId} />
 

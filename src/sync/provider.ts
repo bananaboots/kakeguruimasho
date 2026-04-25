@@ -66,6 +66,7 @@ export function useSyncConnection(): SyncConnection {
         setStatus(e.status === 'connected' ? 'syncing' : 'local-only');
       };
       remote.on('status', onStatus);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- initialize status before WS callback fires; this is a one-shot sync.
       setStatus('local-only'); // until the ws says connected
     } else {
       setStatus('local-only');

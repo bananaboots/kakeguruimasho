@@ -32,6 +32,9 @@ import {
 import { useAppStore } from '../../state/store.ts';
 import type { JarId } from '../../types/ids.ts';
 import type { HistoryEvent } from '../../types/history.ts';
+import { Chip, GoldChip } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from '../spin/clip-colors.ts';
+import type { ClipColor } from '../../types/clip.ts';
 
 type IconCmp = React.ComponentType<
   React.SVGProps<SVGSVGElement> & { size?: number | string }
@@ -65,6 +68,8 @@ interface FeedRow {
   icon: IconCmp;
   subtle: boolean;
   text: string;
+  /** When set, render a <Chip color={...}> instead of `icon`. */
+  clipColor?: ClipColor | 'gold';
 }
 
 export function ActivityFeed({
@@ -151,7 +156,13 @@ export function ActivityFeed({
                 data-kind={r.evt.kind}
               >
                 <span className="activity-feed__item-icon" aria-hidden="true">
-                  <r.icon size={16} />
+                  {r.clipColor === 'gold' ? (
+                    <GoldChip size={16} />
+                  ) : r.clipColor ? (
+                    <Chip color={CLIP_HEX[r.clipColor]} size={16} />
+                  ) : (
+                    <r.icon size={16} />
+                  )}
                 </span>
                 <span className="activity-feed__item-text">{r.text}</span>
                 <span className="activity-feed__item-time">{r.time}</span>
@@ -166,13 +177,14 @@ export function ActivityFeed({
 
 function describe(
   evt: HistoryEvent,
-): { icon: IconCmp; subtle: boolean; text: string } | null {
+): { icon: IconCmp; subtle: boolean; text: string; clipColor?: ClipColor | 'gold' } | null {
   switch (evt.kind) {
     case 'clip_earned':
       return {
         icon: Coins as unknown as IconCmp,
         subtle: false,
         text: `Earned a ${evt.drawnColor} clip`,
+        clipColor: evt.drawnColor,
       };
     case 'milestone_unlocked':
       return {

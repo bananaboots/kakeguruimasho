@@ -15,7 +15,11 @@
     "test:e2e:ui": "playwright test --ui",
     "generate-icons": "node scripts/generate-icons.mjs",
     "sync:dev": "partykit dev",
-    "sync:deploy": "partykit deploy"
+    "sync:deploy": "partykit deploy",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": "eslint"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.6",
@@ -54,7 +58,9 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "fake-indexeddb": "^6.2.5",
     "globals": "^17.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^29.0.2",
+    "lint-staged": "^16.4.0",
     "partykit": "^0.0.115",
     "prettier": "^3.8.3",
     "sharp": "^0.34.5",

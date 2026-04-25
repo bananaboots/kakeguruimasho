@@ -8,15 +8,36 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs.tsx';
 import { RewardMenu } from '../features/rewards/RewardMenu.tsx';
 import { RewardRulesSidebar } from '../features/rewards/reward-rules-sidebar.tsx';
+import { useTheme } from '../styles/theme-context.ts';
+import { DecoDivider, Motif } from '../ui/parlour/index.ts';
 
 export default function Rewards() {
+  const { themeMeta } = useTheme();
   return (
-    <section className="route" aria-labelledby="rewards-title">
-      <header className="route__header">
-        <h1 id="rewards-title" className="route__title">
-          Rewards
+    <section
+      className="route route--rewards parlour-grain parlour-halftone"
+      aria-labelledby="rewards-title"
+    >
+      <header className="parlour-masthead">
+        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
+        <h1 id="rewards-title" className="parlour-masthead__title">
+          The Vault
         </h1>
+        <p className="parlour-masthead__tagline">
+          What the house owes you when the wheel lands true.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 'var(--space-3) auto 0',
+          }}
+        >
+          <Motif size={36} />
+        </div>
       </header>
+
+      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
       <RewardRulesSidebar />
 

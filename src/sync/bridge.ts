@@ -83,7 +83,7 @@ export function bridgeStoreAndDoc(store: AnyStore, doc: Y.Doc): () => void {
     }, BRIDGE_ORIGIN);
   };
 
-  const unsubStore = store.subscribe((_state, _prev) => {
+  const unsubStore = store.subscribe(() => {
     if (applyingRemote) return;
     if (pending) return;
     pending = setTimeout(writeStateToDoc, DEBOUNCE_MS);

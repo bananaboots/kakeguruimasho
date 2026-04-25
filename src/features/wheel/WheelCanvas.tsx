@@ -13,7 +13,7 @@
 //   Tap-safe spin button is rendered by 3E, not here.
 
 import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import {
   BONUS_WHEEL_REVOLUTIONS,
@@ -27,49 +27,54 @@ import {
   BONUS_WHEEL_SEGMENT_ORDER,
   MAIN_WHEEL_SEGMENT_ORDER,
 } from './wheel.engine.ts';
+import {
+  BONUS_WHEEL_SLICE_SEQUENCE,
+  MAIN_WHEEL_SLICE_SEQUENCE,
+  bonusSegmentToVisualSlice,
+  mainTierToVisualSlice,
+  type BonusSlicePrize,
+  type MainSliceTier,
+} from './wheel-slices.ts';
+import { Chrysanthemum } from './Chrysanthemum.tsx';
+import { PlumBlossom } from './PlumBlossom.tsx';
+import { BrassPointer } from './BrassPointer.tsx';
 import type { BonusSegment, MainWheelTier } from '../../types/wheel.ts';
 
-// ---- Segment visual metadata ----
+// ---- Slice tier visual metadata (50-slice main wheel) ----
 
-type MainSegmentMeta = {
-  tier: MainWheelTier;
-  label: string;
-  fill: string;
-  /** Whether this segment is visually "big-reward" (gold glow on settle). */
-  emphasized: boolean;
+type MainSliceTierMeta = {
+  base: string;
+  shade: string;
+  jp: string;
+  /** Maps a slice tier to the engine MainWheelTier so we can preserve data-tier. */
+  engineTier: MainWheelTier;
+  ink: 'light' | 'dark';
 };
 
-const MAIN_SEGMENT_META: Record<MainWheelTier, Omit<MainSegmentMeta, 'tier'>> =
-  {
-    T1: { label: 'T1', fill: 'var(--color-surface-2, #1f1f22)', emphasized: false },
-    T2: { label: 'T2', fill: 'var(--color-surface-3, #2a2a2e)', emphasized: false },
-    T3: { label: 'T3', fill: 'var(--color-accent, #E53935)', emphasized: true },
-    BONUS: {
-      label: 'BONUS',
-      fill: 'var(--color-success, #3FB68B)',
-      emphasized: true,
-    },
-    JACKPOT: {
-      label: 'JACKPOT',
-      fill: 'var(--color-gold, #FFD700)',
-      emphasized: true,
-    },
-  };
-
-type BonusSegmentMeta = {
-  segment: BonusSegment;
-  label: string;
-  fill: string;
+const SLICE_TIER_META: Record<MainSliceTier, MainSliceTierMeta> = {
+  I:     { base: '#a8302a', shade: '#7a1f1c', jp: '一', engineTier: 'T1',     ink: 'light' },
+  II:    { base: '#3a6680', shade: '#284b62', jp: '二', engineTier: 'T2',     ink: 'light' },
+  III:   { base: '#704a76', shade: '#523557', jp: '三', engineTier: 'T3',     ink: 'light' },
+  BONUS: { base: '#3a7458', shade: '#28553e', jp: '副', engineTier: 'BONUS',  ink: 'light' },
+  JP:    { base: 'var(--color-gold)', shade: 'var(--color-gold-deep)', jp: '★', engineTier: 'JACKPOT', ink: 'dark' },
 };
 
-const BONUS_SEGMENT_META: Record<BonusSegment, Omit<BonusSegmentMeta, 'segment'>> =
-  {
-    PCT_75: { label: '75%', fill: 'var(--color-surface-2, #1f1f22)' },
-    PCT_50: { label: '50%', fill: 'var(--color-surface-3, #2a2a2e)' },
-    PCT_25: { label: '25%', fill: 'var(--color-accent, #E53935)' },
-    FREE: { label: 'FREE', fill: 'var(--color-gold, #FFD700)' },
-    EXTRA: { label: '+1 SPIN', fill: 'var(--color-success, #3FB68B)' },
-  };
+type BonusPrizeMeta = {
+  base: string;
+  shade: string;
+  big: string;
+  /** Maps to engine BonusSegment for data-segment preservation. */
+  engineSegment: BonusSegment;
+  rare: boolean;
+};
+
+const BONUS_PRIZE_META: Record<BonusSlicePrize, BonusPrizeMeta> = {
+  sm:   { base: '#704a76', shade: '#523557', big: '二五', engineSegment: 'PCT_25', rare: false },
+  md:   { base: '#3a6680', shade: '#284b62', big: '五十', engineSegment: 'PCT_50', rare: false },
+  lg:   { base: '#a8302a', shade: '#7a1f1c', big: '七五', engineSegment: 'PCT_75', rare: true  },
+  x2:   { base: '#3a7458', shade: '#28553e', big: '倍',   engineSegment: 'EXTRA',  rare: true  },
+  free: { base: 'var(--color-gold)', shade: 'var(--color-gold-deep)', big: '無料', engineSegment: 'FREE', rare: true },
+};
 
 // ---- Props ----
 
@@ -94,26 +99,6 @@ export type WheelCanvasProps = {
 
 const VIEWBOX = 400;
 const CENTER = VIEWBOX / 2;
-const OUTER_RADIUS = 185;
-const LABEL_RADIUS = 120;
-
-function polarToCartesian(cx: number, cy: number, r: number, deg: number): {
-  x: number;
-  y: number;
-} {
-  const rad = ((deg - 90) * Math.PI) / 180;
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-function segmentPath(index: number, count: number): string {
-  const sweep = 360 / count;
-  const start = index * sweep;
-  const end = start + sweep;
-  const s = polarToCartesian(CENTER, CENTER, OUTER_RADIUS, start);
-  const e = polarToCartesian(CENTER, CENTER, OUTER_RADIUS, end);
-  const largeArc = sweep > 180 ? 1 : 0;
-  return `M ${CENTER} ${CENTER} L ${s.x} ${s.y} A ${OUTER_RADIUS} ${OUTER_RADIUS} 0 ${largeArc} 1 ${e.x} ${e.y} Z`;
-}
 
 /**
  * Compute the rotation (in degrees) that lands segment `index` under the
@@ -131,28 +116,28 @@ function rotationForIndex(index: number, count: number): number {
 
 export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
   const { targetSegmentIndex, nearMissDriftIndex, onAnimationComplete, idle } = props;
-  const segments = MAIN_WHEEL_SEGMENT_ORDER;
   const controls = useAnimationControls();
   const reduceMotion = useReducedMotion();
   const lastPlayedRef = useRef<number | null>(null);
 
-  const segmentMeta: MainSegmentMeta[] = useMemo(
-    () =>
-      segments.map((tier) => ({ tier, ...MAIN_SEGMENT_META[tier] })),
-    [segments],
-  );
+  // The animation operates on the 50-slice visual indexing.
+  const targetTier = MAIN_WHEEL_SEGMENT_ORDER[targetSegmentIndex];
+  const driftTier =
+    nearMissDriftIndex !== undefined && nearMissDriftIndex !== targetSegmentIndex
+      ? MAIN_WHEEL_SEGMENT_ORDER[nearMissDriftIndex]
+      : undefined;
+  const targetVisualIdx = targetTier ? mainTierToVisualSlice(targetTier) : 0;
+  const driftVisualIdx = driftTier ? mainTierToVisualSlice(driftTier) : undefined;
 
   useEffect(() => {
     if (idle) return;
-    // Only play once per distinct target selection.
     const playKey = targetSegmentIndex * 1000 + (nearMissDriftIndex ?? -1);
     if (lastPlayedRef.current === playKey) return;
     lastPlayedRef.current = playKey;
 
-    const N = segments.length;
-    const finalRot = rotationForIndex(targetSegmentIndex, N);
+    const N = MAIN_WHEEL_SLICE_SEQUENCE.length; // 50
+    const finalRot = rotationForIndex(targetVisualIdx, N);
 
-    // Reduced motion: no drift, short rotation.
     if (reduceMotion) {
       void controls
         .start({
@@ -164,87 +149,72 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
     }
 
     const run = async (): Promise<void> => {
-      if (nearMissDriftIndex !== undefined && nearMissDriftIndex !== targetSegmentIndex) {
-        // Phase 1: spin past the drift segment with overshoot.
-        const driftRot = rotationForIndex(nearMissDriftIndex, N);
+      if (driftVisualIdx !== undefined) {
+        const driftRot = rotationForIndex(driftVisualIdx, N);
         const overshootSweep = (360 / N) * NEAR_MISS_OVERSHOOT_FACTOR;
         const phase1End = driftRot - overshootSweep - 360 * MAIN_WHEEL_REVOLUTIONS;
-
         await controls.start({
           rotate: phase1End,
-          transition: {
-            duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.75,
-            ease: [0.15, 0.5, 0.3, 1], // fast start, bleed off speed
-          },
+          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.75, ease: [0.15, 0.5, 0.3, 1] },
         });
-
-        // Phase 2: ease back onto the target (always ending on target — R3).
-        // Normalize so we ease "forward" the short way.
         const remainder = ((phase1End - finalRot) % 360 + 360) % 360;
         const phase2End = phase1End - remainder;
         await controls.start({
           rotate: phase2End,
-          transition: {
-            duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.25,
-            ease: 'easeOut',
-          },
+          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.25, ease: 'easeOut' },
         });
       } else {
-        // Clean spin — multiple revolutions then settle.
         const endRot = finalRot - 360 * MAIN_WHEEL_REVOLUTIONS;
         await controls.start({
           rotate: endRot,
-          transition: {
-            duration: MAIN_WHEEL_SPIN_DURATION_SEC,
-            ease: [0.2, 0.8, 0.2, 1],
-          },
+          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC, ease: [0.2, 0.8, 0.2, 1] },
         });
       }
-
-      // Winning-segment pulse — spec §12.
       await controls.start({
         scale: [1, 1.04, 1],
         transition: { duration: WIN_PULSE_DURATION_SEC, ease: 'easeInOut' },
       });
       onAnimationComplete?.();
     };
-
     void run();
   }, [
     idle,
     targetSegmentIndex,
     nearMissDriftIndex,
+    targetVisualIdx,
+    driftVisualIdx,
     reduceMotion,
     controls,
     onAnimationComplete,
-    segments.length,
-    segments,
   ]);
+
+  // Geometry — 50 slices fan from a 165-radius circle to the 60-radius hub.
+  // We keep VIEWBOX/CENTER from the existing module-level constants.
+  const N = MAIN_WHEEL_SLICE_SEQUENCE.length;
+  const slice = 360 / N;
+  const cx = CENTER, cy = CENTER;
+  const rOuter = 165;
+  const rInner = 60;
+  const rLabel = rOuter - 14;
 
   return (
     <div
       data-testid="main-wheel"
-      style={{
-        position: 'relative',
-        width: '100%',
-        maxWidth: 400,
-        aspectRatio: '1 / 1',
-        margin: '0 auto',
-      }}
+      style={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '1 / 1', margin: '0 auto' }}
     >
-      {/* Pointer at top (12 o'clock). */}
-      <svg
-        viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-        aria-hidden="true"
+      {/* Pointer at top */}
+      <div
+        style={{
+          position: 'absolute',
+          top: -8,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 3,
+          pointerEvents: 'none',
+        }}
       >
-        <polygon
-          points={`${CENTER - 14},12 ${CENTER + 14},12 ${CENTER},${12 + 22}`}
-          fill="var(--color-accent, #E53935)"
-          stroke="var(--color-bg, #0A0A0B)"
-          strokeWidth={2}
-        />
-      </svg>
+        <BrassPointer size="main" />
+      </div>
 
       <motion.svg
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
@@ -254,43 +224,143 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
         role="img"
         aria-label="Main reward wheel"
       >
-        {segmentMeta.map((meta, i) => {
-          const sweep = 360 / segmentMeta.length;
-          const labelAngle = (i + 0.5) * sweep;
-          const lp = polarToCartesian(CENTER, CENTER, LABEL_RADIUS, labelAngle);
+        <defs>
+          <radialGradient id="pw-felt" cx="50%" cy="50%" r="55%">
+            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.05)" />
+            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.5)" />
+          </radialGradient>
+          <linearGradient id="pw-rim" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-gold)" />
+            <stop offset="50%" stopColor="var(--color-gold-deep)" />
+            <stop offset="100%" stopColor="var(--color-gold)" />
+          </linearGradient>
+        </defs>
+
+        {/* Outer brass cabinet rim */}
+        <circle cx={cx} cy={cy} r={rOuter + 22} fill="none" stroke="var(--color-gold-deep)" strokeWidth="3" />
+        <circle cx={cx} cy={cy} r={rOuter + 18} fill="none" stroke="url(#pw-rim)" strokeWidth="3" />
+        <circle cx={cx} cy={cy} r={rOuter + 12} fill="none" stroke="var(--color-bg)" strokeWidth="1" />
+
+        {/* 50 slices */}
+        {MAIN_WHEEL_SLICE_SEQUENCE.map((tk, i) => {
+          const meta = SLICE_TIER_META[tk];
+          const a0 = ((i * slice - 90) * Math.PI) / 180;
+          const a1 = (((i + 1) * slice - 90) * Math.PI) / 180;
+          const x0 = cx + Math.cos(a0) * rOuter;
+          const y0 = cy + Math.sin(a0) * rOuter;
+          const x1 = cx + Math.cos(a1) * rOuter;
+          const y1 = cy + Math.sin(a1) * rOuter;
+          const fill = i % 2 === 0 ? meta.base : meta.shade;
+          const showLabel = tk === 'JP' || tk === 'BONUS' || i % 5 === 0;
+          const aMid = (((i + 0.5) * slice - 90) * Math.PI) / 180;
+          const lx = cx + Math.cos(aMid) * rLabel;
+          const ly = cy + Math.sin(aMid) * rLabel;
+          const labelRot = (i + 0.5) * slice;
           return (
-            <g key={meta.tier} data-segment-index={i} data-tier={meta.tier}>
+            <g key={i} data-slice-index={i} data-tier={meta.engineTier}>
               <path
-                d={segmentPath(i, segmentMeta.length)}
-                fill={meta.fill}
-                stroke="var(--color-border-strong, #3a3a3e)"
-                strokeWidth={1}
+                d={`M${cx} ${cy} L${x0} ${y0} A${rOuter} ${rOuter} 0 0 1 ${x1} ${y1} Z`}
+                fill={fill}
+                stroke="var(--color-bg)"
+                strokeWidth="0.5"
+                strokeOpacity="0.6"
               />
-              <text
-                x={lp.x}
-                y={lp.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                transform={`rotate(${labelAngle} ${lp.x} ${lp.y})`}
-                fill="var(--color-text, #F5F5F7)"
-                fontSize={meta.emphasized ? 22 : 18}
-                fontWeight={700}
-              >
-                {meta.label}
-              </text>
+              {i % 5 === 0 ? (
+                <line
+                  x1={cx + Math.cos(a0) * (rOuter - 8)}
+                  y1={cy + Math.sin(a0) * (rOuter - 8)}
+                  x2={cx + Math.cos(a0) * rOuter}
+                  y2={cy + Math.sin(a0) * rOuter}
+                  stroke="var(--color-gold)"
+                  strokeWidth="0.8"
+                  opacity="0.9"
+                />
+              ) : null}
+              {showLabel ? (
+                <text
+                  x={lx}
+                  y={ly}
+                  fill={meta.ink === 'light' ? 'var(--color-ink)' : 'var(--color-bg)'}
+                  fontFamily='"Shippori Mincho", "DM Serif Display", serif'
+                  fontSize={tk === 'JP' ? 13 : 11}
+                  fontWeight="700"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={`rotate(${labelRot}, ${lx}, ${ly})`}
+                  style={{ letterSpacing: '0.05em' }}
+                >
+                  {meta.jp}
+                </text>
+              ) : null}
             </g>
           );
         })}
+
+        {/* Felt overlay */}
+        <circle cx={cx} cy={cy} r={rOuter} fill="url(#pw-felt)" opacity="0.4" pointerEvents="none" />
+
+        {/* Peg ring — 50 brass dots */}
+        {Array.from({ length: 50 }).map((_, i) => {
+          const a = (i / 50) * Math.PI * 2;
+          const px = cx + Math.cos(a) * (rOuter + 4);
+          const py = cy + Math.sin(a) * (rOuter + 4);
+          return (
+            <g key={`peg-${i}`} aria-hidden="true">
+              <circle cx={px} cy={py} r="1.6" fill="var(--color-gold-deep)" />
+              <circle cx={px - 0.3} cy={py - 0.3} r="0.6" fill="#ffffff" opacity="0.7" />
+            </g>
+          );
+        })}
+
         {/* Hub */}
-        <circle
-          cx={CENTER}
-          cy={CENTER}
-          r={16}
-          fill="var(--color-border-strong, #3a3a3e)"
-          stroke="var(--color-text, #F5F5F7)"
-          strokeWidth={1.5}
-        />
+        <circle cx={cx} cy={cy} r={rInner + 6} fill="var(--color-bg)" stroke="var(--color-gold-deep)" strokeWidth="0.8" />
+        <circle cx={cx} cy={cy} r={rInner} fill="var(--color-felt-deep)" stroke="var(--color-gold)" strokeWidth="1.5" />
+        <circle cx={cx} cy={cy} r={rInner - 4} fill="none" stroke="var(--color-gold-deep)" strokeWidth="0.5" />
+
+        {/* Test anchors — preserve `data-segment-index` 0..4 + data-tier for near-miss tests */}
+        <g aria-hidden="true">
+          {MAIN_WHEEL_SEGMENT_ORDER.map((tier, i) => (
+            <rect
+              key={tier}
+              data-segment-index={i}
+              data-tier={tier}
+              x={-1}
+              y={-1}
+              width={1}
+              height={1}
+              fill="transparent"
+              opacity={0}
+            />
+          ))}
+        </g>
       </motion.svg>
+
+      {/* Hub overlay (Chrysanthemum + wordmark) — rendered outside the spinning <svg>
+          so the brand mark stays upright while the wheel rotates. */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          textAlign: 'center',
+          pointerEvents: 'none',
+        }}
+      >
+        <Chrysanthemum size={48} />
+        <div
+          style={{
+            fontFamily: '"Shippori Mincho", serif',
+            fontWeight: 800,
+            fontSize: 11,
+            letterSpacing: '0.3em',
+            color: 'var(--color-gold)',
+            marginTop: 2,
+          }}
+        >
+          賭狂魔笙
+        </div>
+      </div>
     </div>
   );
 }
@@ -306,23 +376,19 @@ export type BonusWheelCanvasProps = {
 
 export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactElement {
   const { targetSegmentIndex, onAnimationComplete } = props;
-  const segments = BONUS_WHEEL_SEGMENT_ORDER;
   const controls = useAnimationControls();
   const reduceMotion = useReducedMotion();
   const lastPlayedRef = useRef<number | null>(null);
 
-  const segmentMeta: BonusSegmentMeta[] = useMemo(
-    () =>
-      segments.map((segment) => ({ segment, ...BONUS_SEGMENT_META[segment] })),
-    [segments],
-  );
+  const targetSegment = BONUS_WHEEL_SEGMENT_ORDER[targetSegmentIndex];
+  const targetVisualIdx = targetSegment ? bonusSegmentToVisualSlice(targetSegment) : 0;
 
   useEffect(() => {
     if (lastPlayedRef.current === targetSegmentIndex) return;
     lastPlayedRef.current = targetSegmentIndex;
 
-    const N = segments.length;
-    const finalRot = rotationForIndex(targetSegmentIndex, N);
+    const N = BONUS_WHEEL_SLICE_SEQUENCE.length; // 24
+    const finalRot = rotationForIndex(targetVisualIdx, N);
 
     if (reduceMotion) {
       void controls
@@ -338,10 +404,7 @@ export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactEleme
     const run = async (): Promise<void> => {
       await controls.start({
         rotate: endRot,
-        transition: {
-          duration: BONUS_WHEEL_SPIN_DURATION_SEC,
-          ease: [0.2, 0.8, 0.2, 1],
-        },
+        transition: { duration: BONUS_WHEEL_SPIN_DURATION_SEC, ease: [0.2, 0.8, 0.2, 1] },
       });
       await controls.start({
         scale: [1, 1.05, 1],
@@ -350,31 +413,32 @@ export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactEleme
       onAnimationComplete?.();
     };
     void run();
-  }, [targetSegmentIndex, reduceMotion, controls, onAnimationComplete, segments.length, segments]);
+  }, [targetSegmentIndex, targetVisualIdx, reduceMotion, controls, onAnimationComplete]);
+
+  const N = BONUS_WHEEL_SLICE_SEQUENCE.length;
+  const slice = 360 / N;
+  const cx = CENTER, cy = CENTER;
+  const rOuter = 150;
+  const rLabel = rOuter - 14;
 
   return (
     <div
       data-testid="bonus-wheel"
-      style={{
-        position: 'relative',
-        width: '100%',
-        maxWidth: 320,
-        aspectRatio: '1 / 1',
-        margin: '0 auto',
-      }}
+      style={{ position: 'relative', width: '100%', maxWidth: 320, aspectRatio: '1 / 1', margin: '0 auto' }}
     >
-      <svg
-        viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-        aria-hidden="true"
+      <div
+        style={{
+          position: 'absolute',
+          top: -4,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 3,
+          pointerEvents: 'none',
+        }}
       >
-        <polygon
-          points={`${CENTER - 12},14 ${CENTER + 12},14 ${CENTER},${14 + 20}`}
-          fill="var(--color-accent, #E53935)"
-          stroke="var(--color-bg, #0A0A0B)"
-          strokeWidth={2}
-        />
-      </svg>
+        <BrassPointer size="bonus" />
+      </div>
+
       <motion.svg
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
         animate={controls}
@@ -383,42 +447,124 @@ export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactEleme
         role="img"
         aria-label="Bonus reward wheel"
       >
-        {segmentMeta.map((meta, i) => {
-          const sweep = 360 / segmentMeta.length;
-          const labelAngle = (i + 0.5) * sweep;
-          const lp = polarToCartesian(CENTER, CENTER, LABEL_RADIUS, labelAngle);
+        <defs>
+          <radialGradient id="bw-felt" cx="50%" cy="50%" r="55%">
+            <stop offset="0%" stopColor="rgba(255, 255, 255, 0.04)" />
+            <stop offset="100%" stopColor="rgba(0, 0, 0, 0.45)" />
+          </radialGradient>
+          <linearGradient id="bw-rim" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-gold)" />
+            <stop offset="50%" stopColor="var(--color-gold-deep)" />
+            <stop offset="100%" stopColor="var(--color-gold)" />
+          </linearGradient>
+        </defs>
+
+        {/* nested brass rim */}
+        <circle cx={cx} cy={cy} r={rOuter + 14} fill="var(--color-gold-deep)" />
+        <circle cx={cx} cy={cy} r={rOuter + 12} fill="url(#bw-rim)" />
+        <circle cx={cx} cy={cy} r={rOuter + 8} fill="var(--color-bg)" />
+        <circle cx={cx} cy={cy} r={rOuter + 6} fill="none" stroke="var(--color-gold)" strokeWidth="0.5" opacity="0.7" />
+
+        {BONUS_WHEEL_SLICE_SEQUENCE.map((pk, i) => {
+          const meta = BONUS_PRIZE_META[pk];
+          const a0 = ((i * slice - 90) * Math.PI) / 180;
+          const a1 = (((i + 1) * slice - 90) * Math.PI) / 180;
+          const x0 = cx + Math.cos(a0) * rOuter;
+          const y0 = cy + Math.sin(a0) * rOuter;
+          const x1 = cx + Math.cos(a1) * rOuter;
+          const y1 = cy + Math.sin(a1) * rOuter;
+          const fill = i % 2 === 0 ? meta.base : meta.shade;
+          const aMid = (((i + 0.5) * slice - 90) * Math.PI) / 180;
+          const lx = cx + Math.cos(aMid) * rLabel;
+          const ly = cy + Math.sin(aMid) * rLabel;
+          const labelRot = (i + 0.5) * slice;
           return (
-            <g key={meta.segment} data-segment-index={i} data-segment={meta.segment}>
+            <g key={i} data-slice-index={i} data-segment={meta.engineSegment}>
               <path
-                d={segmentPath(i, segmentMeta.length)}
-                fill={meta.fill}
-                stroke="var(--color-border-strong, #3a3a3e)"
-                strokeWidth={1}
+                d={`M${cx} ${cy} L${x0} ${y0} A${rOuter} ${rOuter} 0 0 1 ${x1} ${y1} Z`}
+                fill={fill}
+                stroke="var(--color-bg)"
+                strokeWidth="0.5"
+                strokeOpacity="0.6"
               />
-              <text
-                x={lp.x}
-                y={lp.y}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                transform={`rotate(${labelAngle} ${lp.x} ${lp.y})`}
-                fill="var(--color-text, #F5F5F7)"
-                fontSize={18}
-                fontWeight={700}
-              >
-                {meta.label}
-              </text>
+              {pk === 'free' ? (
+                <line
+                  x1={cx + Math.cos(a0) * (rOuter - 6)}
+                  y1={cy + Math.sin(a0) * (rOuter - 6)}
+                  x2={cx + Math.cos(a0) * rOuter}
+                  y2={cy + Math.sin(a0) * rOuter}
+                  stroke="var(--color-gold)"
+                  strokeWidth="1"
+                />
+              ) : null}
+              {meta.rare ? (
+                <text
+                  x={lx}
+                  y={ly}
+                  fill={pk === 'free' ? 'var(--color-bg)' : 'var(--color-ink)'}
+                  fontFamily='"Shippori Mincho", "DM Serif Display", serif'
+                  fontSize={pk === 'free' ? 13 : 11}
+                  fontWeight="700"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  transform={`rotate(${labelRot}, ${lx}, ${ly})`}
+                  style={{ letterSpacing: '0.05em' }}
+                >
+                  {meta.big}
+                </text>
+              ) : null}
             </g>
           );
         })}
-        <circle
-          cx={CENTER}
-          cy={CENTER}
-          r={14}
-          fill="var(--color-border-strong, #3a3a3e)"
-          stroke="var(--color-text, #F5F5F7)"
-          strokeWidth={1.5}
-        />
+
+        <circle cx={cx} cy={cy} r={rOuter} fill="url(#bw-felt)" opacity="0.5" pointerEvents="none" />
+
+        {Array.from({ length: 36 }).map((_, i) => {
+          const a = (i / 36) * Math.PI * 2;
+          const px = cx + Math.cos(a) * (rOuter + 3);
+          const py = cy + Math.sin(a) * (rOuter + 3);
+          return (
+            <g key={`bp-${i}`} aria-hidden="true">
+              <circle cx={px} cy={py} r="1.4" fill="var(--color-gold-deep)" />
+              <circle cx={px - 0.3} cy={py - 0.3} r="0.5" fill="#ffffff" opacity="0.7" />
+            </g>
+          );
+        })}
+
+        <circle cx={cx} cy={cy} r={32} fill="var(--color-bg)" stroke="var(--color-gold-deep)" strokeWidth="0.6" />
+        <circle cx={cx} cy={cy} r={28} fill="var(--color-felt-deep)" stroke="var(--color-gold)" strokeWidth="1" />
+        <circle cx={cx} cy={cy} r={22} fill="none" stroke="var(--color-gold-deep)" strokeWidth="0.4" />
+
+        {/* Test anchors — preserve `data-segment-index` 0..4 + data-segment for any future tests */}
+        <g aria-hidden="true">
+          {BONUS_WHEEL_SEGMENT_ORDER.map((segment, i) => (
+            <rect
+              key={segment}
+              data-segment-index={i}
+              data-segment={segment}
+              x={-1}
+              y={-1}
+              width={1}
+              height={1}
+              fill="transparent"
+              opacity={0}
+            />
+          ))}
+        </g>
       </motion.svg>
+
+      {/* Plum-blossom hub — outside motion.svg so it stays upright. */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }}
+      >
+        <PlumBlossom size={36} />
+      </div>
     </div>
   );
 }
