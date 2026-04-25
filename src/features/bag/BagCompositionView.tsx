@@ -18,6 +18,8 @@ import { bagComposition } from './bag.engine.ts';
 import type { ClipColor } from '../../types/clip.ts';
 import type { JarId } from '../../types/ids.ts';
 import { DEFAULT_CLIP_COLORS } from '../../types/clip.ts';
+import { Chip, GoldChip } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from '../spin/clip-colors.ts';
 
 import './bag-composition-view.css';
 
@@ -26,16 +28,6 @@ export type BagCompositionViewProps = {
   /** Optional override for the color ordering (defaults to DEFAULT_CLIP_COLORS). */
   colors?: readonly ClipColor[];
   className?: string;
-};
-
-/** Maps each ClipColor to its token-backed CSS variable. */
-const SWATCH_VAR: Record<ClipColor, string> = {
-  red: 'var(--clip-red)',
-  blue: 'var(--clip-blue)',
-  green: 'var(--clip-green)',
-  yellow: 'var(--clip-yellow)',
-  purple: 'var(--clip-purple)',
-  pink: 'var(--clip-pink)',
 };
 
 export default function BagCompositionView(props: BagCompositionViewProps): ReactElement {
@@ -75,11 +67,7 @@ export default function BagCompositionView(props: BagCompositionViewProps): Reac
             data-color={color}
             aria-label={`${counts[color]} ${color}`}
           >
-            <span
-              className="bag-composition__swatch"
-              style={{ backgroundColor: SWATCH_VAR[color] }}
-              aria-hidden="true"
-            />
+            <Chip color={CLIP_HEX[color]} size={24} ariaLabel={`${color} clip`} />
             <span className="bag-composition__count">{counts[color]}</span>
             <span className="bag-composition__label">{color}</span>
           </li>
@@ -89,10 +77,7 @@ export default function BagCompositionView(props: BagCompositionViewProps): Reac
           data-color="gold"
           aria-label={`${counts.gold} gold`}
         >
-          <span
-            className="bag-composition__swatch bag-composition__swatch--gold"
-            aria-hidden="true"
-          />
+          <GoldChip size={24} ariaLabel="Gold clip" />
           <span className="bag-composition__count">{counts.gold}</span>
           <span className="bag-composition__label">gold</span>
         </li>
