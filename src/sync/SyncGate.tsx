@@ -1,67 +1,38 @@
-// SyncGate — mounts Clerk + the sync bridge around the app.
+// SyncGate — env-aware shell around the cloud-sync infrastructure.
 //
-// If the build wasn't configured with cloud sync env vars
-// (VITE_CLERK_PUBLISHABLE_KEY + VITE_PARTYKIT_HOST), this gate is a
-// no-op passthrough — the app behaves exactly like the legacy
-// single-device build, backed by the existing IDB persist layer.
+// This file is intentionally tiny and dependency-free so it can stay in
+// the entry chunk. The heavy bits — Clerk auth UI, Yjs, y-indexeddb,
+// y-partykit — live in `SyncGateActive.tsx` and only enter a lazy
+// chunk that's fetched on demand.
 //
-// When sync is enabled:
-//   <ClerkProvider>
-//     <SignedIn>
-//       <SyncBridge>   ← wires Yjs doc ↔ Zustand store
-//         {children}
-//     <SignedOut>
-//       <SignIn />
+// Behavior:
+//   * Builds without VITE_PARTYKIT_HOST + VITE_CLERK_PUBLISHABLE_KEY:
+//     synchronous passthrough. The lazy chunk is never fetched, and
+//     Rollup keeps the heavy deps out of the entry chunk.
+//   * Builds with both env vars: render <Suspense> around the lazily-
+//     imported active gate. There's a brief load-time gap on first
+//     visit while the chunk arrives; subsequent loads are cached.
+//
+// `SYNC_ENABLED` is a build-time constant because Vite inlines
+// `import.meta.env.VITE_*` at build time.
 
-import { useEffect, type ReactNode } from 'react';
-import { ClerkProvider, SignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
-import { SYNC_ENABLED, useSyncConnection } from './provider';
-import { bridgeStoreAndDoc } from './bridge';
-import { getAppStore } from '../state/store';
+import { lazy, Suspense, type ReactNode } from 'react';
 
-const CLERK_PK = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as string | undefined;
+const SYNC_ENABLED =
+  Boolean(import.meta.env.VITE_PARTYKIT_HOST) &&
+  Boolean(import.meta.env.VITE_CLERK_PUBLISHABLE_KEY);
+
+const SyncGateActive = lazy(() =>
+  import('./SyncGateActive.tsx').then((m) => ({ default: m.SyncGateActive })),
+);
 
 export function SyncGate({ children }: { children: ReactNode }) {
-  if (!SYNC_ENABLED || !CLERK_PK) {
+  if (!SYNC_ENABLED) {
     return <>{children}</>;
   }
   return (
-    <ClerkProvider publishableKey={CLERK_PK}>
-      <SignedIn>
-        <SyncBridge>{children}</SyncBridge>
-      </SignedIn>
-      <SignedOut>
-        <SignInScreen />
-      </SignedOut>
-    </ClerkProvider>
-  );
-}
-
-function SyncBridge({ children }: { children: ReactNode }) {
-  const { doc } = useSyncConnection();
-
-  useEffect(() => {
-    if (!doc) return;
-    const store = getAppStore();
-    const teardown = bridgeStoreAndDoc(store, doc);
-    return teardown;
-  }, [doc]);
-
-  return <>{children}</>;
-}
-
-function SignInScreen() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100dvh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-      }}
-    >
-      <SignIn routing="hash" />
-    </div>
+    <Suspense fallback={null}>
+      <SyncGateActive>{children}</SyncGateActive>
+    </Suspense>
   );
 }
