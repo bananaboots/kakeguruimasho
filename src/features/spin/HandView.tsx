@@ -20,6 +20,8 @@ import { selectHand } from '../../state/selectors.ts';
 import type { Clip, ClipColor } from '../../types/clip.ts';
 import type { JarId } from '../../types/ids.ts';
 import { DEFAULT_CLIP_COLORS } from '../../types/clip.ts';
+import { Chip, GoldChip } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from './clip-colors.ts';
 
 import './spin.css';
 
@@ -29,16 +31,6 @@ export type HandViewProps = {
 };
 
 type GroupKey = ClipColor | 'gold';
-
-/** Map each ClipColor to its token-backed CSS variable (mirrors 3B). */
-const SWATCH_VAR: Record<ClipColor, string> = {
-  red: 'var(--clip-red)',
-  blue: 'var(--clip-blue)',
-  green: 'var(--clip-green)',
-  yellow: 'var(--clip-yellow)',
-  purple: 'var(--clip-purple)',
-  pink: 'var(--clip-pink)',
-};
 
 function groupHandByColor(hand: Clip[]): Record<GroupKey, Clip[]> {
   const out: Record<GroupKey, Clip[]> = {
@@ -118,14 +110,15 @@ export function HandView({ jarId, className }: HandViewProps): ReactElement {
                     data-color={key}
                     data-testid={`hand-view__group-${key}`}
                   >
-                    <span
-                      className={cn(
-                        'hand-view__swatch',
-                        isGold && 'hand-view__swatch--gold',
-                      )}
-                      style={isGold ? undefined : { backgroundColor: SWATCH_VAR[key as ClipColor] }}
-                      aria-hidden="true"
-                    />
+                    {isGold ? (
+                      <GoldChip size={28} ariaLabel="Gold clip" />
+                    ) : (
+                      <Chip
+                        color={CLIP_HEX[key as ClipColor]}
+                        size={28}
+                        ariaLabel={`${key} clip`}
+                      />
+                    )}
                     <span className="hand-view__count">{count}</span>
                     <span className="hand-view__label">{key}</span>
                   </button>
@@ -146,17 +139,15 @@ export function HandView({ jarId, className }: HandViewProps): ReactElement {
               {groups[expanded].map((clip) => (
                 <span
                   key={clip.id}
-                  className={cn(
-                    'hand-view__chip',
-                    expanded === 'gold' && 'hand-view__chip--gold',
-                  )}
-                  style={
-                    expanded === 'gold'
-                      ? undefined
-                      : { backgroundColor: SWATCH_VAR[expanded as ClipColor] }
-                  }
+                  className="hand-view__substack-item"
                   aria-hidden="true"
-                />
+                >
+                  {expanded === 'gold' ? (
+                    <GoldChip size={20} />
+                  ) : (
+                    <Chip color={CLIP_HEX[expanded as ClipColor]} size={20} />
+                  )}
+                </span>
               ))}
             </div>
           ) : null}

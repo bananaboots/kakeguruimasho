@@ -139,25 +139,6 @@
   );
 }
 
-.hand-view__swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  flex-shrink: 0;
-}
-
-.hand-view__swatch--gold {
-  background: radial-gradient(
-    circle at 30% 30%,
-    #fff4a8,
-    var(--color-gold) 55%,
-    #c9a400 100%
-  );
-  border-color: var(--color-gold);
-  box-shadow: 0 0 8px var(--color-gold-glow);
-}
-
 .hand-view__count {
   font-size: var(--text-base);
   font-weight: 600;
@@ -188,23 +169,10 @@
   border-radius: var(--radius-sm);
 }
 
-.hand-view__chip {
-  display: inline-block;
-  width: 18px;
-  height: 10px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(0, 0, 0, 0.25);
-}
-
-.hand-view__chip--gold {
-  background: radial-gradient(
-    circle at 30% 30%,
-    #fff4a8,
-    var(--color-gold) 55%,
-    #c9a400 100%
-  );
-  border-color: var(--color-gold);
-  box-shadow: 0 0 6px var(--color-gold-glow);
+.hand-view__substack-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ---- CashInPicker ---- */
