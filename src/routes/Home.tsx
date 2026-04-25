@@ -1,12 +1,12 @@
 /**
- * Home — landing screen skeleton (3J).
+ * Home — Vintage Pachinko salon landing.
  *
- * ARCHITECTURE §6 component hierarchy: composes quick-log buttons [3D],
- * hand summary [3E], jar snippet + streak header + activity feed [3G].
- * Those mount into the slots below when Wave 2+ land.
+ * The chassis (masthead + paper grain) is theme-driven; the inner
+ * arrangement (streak chips, quick-log grid, hand summary, jar snippet,
+ * activity feed) is unchanged so it continues to receive new tokens
+ * via CSS variables.
  *
- * Wave 2 3D: fills `[3D] QuickLogButton *5` with a grid of QuickLogButtons
- * for every active (non-archived) habit.
+ * Wave 2 3D fills the QuickLog slot with one button per active habit.
  */
 
 import { useAppStore } from '../state/store.ts';
@@ -17,24 +17,40 @@ import {
   ActivityFeed,
 } from '../features/jar/index.ts';
 import { HandSummary } from '../features/spin/index.ts';
+import { useTheme } from '../styles/theme-context.ts';
+import { DecoDivider, Motif } from '../ui/parlour/index.ts';
 
 export default function Home() {
   const allHabits = useAppStore((s) => s.habits);
   const activeJarId = useAppStore((s) => s.activeJarId);
   const habits = allHabits.filter((h) => !h.archived);
+  const { themeMeta } = useTheme();
 
   return (
-    <section className="route" aria-labelledby="home-title">
-      <header className="route__header">
-        <div>
-          <h1 id="home-title" className="route__title">
-            kakeguruimasho
-          </h1>
-          <p className="route__subtitle">
-            Your slot-machine habit system. Log a habit to earn a paperclip.
-          </p>
+    <section
+      className="route route--home parlour-grain parlour-halftone"
+      aria-labelledby="home-title"
+    >
+      <header className="parlour-masthead">
+        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
+        <h1 id="home-title" className="parlour-masthead__title">
+          {themeMeta.name}
+        </h1>
+        <p className="parlour-masthead__tagline">
+          A clip earned for each ritual kept. Cash them in for a pull.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 'var(--space-3) auto 0',
+          }}
+        >
+          <Motif size={36} />
         </div>
       </header>
+
+      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
       <StreakDisplay jarId={activeJarId} />
 
@@ -47,6 +63,8 @@ export default function Home() {
       </div>
 
       <HandSummary jarId={activeJarId} />
+
+      <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
       <JarVisual jarId={activeJarId} condensed />
 

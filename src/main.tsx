@@ -22,6 +22,7 @@ import App from './App.tsx';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { ToastProvider } from './ui/toast.tsx';
 import { SyncGate } from './sync/SyncGate.tsx';
+import { ThemeProvider } from './styles/theme-provider.tsx';
 import './index.css';
 import './ui/ui.css';
 import './shell.css';
@@ -62,13 +63,15 @@ function mount(): void {
   createRoot(rootEl!).render(
     <StrictMode>
       <ErrorBoundary>
-        <HashRouter>
-          <ToastProvider>
-            <SyncGate>
-              <App />
-            </SyncGate>
-          </ToastProvider>
-        </HashRouter>
+        <ThemeProvider>
+          <HashRouter>
+            <ToastProvider>
+              <SyncGate>
+                <App />
+              </SyncGate>
+            </ToastProvider>
+          </HashRouter>
+        </ThemeProvider>
       </ErrorBoundary>
     </StrictMode>,
   );
