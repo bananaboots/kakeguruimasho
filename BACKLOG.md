@@ -218,51 +218,46 @@ section `03 · Kowloon Electric · Full Flow` in the canvas.
 
 ## Desktop adaptation (added 2026-04-26)
 
-Design source:
-[desktop-wires.jsx](/tmp/design-fresh/kakeguruimasho/project/desktop-wires.jsx),
-section `02a · Desktop Adaptation · Rules + Wireframes` in the canvas.
-The design provides a one-pager rules card + two reference wireframes
-(Salon @ 1440×900, Spin @ 1440×900). Rules are explicit; wireframes are
-recipes for Claude Code to follow for the rest of the screens.
+Shipped 2026-04-26 in PR for the desktop chassis. Source design:
+[desktop-wires.jsx](/tmp/design-fresh/kakeguruimasho/project/desktop-wires.jsx).
+Spec: [docs/superpowers/specs/2026-04-26-desktop-adaptation-design.md](docs/superpowers/specs/2026-04-26-desktop-adaptation-design.md).
+Plan: [docs/superpowers/plans/2026-04-26-desktop-adaptation.md](docs/superpowers/plans/2026-04-26-desktop-adaptation.md).
 
-The app is mobile-only today — [shell.css](src/shell.css) caps every
-route at `max-width: 720px` and there are no `@media (min-width)` rules
-in `src/`. Below the desktop breakpoint, today's mobile shell stays.
+#### Chassis
 
-#### Chassis (chassis lands first; per-screen passes follow)
-
-- [ ] **Three-pane shell** — at `≥1024px`, swap `app-shell` for a
-      `280px / 1fr / 320px` grid. Below that, fall through to the
-      mobile shell unchanged. Left rail = house mark + nav + streak
-      meter; center = active screen; right rail = Pot, bonus timer,
-      recent pulls. Wireframe ref: `desktop-wires.jsx:DesktopShell`.
-- [ ] **Rail nav** — promote `BottomNav` items into the left rail when
-      desktop chassis is active; keep them in the bottom nav at mobile.
-- [ ] **Right-rail widgets** — extract `BonusTimerBanner`,
-      `PachinkoPotMini`, and a Recent Pulls list into the right rail at
-      desktop; hide the sticky `BonusTimerBanner` when the rail is
-      visible.
-- [ ] **Salon framing** — wrap each desktop route in `OrnateFrame` at
-      desktop scale; cap content at `max-width: 1280px` for ≥1440px
-      viewports.
-- [ ] **Tablet (480–1024px)** — two-pane: drop the right rail, keep the
-      left rail. No new layout, just media-query adjustments.
+- [x] ~~**Three-pane shell** at `≥1024px`.~~ Shipped 2026-04-26 as
+      `<DesktopShell>` (`src/ui/parlour/DesktopShell.tsx`). Grid columns
+      `280px 1fr 320px`; capped to 1280 max-width at `≥1440px`.
+- [x] ~~**Rail nav.**~~ Shipped 2026-04-26 as `<LeftRail>`. Both
+      `BottomNav` and `LeftRail` consume `src/lib/navItems.ts`.
+- [x] ~~**Right-rail widgets.**~~ Shipped 2026-04-26: Bonus widget
+      (`<RailBonusWidget>`), Pot (`<PachinkoPotMini>`), Recent Pulls
+      (`<RecentPulls>`). Shared selector `useBonusTimerSummary`.
+      `BonusTimerBanner` only mounts at `<1024px`.
+- [x] ~~**Salon framing** — content max-width 1280 at `≥1440px`.~~
+      Shipped 2026-04-26.
+- [ ] **Tablet (480–1024px) two-pane.** Deferred — today's mobile shell
+      handles tablet sizes acceptably; revisit if user research surfaces
+      gaps. Tracked as a v1.1 polish item.
 
 #### Per-screen passes
 
-- [ ] **Spin** — wheel scales to ~420px and centers in the cabinet;
-      lever moves beside it (not below); stake + odds move into the
-      right rail. No vertical scrolling on a 1440×900 viewport.
-- [ ] **Habits / Vault / Pot history** — convert stacked card lists to
-      2- or 3-column grids; individual cards stay ~360px wide so each
-      tile reads identically to the mobile version.
-- [ ] **Cash-in picker → drawer** — convert the bottom-sheet cash-in
-      picker (and any other bottom sheets) to a 480px right-slide
-      drawer at desktop. Same content, more breathing room.
-- [ ] **Hover & focus states** — every interactive element gets a
-      hover treatment: gold border lift, subtle glow, label reveal.
-      Mobile press states stay. Cursors: lever knob `grab`, chip
-      `pointer`.
+- [x] ~~**Spin** — cash-in side-by-side, wheel scaled up at desktop,
+      reveal 2-col picker.~~ Shipped 2026-04-26. Note: stake summary
+      stays inline at desktop for v1; right-rail-aware stake summary is
+      a v1.1 polish item.
+- [x] ~~**Habits / Vault** — multi-column grids.~~ Shipped 2026-04-26
+      (Home rituals 3-col; Habits 3-col; Vault 3 tier columns).
+- [x] ~~**Jar / BonusTimerDetail** — split layouts.~~ Shipped
+      2026-04-26.
+- [x] ~~**Cash-in picker → drawer.**~~ N/A — `CashInPicker` is inline
+      today, not a sheet/dialog. Drawer pattern applied to the actual
+      editor-style modals: `RewardEditor`, `HabitEditor`, `StepEntry`.
+- [x] ~~**Hover & focus states.**~~ Shipped 2026-04-26 under
+      `@media (hover: hover) and (min-width: 1024px)`.
+- [x] ~~**Cinematic Onboarding shell** — corner motifs + framed card.~~
+      Shipped 2026-04-26. Velvet swag along the top edge deferred to
+      v1.1.
 
 #### Constraints from the design rules card
 
