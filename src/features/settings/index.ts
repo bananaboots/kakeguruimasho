@@ -15,8 +15,6 @@ export { SpinStyleToggle } from './SpinStyleToggle.tsx';
 export { ExportImportPanel } from './ExportImportPanel.tsx';
 export type { ExportImportPanelProps } from './ExportImportPanel.tsx';
 
-export { RewardsLinkCard } from './RewardsLinkCard.tsx';
-
 export { ResetAllDanger } from './ResetAllDanger.tsx';
 export type { ResetAllDangerProps } from './ResetAllDanger.tsx';
 

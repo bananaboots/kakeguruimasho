@@ -12,7 +12,6 @@ import {
   ExportImportPanel,
   ResetAllDanger,
   HelpScreen,
-  RewardsLinkCard,
 } from '../features/settings/index.ts';
 import { useAppStore } from '../state/store.ts';
 import { useTheme } from '../styles/theme-context.ts';
@@ -48,7 +47,6 @@ export default function Settings() {
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
       <div className="settings">
-        <RewardsLinkCard />
         <SpinStyleToggle />
         <WheelConfigEditor jarId={activeJarId} />
         <BagCompositionEditor />

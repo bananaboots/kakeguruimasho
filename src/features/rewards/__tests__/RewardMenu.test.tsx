@@ -33,7 +33,7 @@ describe('<RewardMenu />', () => {
     const user = userEvent.setup();
     render(<RewardMenu tier="T2" />);
 
-    await user.click(screen.getByRole('button', { name: /add reward/i }));
+    await user.click(screen.getByRole('button', { name: /\+ Add to Tier/i }));
     const input = await screen.findByPlaceholderText(/YouTube/i);
     await user.type(input, 'New specialty pastry run');
     await user.click(screen.getByRole('button', { name: /^save$/i }));
@@ -75,7 +75,7 @@ describe('<RewardMenu />', () => {
   it('empty-trimmed label does not create reward', async () => {
     const user = userEvent.setup();
     render(<RewardMenu tier="T1" />);
-    await user.click(screen.getByRole('button', { name: /add reward/i }));
+    await user.click(screen.getByRole('button', { name: /\+ Add to Tier/i }));
     const input = await screen.findByPlaceholderText(/YouTube/i);
     await user.type(input, '   ');
     // Save should be disabled because the untrimmed-non-empty input still

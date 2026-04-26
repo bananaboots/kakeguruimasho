@@ -2,8 +2,9 @@
  * SpinFlow route — mounts the Wave 3 3E flow inside the parlour chassis.
  *
  * The spin sequence (hand view, cash-in picker, gold button, spin button,
- * wheel canvas, reward picker, bonus wheel) is owned by <PostSpinFlow>;
- * this route adds the masthead and paper-grain backdrop.
+ * wheel canvas, reveal screen, bonus wheel) is owned by <PostSpinFlow>;
+ * this route adds the masthead and paper-grain backdrop. Step-specific copy
+ * is rendered by `<PostSpinFlow>` itself via the in-flow step label.
  */
 
 import { PostSpinFlow } from '../features/spin/index.ts';
@@ -18,11 +19,13 @@ export default function SpinFlow() {
       aria-labelledby="spin-title"
     >
       <header className="parlour-masthead">
-        <div className="parlour-masthead__kicker">The Pull · Cash-In</div>
+        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="spin-title" className="parlour-masthead__title">
-          {themeMeta.copy.spinCta}
+          The Pull
         </h1>
-        <p className="parlour-masthead__tagline">{themeMeta.tagline}</p>
+        <p className="parlour-masthead__tagline">
+          {themeMeta.copy.spinCta} · 3 steps to the reveal.
+        </p>
         <div
           style={{
             display: 'flex',

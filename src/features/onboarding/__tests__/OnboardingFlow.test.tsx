@@ -68,8 +68,8 @@ describe('<OnboardingFlow />', () => {
     await user.click(screen.getByRole('button', { name: /start/i }));
     // Step 2: Mechanics → Continue
     await user.click(screen.getByRole('button', { name: /continue/i }));
-    // Step 3: Reward rules → I commit
-    await user.click(screen.getByRole('button', { name: /i commit/i }));
+    // Step 3: Reward rules → I Swear to the House
+    await user.click(screen.getByRole('button', { name: /i swear to the house/i }));
     // Step 4: Milestones — fill and save.
     await user.type(screen.getByLabelText('Mini label'), 'Small treat');
     await user.type(screen.getByLabelText('Mid label'), 'Nice dinner');

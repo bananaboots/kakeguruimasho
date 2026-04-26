@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Spin sub-routes** — `/spin` (cash-in) → `/spin/pull` (full-bleed wheel/reels animating) → `/spin/reveal` (rays, confetti, inline claim picker). The reveal is now a real screen instead of a modal popover; replaces the imperative `openRewardPicker` portal in the spin path with an internal `revealRequest` Promise pattern. Cold-loading `/spin/pull` or `/spin/reveal` redirects back to `/spin` via a route guard.
+- **Spin step labels** — `Step I of III · Cash In`, `Step II of III · {spinCta}`, `Step III of III · {jackpot}` rendered on every sub-route as a kicker + gold-gradient title (`.spin-step-label`).
+- **Vault tab + Settings cog.** Bottom nav is now `Salon · Rituals · Spin · Jar · Vault`, matching the design source. Settings was demoted to a cog icon in the Home masthead (top-right). `RewardsLinkCard` was deleted as the Rewards route is now reachable directly from primary nav.
+- **Vault page · all-tiers stack.** Replaced the `<Tabs>` in `/rewards` with a vertical stack of three tier sections (Small Pleasures · Medium Treats · The Big Game). Each tier has a 32×32 badge (Tier III gilded), engraved title, gold-gradient trailing rule, gold-accent reward rows, and a `+ Add to Tier {N}` ghost button at the bottom. Source: `screens-misc.jsx:147`.
+- **Jar art details.** `<JarVisual>` gains a two-piece gold cork stopper (wider base + narrower tip) and an `LE JAR · ${total}` label sticker centered on the jar body. Source: `screens-misc.jsx:140`.
 - **Vintage Pachinko design pass (full).** Every screen now wears the bespoke 昭和 / lacquer-parlour aesthetic instead of the dev-era chassis: parlour cabinets, kanji-flanked section titles, brass-cornered tray cards, lantern-flanked streak ribbons, koi-glyph jar previews, and gilded reveal theatre.
   - **Spin route.** Wheel sits inside a gold/lacquer cabinet with a parlour crest + dynamic stake chips; odds strip (一 40 / 二 30 / 三 20 / 副 8 / ★ 2) below; spin button restyled as a `PachinkoLever` (knob + tracked rail); parlour ledger row (Streak / Pot / Last Pull) under the lever; "House Honours All Pulls" footer rule.
   - **Cash-in.** Per-color +2/+3 grid replaced by a 3-row tier ladder (一/二/三) with kanji badges, reactive cost copy ("Yellow ×2 ready" / "need 1 more Yellow"), and ○/●/✕ status indicators. The system auto-picks the most-abundant matching color.
@@ -24,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Onboarding oath CTA** — "I commit" → "I Swear to the House" (`RewardRulesScreen.tsx`). Tests + e2e selectors updated to match.
 - **"Hygiene bundle" → "Self care bundle".** User-visible rename across seed data, the masthead title, the Self care streak chip, the Settings cutoff editor, the Habits empty-state copy, and two RTL tests. Internal IDs (`habit_hygiene`, `pendingHygieneBundle`, `streaks.hygiene`, `HygieneBundle.tsx`) stay legacy to avoid a schema migration. One-shot boot-time patch in `main.tsx` rewrites the legacy name on existing persisted state. The widget itself is rebuilt as a 4-tab 夜 row (湯 BATH / 歯 TEETH / 顔 FACE / 床 BED) — `role="checkbox"` toggle buttons that gold up on done.
 - **SPEC.md §7 / §8** dropped the "No backend. No API keys. No user accounts." non-negotiable. User accounts + sync relay are now permitted and expected (kept to free-tier providers). Offline-first is still mandatory and export/import still required as a belt-and-suspenders backup.
 

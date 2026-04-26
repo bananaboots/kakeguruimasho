@@ -5,8 +5,8 @@
  * verbatim-copy test in /features/rewards/__tests__ and the one colocated
  * here both assert against the same source of truth.
  *
- * User must tap "I commit" to proceed (§11 — make the Naked Rule a
- * conscious choice, not a scroll-past).
+ * User must tap "I Swear to the House" to proceed (§11 — make the Naked
+ * Rule a conscious choice, not a scroll-past).
  */
 
 import type { ReactElement } from 'react';
@@ -48,7 +48,7 @@ export function RewardRulesScreen({
           Back
         </Button>
         <Button variant="primary" size="lg" onClick={onNext}>
-          I commit
+          I Swear to the House
         </Button>
       </div>
     </div>

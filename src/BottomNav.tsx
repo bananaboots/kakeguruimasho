@@ -1,12 +1,11 @@
 /**
  * BottomNav — mobile-first 5-slot tab bar (3J).
  *
- * Five icons per brief: Home, Habits, Spin, Jar, Settings.
- * All tap targets ≥ 44×44pt (SPEC §4). Labels render beneath the icon
- * for discoverability — at 375px wide, 5 slots fit comfortably.
+ * Salon · Rituals · Spin · Jar · Vault per the design source nav. Settings
+ * is reachable via the cog in the Home masthead, not the bottom nav, so the
+ * core "earn → pull → claim" loop is fully visible.
  *
- * Icon-only would save a line of vertical space but hurts a11y per SPEC §11
- * ("one-handed, tap-first"). Keep labels.
+ * All tap targets ≥ 44×44pt (SPEC §4).
  */
 
 import { NavLink } from 'react-router-dom';
@@ -16,7 +15,7 @@ import {
   ListChecks,
   Dice5,
   Sparkles,
-  Settings as SettingsIcon,
+  Vault as VaultIcon,
 } from 'lucide-react';
 import { cn } from './ui/utils.ts';
 
@@ -31,11 +30,11 @@ interface NavItem {
 }
 
 const items: NavItem[] = [
-  { to: '/', label: 'Home', icon: HomeIcon as unknown as IconCmp },
-  { to: '/habits', label: 'Habits', icon: ListChecks as unknown as IconCmp },
+  { to: '/', label: 'Salon', icon: HomeIcon as unknown as IconCmp },
+  { to: '/habits', label: 'Rituals', icon: ListChecks as unknown as IconCmp },
   { to: '/spin', label: 'Spin', icon: Dice5 as unknown as IconCmp },
   { to: '/jar', label: 'Jar', icon: Sparkles as unknown as IconCmp },
-  { to: '/settings', label: 'Settings', icon: SettingsIcon as unknown as IconCmp },
+  { to: '/rewards', label: 'Vault', icon: VaultIcon as unknown as IconCmp },
 ];
 
 export function BottomNav() {

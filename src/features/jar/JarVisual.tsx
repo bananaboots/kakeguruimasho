@@ -213,6 +213,72 @@ export function JarVisual({
           strokeWidth={2}
         />
 
+        {/* Cork stopper — wider lower piece + narrower top piece. */}
+        <rect
+          x={16}
+          y={9}
+          width={VB_W - 32}
+          height={9}
+          fill="var(--color-gold-deep)"
+          stroke="var(--color-gold)"
+          strokeWidth={1}
+        />
+        <rect
+          x={24}
+          y={2}
+          width={VB_W - 48}
+          height={8}
+          fill="var(--color-gold)"
+        />
+
+        {/* "LE JAR" label sticker, centered on the jar body. */}
+        <g className="jar-visual__label" aria-hidden="true">
+          <rect
+            x={50}
+            y={120}
+            width={60}
+            height={44}
+            fill="var(--color-bg)"
+            stroke="var(--color-gold)"
+            strokeWidth={1}
+            opacity={0.9}
+          />
+          <text
+            x={80}
+            y={134}
+            textAnchor="middle"
+            fill="var(--color-gold)"
+            fontFamily="var(--font-mono)"
+            fontSize={9}
+            letterSpacing="0.12em"
+          >
+            LE
+          </text>
+          <text
+            x={80}
+            y={148}
+            textAnchor="middle"
+            fill="var(--color-gold)"
+            fontFamily="var(--font-display)"
+            fontWeight={700}
+            fontSize={13}
+            letterSpacing="0.04em"
+          >
+            JAR
+          </text>
+          <text
+            x={80}
+            y={160}
+            textAnchor="middle"
+            fill="var(--color-gold)"
+            fontFamily="var(--font-mono)"
+            fontSize={8}
+            letterSpacing="0.1em"
+          >
+            {formatDollars(total)}
+          </text>
+        </g>
+
         {/* Milestone ticks (D1: all live on one cumulative jar, ordered by target). */}
         {milestones
           ? orderedIds.map((id) => {

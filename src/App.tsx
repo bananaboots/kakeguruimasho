@@ -151,7 +151,7 @@ export default function App() {
             />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route
-              path="/spin"
+              path="/spin/*"
               element={
                 <FirstRunGate>
                   <SpinFlow />

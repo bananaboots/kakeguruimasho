@@ -9,6 +9,8 @@
  * Wave 2 3D fills the QuickLog slot with one button per active habit.
  */
 
+import { Link } from 'react-router-dom';
+import { Settings as SettingsIcon } from 'lucide-react';
 import { useAppStore } from '../state/store.ts';
 import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
@@ -38,6 +40,13 @@ export default function Home() {
       aria-labelledby="home-title"
     >
       <header className="parlour-masthead">
+        <Link
+          to="/settings"
+          className="parlour-masthead__cog"
+          aria-label="Settings"
+        >
+          <SettingsIcon size={20} aria-hidden="true" />
+        </Link>
         <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="home-title" className="parlour-masthead__title">
           {themeMeta.name}

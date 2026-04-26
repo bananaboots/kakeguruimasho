@@ -63,9 +63,9 @@ test.describe('Kakeguruimasho smoke', () => {
     await expect(page.getByTestId('mechanics-screen')).toBeVisible();
     await page.getByRole('button', { name: 'Continue' }).click();
 
-    // Step 3: Reward Rules. Click "I commit".
+    // Step 3: Reward Rules. Click "I Swear to the House".
     await expect(page.getByTestId('reward-rules-screen')).toBeVisible();
-    await page.getByRole('button', { name: 'I commit' }).click();
+    await page.getByRole('button', { name: 'I Swear to the House' }).click();
 
     // Step 4: Milestones. Fill minimal values then Save.
     await expect(page.getByTestId('milestones-screen')).toBeVisible();

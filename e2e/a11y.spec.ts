@@ -38,7 +38,7 @@ async function completeOnboarding(page: Page): Promise<void> {
 
   await page.getByRole('button', { name: 'Start' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'I commit' }).click();
+  await page.getByRole('button', { name: 'I Swear to the House' }).click();
   await page.getByLabel('Mini label').fill('Coffee');
   await page.getByLabel('Mini target in dollars').fill('10');
   await page.getByLabel('Mid label').fill('Book');
