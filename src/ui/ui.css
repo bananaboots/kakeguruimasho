@@ -169,6 +169,71 @@
   }
 }
 
+/* ============================================================ Drawer
+ * Built atop Dialog: same overlay + a11y, different positioning.
+ * The .drawer__content--{bottom,right} class is added by Drawer.tsx
+ * based on viewport width. Both modes override the centered Dialog
+ * default position.
+ */
+.drawer__content {
+  /* Override Dialog's centered position. */
+  left: auto;
+  top: auto;
+  transform: none;
+  border-radius: 0;
+  max-width: none;
+  /* Inherits background/border/box-shadow/padding from .dialog__content. */
+}
+
+.drawer__content--bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-height: 90dvh;
+  border-top-left-radius: var(--radius-card);
+  border-top-right-radius: var(--radius-card);
+  animation: drawer-slide-up var(--duration-base) var(--ease-out);
+}
+
+.drawer__content--right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  border-radius: 0;
+  border-left: 1px solid var(--color-border);
+  animation: drawer-slide-left var(--duration-base) var(--ease-out);
+}
+
+@keyframes drawer-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes drawer-slide-left {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer__content--bottom,
+  .drawer__content--right {
+    animation: none;
+  }
+}
+
 /* ============================================================ Tabs */
 .tabs__list {
   display: flex;

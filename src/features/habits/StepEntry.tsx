@@ -20,11 +20,11 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Button } from '../../ui/button.tsx';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '../../ui/dialog.tsx';
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../../ui/Drawer.tsx';
 import { Input } from '../../ui/input.tsx';
 import { getAppStore } from '../../state/store.ts';
 import type { Habit } from '../../types/habit.ts';
@@ -80,12 +80,12 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
   }, [onClose]);
 
   return (
-    <Dialog open={open} onOpenChange={(next) => (!next ? handleCancel() : undefined)}>
-      <DialogContent>
-        <DialogTitle>Log {habit.name}</DialogTitle>
-        <DialogDescription>
+    <Drawer open={open} onOpenChange={(next) => (!next ? handleCancel() : undefined)}>
+      <DrawerContent>
+        <DrawerTitle>Log {habit.name}</DrawerTitle>
+        <DrawerDescription>
           {target.toLocaleString()} steps per clip. Enter today&apos;s step count.
-        </DialogDescription>
+        </DrawerDescription>
 
         <div className="step-entry__field">
           <label htmlFor="step-entry-input" className="step-entry__label">
@@ -161,7 +161,7 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
               : `Log ${clips || 0} clip${clips === 1 ? '' : 's'}`}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }
