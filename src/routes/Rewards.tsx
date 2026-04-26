@@ -1,15 +1,25 @@
 /**
- * Rewards route.
+ * Rewards route — "The Vault".
  *
- * ARCHITECTURE §6 / §7F: 3F owns <Tabs T1/T2/T3> → <RewardMenu tier=.../>
- * plus a persistent <RewardRulesSidebar/> that starts collapsed.
+ * All three tiers are visible at once, stacked. Each tier gets a badge +
+ * title + trailing gold rule, mirroring the design source's
+ * "Menu · Treat Yourself" screen.
+ *
+ * Source: `/tmp/design1/kakeguruimasho/project/screens-misc.jsx:147`.
  */
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs.tsx';
 import { RewardMenu } from '../features/rewards/RewardMenu.tsx';
 import { RewardRulesSidebar } from '../features/rewards/reward-rules-sidebar.tsx';
 import { useTheme } from '../styles/theme-context.ts';
 import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import type { Tier } from '../types/wheel.ts';
+import { cn } from '../ui/utils.ts';
+
+const TIERS: { tier: Tier; n: string; title: string }[] = [
+  { tier: 'T1', n: 'I', title: 'Small Pleasures' },
+  { tier: 'T2', n: 'II', title: 'Medium Treats' },
+  { tier: 'T3', n: 'III', title: 'The Big Game' },
+];
 
 export default function Rewards() {
   const { themeMeta } = useTheme();
@@ -41,22 +51,30 @@ export default function Rewards() {
 
       <RewardRulesSidebar />
 
-      <Tabs defaultValue="T1">
-        <TabsList>
-          <TabsTrigger value="T1">Tier 1</TabsTrigger>
-          <TabsTrigger value="T2">Tier 2</TabsTrigger>
-          <TabsTrigger value="T3">Tier 3</TabsTrigger>
-        </TabsList>
-        <TabsContent value="T1">
-          <RewardMenu tier="T1" />
-        </TabsContent>
-        <TabsContent value="T2">
-          <RewardMenu tier="T2" />
-        </TabsContent>
-        <TabsContent value="T3">
-          <RewardMenu tier="T3" />
-        </TabsContent>
-      </Tabs>
+      <div className="reward-tiers">
+        {TIERS.map((t) => (
+          <section
+            key={t.tier}
+            className="reward-tier"
+            aria-label={`Tier ${t.n} · ${t.title}`}
+          >
+            <header className="reward-tier__header">
+              <div
+                className={cn(
+                  'reward-tier__badge',
+                  t.tier === 'T3' && 'reward-tier__badge--gold',
+                )}
+                aria-hidden
+              >
+                {t.n}
+              </div>
+              <h2 className="reward-tier__title">{t.title}</h2>
+              <div className="reward-tier__rule" aria-hidden />
+            </header>
+            <RewardMenu tier={t.tier} />
+          </section>
+        ))}
+      </div>
     </section>
   );
 }

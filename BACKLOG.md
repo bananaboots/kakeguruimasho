@@ -3,6 +3,58 @@
 Future work earmarked but not yet built. Add new items at the top of the
 relevant section.
 
+## Design audit follow-ups (2026-04-25)
+
+A second-pass audit against `/tmp/design1/kakeguruimasho/project/` flagged
+the following gaps. Item numbers match the audit summary.
+
+### Information architecture
+
+- [x] ~~**1. Promote Rewards to bottom nav** — design has 5 tabs: Salon ·
+      Rituals · Spin · Jar · Vault.~~ Shipped 2026-04-25. Settings
+      demoted to a cog in the Home masthead; Rewards is now tab 5
+      (`Vault`).
+- [x] ~~**4. Vintage nav labels** — `Home → Salon`, `Habits → Rituals`,
+      `Rewards → Vault`.~~ Shipped 2026-04-25 alongside item 1.
+
+### Spin flow
+
+- [x] ~~**3. Step labels** — render `Step I of III · Cash In`,
+      `Step II of III · {spinCta}`, `Step III of III · {jackpot}` chrome
+      on each spin screen.~~ Shipped 2026-04-25.
+- [x] ~~**3.5. Spin sub-routes** — split `/spin` into three discrete
+      screens, one per step.~~ Shipped 2026-04-25:
+      - `/spin` — cash-in (hand, tier ladder, lock stake)
+      - `/spin/pull` — full-bleed wheel/reels animating
+      - `/spin/reveal` — rays + confetti + inline claim picker (replaces
+        the imperative `openRewardPicker` modal)
+      Linear state machine; route guards redirect cold-load on
+      `/spin/pull` or `/spin/reveal` back to `/spin`. The reveal screen
+      uses an internal `revealRequest` Promise pattern so the
+      orchestrator can `await` the user's pick.
+
+### Onboarding
+
+- [x] ~~**5. Oath CTA copy** — `"I commit"` → `"I Swear to the House"`.~~
+      Shipped 2026-04-25.
+
+### Jar
+
+- [x] ~~**6. Jar art details** — add `LE JAR` label sticker + cork stopper
+      to [JarVisual.tsx](src/features/jar/JarVisual.tsx).~~ Shipped
+      2026-04-25.
+
+### Rewards
+
+- [x] ~~**7. Visible all-tiers layout** — replace the `<Tabs>` in
+      [routes/Rewards.tsx](src/routes/Rewards.tsx) with a vertical stack:
+      tier icon + name + reward rows + "+ Add to Tier N" dashed row.~~
+      Shipped 2026-04-25.
+
+> Item 2 — "Select Your Parlour" theme picker — is **deferred**. Want to
+> finish design passes for the stub themes (kowloon, house, riding,
+> imperial, ukiyoe, celestial, speakeasy) before exposing the picker.
+
 ## Vintage Pachinko design pass
 
 The bespoke pachinko design lives at

@@ -3,7 +3,7 @@
  *
  * Asserts that tapping <GoldInstantT3Button> in the full <PostSpinFlow> tree:
  *   1. Does NOT mount <WheelCanvas>.
- *   2. Opens the T3 reward picker (via 3F's openRewardPicker portal).
+ *   2. Opens the T3 reveal screen inline (Step III sub-route).
  *   3. Returns the gold clip to the bag (A7).
  *   4. Logs `reward_claimed { source: 'gold', tier: 'T3' }` when the user
  *      picks a reward (A6).
@@ -19,6 +19,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 
 import { PostSpinFlow } from '../PostSpinFlow.tsx';
 import {
@@ -28,7 +29,7 @@ import {
 } from '../../../state/store.ts';
 import { seedInitialAppState } from '../../../data/defaults.ts';
 import { ToastProvider } from '../../../ui/toast.tsx';
-import { __resetRewardPickerForTests } from '../../../features/rewards/openRewardPicker.tsx';
+import { ThemeProvider } from '../../../styles/theme-provider.tsx';
 import { DEFAULT_JAR_ID, asClipId, type ClipId } from '../../../types/ids.ts';
 import type { AppState } from '../../../types/app-state.ts';
 import type { Clip } from '../../../types/clip.ts';
@@ -49,6 +50,16 @@ function seedWithGold(): AppState {
   };
 }
 
+function wrap(ui: React.ReactElement, initialPath = '/spin'): React.ReactElement {
+  return (
+    <MemoryRouter initialEntries={[initialPath]}>
+      <ThemeProvider>
+        <ToastProvider>{ui}</ToastProvider>
+      </ThemeProvider>
+    </MemoryRouter>
+  );
+}
+
 describe('<PostSpinFlow /> — gold short-circuit', () => {
   beforeEach(() => {
     setPersistenceEnabled(false);
@@ -56,19 +67,14 @@ describe('<PostSpinFlow /> — gold short-circuit', () => {
   });
 
   afterEach(() => {
-    __resetRewardPickerForTests();
     cleanup();
     setPersistenceEnabled(true);
   });
 
-  it('tapping Use gold: skips the wheel, opens T3 picker, logs source=gold, returns clip', async () => {
+  it('tapping Use gold: skips the wheel, shows T3 reveal screen, logs source=gold, returns clip', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ToastProvider>
-        <PostSpinFlow jarId={DEFAULT_JAR_ID} />
-      </ToastProvider>,
-    );
+    render(wrap(<PostSpinFlow jarId={DEFAULT_JAR_ID} />));
 
     // Sanity: gold button visible; wheel not rendered.
     const goldBtn = screen.getByTestId('gold-instant-t3');
@@ -78,10 +84,12 @@ describe('<PostSpinFlow /> — gold short-circuit', () => {
     // Tap the gold button.
     await user.click(goldBtn);
 
-    // Reward picker (portal) should open with T3.
+    // The inline T3 reveal screen should mount on /spin/reveal.
     await waitFor(() => {
-      const title = document.querySelector('[role="dialog"]');
-      expect(title).not.toBeNull();
+      expect(screen.getByTestId('reveal-screen')).toBeInTheDocument();
+      expect(screen.getByTestId('reveal-screen').getAttribute('data-tier')).toBe(
+        'T3',
+      );
     });
     // Should not have mounted the main wheel at any point.
     expect(screen.queryByTestId('spin-flow__wheel')).not.toBeInTheDocument();
@@ -95,19 +103,17 @@ describe('<PostSpinFlow /> — gold short-circuit', () => {
       expect(bag.find((c) => c.id === asClipId('goldtest'))).toBeDefined();
     });
 
-    // Pick the first T3 reward from the portal.
+    // Pick the first T3 reward from the inline list, then claim.
     const firstOption = document.querySelector<HTMLElement>(
       '[role="listbox"] [role="option"]',
     );
     expect(firstOption).not.toBeNull();
     await user.click(firstOption!);
 
-    await act(async () => {});
+    const claimBtn = screen.getByRole('button', { name: /^Claim · /i });
+    await user.click(claimBtn);
 
-    // Flow returns to idle: gold button gone (no gold clips left).
-    await waitFor(() => {
-      expect(screen.queryByTestId('gold-instant-t3')).not.toBeInTheDocument();
-    });
+    await act(async () => {});
 
     // History must carry a `reward_claimed` with tier=T3 and source=gold.
     const history = getAppStore().getState().history;
@@ -129,11 +135,7 @@ describe('<PostSpinFlow /> — gold short-circuit', () => {
 
   it('gold button is hidden when hand has no gold clips', () => {
     __resetAppStoreForTests(seedInitialAppState()); // default seed: empty hand
-    render(
-      <ToastProvider>
-        <PostSpinFlow jarId={DEFAULT_JAR_ID} />
-      </ToastProvider>,
-    );
+    render(wrap(<PostSpinFlow jarId={DEFAULT_JAR_ID} />));
     expect(screen.queryByTestId('gold-instant-t3')).not.toBeInTheDocument();
   });
 });

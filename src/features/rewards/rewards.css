@@ -3,17 +3,93 @@
  * Mobile-first; all values route through 3J design tokens.
  */
 
-/* ---------- Reward menu (list view inside a tier tab) ---------- */
+/* ---------- Tiered Vault stack ---------- */
 
-.reward-menu {
+.reward-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.reward-tier {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
 }
 
+.reward-tier__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reward-tier__badge {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-felt-deep);
+  border: 1px solid var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-gold);
+  letter-spacing: 0.04em;
+}
+
+.reward-tier__badge--gold {
+  background: linear-gradient(
+    135deg,
+    var(--color-gold),
+    var(--color-gold-deep)
+  );
+  color: var(--color-bg);
+}
+
+.reward-tier__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  letter-spacing: 0.02em;
+  background: linear-gradient(
+    180deg,
+    var(--color-gold) 0%,
+    var(--color-gold-deep) 55%,
+    var(--color-gold) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reward-tier__rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--color-gold-deep),
+    transparent
+  );
+}
+
+/* ---------- Reward menu (list of rewards within a tier) ---------- */
+
+.reward-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .reward-menu__toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: stretch;
+  order: 2;
+}
+
+.reward-menu__toolbar > button {
+  flex: 1;
+  border-style: dashed;
 }
 
 .reward-menu__empty {
@@ -44,6 +120,17 @@
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  position: relative;
+}
+
+.reward-menu__item::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  margin-right: var(--space-2);
+  background: var(--color-gold);
+  opacity: 0.6;
+  flex: 0 0 4px;
 }
 
 .reward-menu__item[data-archived='true'] {

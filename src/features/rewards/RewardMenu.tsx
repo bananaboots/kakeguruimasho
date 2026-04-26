@@ -79,14 +79,10 @@ export function RewardMenu({
     applyRewardMutation((s) => updateReward(s, tier, rewardId, { archived: false }));
   };
 
+  const tierLabel = tier === 'T1' ? 'I' : tier === 'T2' ? 'II' : 'III';
+
   return (
     <div className="reward-menu" data-tier={tier}>
-      <div className="reward-menu__toolbar">
-        <Button variant="primary" size="md" onClick={openAdd}>
-          Add reward
-        </Button>
-      </div>
-
       {visible.length === 0 ? (
         <p className="reward-menu__empty">
           No rewards yet. Add one to populate the {tier} menu.
@@ -133,6 +129,12 @@ export function RewardMenu({
           ))}
         </ul>
       )}
+
+      <div className="reward-menu__toolbar">
+        <Button variant="ghost" size="md" onClick={openAdd}>
+          + Add to Tier {tierLabel}
+        </Button>
+      </div>
 
       <RewardEditor
         // Remount between modes so internal `useState(initialLabel)` is fresh.

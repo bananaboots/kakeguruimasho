@@ -30,12 +30,14 @@
 
 import {
   useCallback,
+  useEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
   type ReactElement,
 } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppStore } from '../../state/store.ts';
 import type { Store } from '../../state/store.ts';
@@ -54,9 +56,9 @@ import {
   mainSegmentIndex,
   bonusSegmentIndex,
 } from '../wheel/index.ts';
-import { openRewardPicker } from '../rewards/openRewardPicker.tsx';
 import { rng as getRng } from '../../lib/rng.ts';
 import { useToast } from '../../ui/toast-context.ts';
+import { useTheme } from '../../styles/theme-context.ts';
 
 import { CashInPicker } from './CashInPicker.tsx';
 import { HandView } from './HandView.tsx';
@@ -66,6 +68,7 @@ import { WheelCabinet, ParlourCrest } from './WheelCabinet.tsx';
 import { WheelOddsStrip } from './WheelOddsStrip.tsx';
 import { ParlourLedger } from './ParlourLedger.tsx';
 import { HouseRule } from './HouseRule.tsx';
+import { RevealScreen } from './RevealScreen.tsx';
 import { Chip, GoldChip, Label } from '../../ui/parlour/index.ts';
 import { CLIP_HEX } from './clip-colors.ts';
 import type { Clip, ClipColor } from '../../types/clip.ts';
@@ -128,6 +131,14 @@ function bestAvailableTier(unlocked: Tier | null): Tier {
   return unlocked ?? 'T1';
 }
 
+type SubStep = 'cash' | 'pull' | 'reveal';
+
+function subStepFromPath(pathname: string): SubStep {
+  if (pathname.endsWith('/spin/pull')) return 'pull';
+  if (pathname.endsWith('/spin/reveal')) return 'reveal';
+  return 'cash';
+}
+
 export function PostSpinFlow({
   jarId = DEFAULT_JAR_ID,
 }: PostSpinFlowProps): ReactElement {
@@ -138,6 +149,11 @@ export function PostSpinFlow({
   const spinStyle = useAppStore((s) => s.settings.spinStyle);
   const actions = useAppStore((s: Store) => s.actions);
   const { toast } = useToast();
+  const { themeMeta } = useTheme();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const subStep: SubStep = subStepFromPath(location.pathname);
 
   const [state, dispatch] = useReducer(reduce, INITIAL_STATE);
   // Ground-truth drift/target indices to hand to <WheelCanvas>. Set when
@@ -156,12 +172,47 @@ export function PostSpinFlow({
   // `await` the canvas settle. Kept in a ref because we re-create it each
   // bonus spin.
   const bonusCompleteResolver = useRef<(() => void) | null>(null);
+  // Inline reveal request — replaces the imperative openRewardPicker modal.
+  // Set when the orchestrator wants the user to pick a reward; the
+  // `/spin/reveal` sub-screen consumes it and calls `resolve` on pick or
+  // dismiss.
+  const [revealRequest, setRevealRequest] = useState<{
+    tier: Tier;
+    resolve: (rewardId: RewardId | null) => void;
+  } | null>(null);
 
   // aria-live announcement text — single source for the polite announcer.
   const [announcement, setAnnouncement] = useState<string>('');
 
   // A9 freeze across the whole non-idle lifetime.
   const frozen = isCashInFrozen(state);
+
+  // Inline reveal helper — replaces the imperative `openRewardPicker(tier)`
+  // pattern. Returns a Promise that resolves to the picked RewardId (or
+  // null on dismiss/forfeit). Side-effect: navigates the spin sub-route to
+  // `/spin/reveal` so the inline picker takes over the viewport.
+  const awaitReveal = useCallback(
+    (tier: Tier): Promise<RewardId | null> => {
+      return new Promise<RewardId | null>((resolve) => {
+        setRevealRequest({ tier, resolve });
+        navigate('/spin/reveal');
+      });
+    },
+    [navigate],
+  );
+
+  // Route guard — if the user lands on /spin/pull or /spin/reveal without
+  // an active spin (e.g. cold-load, manual URL, browser back-forward), bounce
+  // back to /spin so they can't see a half-rendered flow.
+  useEffect(() => {
+    if (subStep === 'pull' && pendingSpin === null && pendingBonus === null) {
+      navigate('/spin', { replace: true });
+      return;
+    }
+    if (subStep === 'reveal' && revealRequest === null) {
+      navigate('/spin', { replace: true });
+    }
+  }, [subStep, pendingSpin, pendingBonus, revealRequest, navigate]);
 
   // ---- Selection ----
 
@@ -189,7 +240,7 @@ export function PostSpinFlow({
       // promise is already registered. Then transition into rewardPicker so
       // the wheel UI stays hidden.
       dispatch({ type: 'START_REWARD_PICKER', tier: 'T3', source: 'gold' });
-      const rewardId = await openRewardPicker('T3');
+      const rewardId = await awaitReveal('T3');
 
       actions.appendHistory({
         kind: 'reward_claimed',
@@ -209,8 +260,10 @@ export function PostSpinFlow({
           ? 'Tier 3 reward claimed.'
           : 'Tier 3 reward forfeited.',
       );
+      navigate('/');
+      setRevealRequest(null);
     },
-    [frozen, actions, jarId],
+    [frozen, actions, jarId, awaitReveal, navigate],
   );
 
   // ---- SPIN (main wheel) ----
@@ -260,8 +313,9 @@ export function PostSpinFlow({
     if (frozen) return;
     dispatch({ type: 'START_SPIN' });
     setAnnouncement('Spinning the main wheel.');
+    navigate('/spin/pull');
     void runSpinFlow();
-  }, [frozen, runSpinFlow]);
+  }, [frozen, runSpinFlow, navigate]);
 
   // ---- Bonus wheel runner (shared by JACKPOT + BONUS paths) ----
   //
@@ -339,7 +393,7 @@ export function PostSpinFlow({
       // Mark bonus pending so REWARD_PICKED routes to bonusSpinning.
       dispatch({ type: 'SET_BONUS_PENDING', pending: true });
       dispatch({ type: 'START_REWARD_PICKER', tier: 'T3', source: 'jackpot' });
-      const rewardId = await openRewardPicker('T3');
+      const rewardId = await awaitReveal('T3');
       actions.logMainSpin(
         jarId,
         result,
@@ -359,9 +413,12 @@ export function PostSpinFlow({
         rewardId: rewardId as RewardId | null,
       });
       // Force bonus flow since withBonusPending wasn't a real dispatch.
+      navigate('/spin/pull');
+      setRevealRequest(null);
       await runBonusWheel();
       dispatch({ type: 'ALL_DONE' });
       setPendingSpin(null);
+      navigate('/');
       return;
     }
 
@@ -376,7 +433,7 @@ export function PostSpinFlow({
         tier: autoTier,
         source: 'bonus-auto',
       });
-      const rewardId = await openRewardPicker(autoTier);
+      const rewardId = await awaitReveal(autoTier);
       actions.logMainSpin(
         jarId,
         result,
@@ -398,9 +455,12 @@ export function PostSpinFlow({
         rewardId: rewardId as RewardId | null,
       });
       dispatch({ type: 'START_BONUS_SPIN' });
+      navigate('/spin/pull');
+      setRevealRequest(null);
       await runBonusWheel();
       dispatch({ type: 'ALL_DONE' });
       setPendingSpin(null);
+      navigate('/');
       return;
     }
 
@@ -409,7 +469,7 @@ export function PostSpinFlow({
       const t = tier as Tier;
       setAnnouncement(`${t} won — pick a reward.`);
       dispatch({ type: 'START_REWARD_PICKER', tier: t, source: 'wheel' });
-      const rewardId = await openRewardPicker(t);
+      const rewardId = await awaitReveal(t);
       actions.logMainSpin(jarId, result, unlockedTier, rewardId as RewardId | null);
       actions.appendHistory({
         kind: 'reward_claimed',
@@ -424,6 +484,8 @@ export function PostSpinFlow({
       });
       dispatch({ type: 'ALL_DONE' });
       setPendingSpin(null);
+      navigate('/');
+      setRevealRequest(null);
       return;
     }
 
@@ -452,7 +514,8 @@ export function PostSpinFlow({
     });
     dispatch({ type: 'ALL_DONE' });
     setPendingSpin(null);
-  }, [actions, jarId, pendingSpin, toast, runBonusWheel]);
+    navigate('/spin');
+  }, [actions, jarId, pendingSpin, toast, runBonusWheel, awaitReveal, navigate]);
 
   const handleBonusAnimationComplete = useCallback(() => {
     const resolve = bonusCompleteResolver.current;
@@ -533,90 +596,152 @@ export function PostSpinFlow({
     <Label size={7}>No stake yet</Label>
   );
 
+  // The reveal handlers only resolve the awaiting Promise. Clearing
+  // `revealRequest` is deferred to the awaiting flow's terminal step so the
+  // route guard never observes `subStep='reveal'` with no active request
+  // mid-transition (which would bounce us back to /spin).
+  const handleRevealPick = useCallback(
+    (rewardId: RewardId): void => {
+      revealRequest?.resolve(rewardId);
+    },
+    [revealRequest],
+  );
+
+  const handleRevealDismiss = useCallback((): void => {
+    revealRequest?.resolve(null);
+  }, [revealRequest]);
+
+  // ---- Step labels (Step I/II/III · ...) ----
+
+  const stepLabel: { step: string; title: string } | null =
+    subStep === 'cash'
+      ? { step: 'Step I of III', title: 'Cash In' }
+      : subStep === 'pull'
+      ? { step: 'Step II of III', title: themeMeta.copy.spinCta }
+      : subStep === 'reveal'
+      ? { step: 'Step III of III', title: themeMeta.copy.jackpot }
+      : null;
+
   return (
-    <div className="spin-flow" data-testid="spin-flow" data-phase={state.phase}>
+    <div
+      className="spin-flow"
+      data-testid="spin-flow"
+      data-phase={state.phase}
+      data-substep={subStep}
+    >
       {announcer}
 
-      <HandView jarId={jarId} />
-
-      <CashInPicker
-        hand={hand}
-        selection={state.selection}
-        onChange={handleSelectionChange}
-        disabled={frozen}
-      />
-
-      {hasGold ? (
-        <GoldInstantT3Button
-          hand={hand}
-          onRedeemGold={handleRedeemGold}
-          disabled={frozen}
-        />
-      ) : null}
-
-      {wheelMounted && pendingSpin !== null ? (
-        <WheelCabinet
-          crest={
-            <ParlourCrest title="賭狂魔笙" subtitle="Parlour No. 7" />
-          }
-          meta={crestMeta}
-        >
-          <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
-            {spinStyle === 'reels' ? (
-              <SlotReelsCanvas
-                targetSegmentIndex={pendingSpin.targetIndex}
-                onAnimationComplete={() => {
-                  void handleMainSpinAnimationComplete();
-                }}
-              />
-            ) : pendingSpin.driftIndex !== null ? (
-              <WheelCanvas
-                targetSegmentIndex={pendingSpin.targetIndex}
-                nearMissDriftIndex={pendingSpin.driftIndex}
-                onAnimationComplete={() => {
-                  void handleMainSpinAnimationComplete();
-                }}
-              />
-            ) : (
-              <WheelCanvas
-                targetSegmentIndex={pendingSpin.targetIndex}
-                onAnimationComplete={() => {
-                  void handleMainSpinAnimationComplete();
-                }}
-              />
-            )}
-          </div>
-        </WheelCabinet>
-      ) : null}
-
-      {bonusWheelMounted && pendingBonus !== null ? (
-        <div
-          className="spin-flow__bonus-wheel"
-          data-testid="spin-flow__bonus-wheel"
-        >
-          <BonusWheelCanvas
-            targetSegmentIndex={pendingBonus.segmentIndex}
-            onAnimationComplete={handleBonusAnimationComplete}
-          />
+      {stepLabel !== null ? (
+        <div className="spin-step-label" aria-hidden>
+          <span className="spin-step-label__step">{stepLabel.step}</span>
+          <h2 className="spin-step-label__title">{stepLabel.title}</h2>
         </div>
       ) : null}
 
-      <WheelOddsStrip jarId={jarId} />
+      {/* ---- Step I · Cash In ---- */}
+      {subStep === 'cash' ? (
+        <>
+          <HandView jarId={jarId} />
 
-      <div className="spin-flow__actions">
-        {spinButtonLabel !== undefined ? (
-          <SpinButton
-            onSpin={handleStartSpin}
-            disabled={spinButtonDisabled}
-            label={spinButtonLabel}
+          <CashInPicker
+            hand={hand}
+            selection={state.selection}
+            onChange={handleSelectionChange}
+            disabled={frozen}
           />
-        ) : (
-          <SpinButton onSpin={handleStartSpin} disabled={spinButtonDisabled} />
-        )}
-      </div>
 
-      <ParlourLedger jarId={jarId} />
-      <HouseRule />
+          {hasGold ? (
+            <GoldInstantT3Button
+              hand={hand}
+              onRedeemGold={handleRedeemGold}
+              disabled={frozen}
+            />
+          ) : null}
+
+          <WheelOddsStrip jarId={jarId} />
+
+          <div className="spin-flow__actions">
+            {spinButtonLabel !== undefined ? (
+              <SpinButton
+                onSpin={handleStartSpin}
+                disabled={spinButtonDisabled}
+                label={spinButtonLabel}
+              />
+            ) : (
+              <SpinButton
+                onSpin={handleStartSpin}
+                disabled={spinButtonDisabled}
+              />
+            )}
+          </div>
+
+          <ParlourLedger jarId={jarId} />
+          <HouseRule />
+        </>
+      ) : null}
+
+      {/* ---- Step II · Pull (wheel or reels animating) ---- */}
+      {subStep === 'pull' ? (
+        <>
+          {wheelMounted && pendingSpin !== null ? (
+            <WheelCabinet
+              crest={
+                <ParlourCrest title="賭狂魔笙" subtitle="Parlour No. 7" />
+              }
+              meta={crestMeta}
+            >
+              <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
+                {spinStyle === 'reels' ? (
+                  <SlotReelsCanvas
+                    targetSegmentIndex={pendingSpin.targetIndex}
+                    onAnimationComplete={() => {
+                      void handleMainSpinAnimationComplete();
+                    }}
+                  />
+                ) : pendingSpin.driftIndex !== null ? (
+                  <WheelCanvas
+                    targetSegmentIndex={pendingSpin.targetIndex}
+                    nearMissDriftIndex={pendingSpin.driftIndex}
+                    onAnimationComplete={() => {
+                      void handleMainSpinAnimationComplete();
+                    }}
+                  />
+                ) : (
+                  <WheelCanvas
+                    targetSegmentIndex={pendingSpin.targetIndex}
+                    onAnimationComplete={() => {
+                      void handleMainSpinAnimationComplete();
+                    }}
+                  />
+                )}
+              </div>
+            </WheelCabinet>
+          ) : null}
+
+          {bonusWheelMounted && pendingBonus !== null ? (
+            <div
+              className="spin-flow__bonus-wheel"
+              data-testid="spin-flow__bonus-wheel"
+            >
+              <BonusWheelCanvas
+                targetSegmentIndex={pendingBonus.segmentIndex}
+                onAnimationComplete={handleBonusAnimationComplete}
+              />
+            </div>
+          ) : null}
+
+          <HouseRule />
+        </>
+      ) : null}
+
+      {/* ---- Step III · Reveal (inline picker) ---- */}
+      {subStep === 'reveal' && revealRequest !== null ? (
+        <RevealScreen
+          tier={revealRequest.tier}
+          onPick={handleRevealPick}
+          onDismiss={handleRevealDismiss}
+        />
+      ) : null}
     </div>
   );
 }
