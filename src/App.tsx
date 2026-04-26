@@ -18,7 +18,10 @@ import { PwaUpdatePrompt } from './PwaUpdatePrompt.tsx';
 import { checkRetroactiveHygiene } from './features/habits/checkRetroactiveHygiene.ts';
 import { useAppStore } from './state/store.ts';
 import { DesktopShell } from './ui/parlour/index.ts';
+import { RecentPulls } from './ui/parlour/RecentPulls.tsx';
 import { useIsDesktop } from './lib/useIsDesktop.ts';
+import { PachinkoPotMini } from './features/jar/index.ts';
+import { RailBonusWidget } from './features/bonus/RailBonusWidget.tsx';
 
 // Lazy-load routes so the initial bundle stays lean. Each route ends up in
 // its own chunk. The home chunk is small enough that eager is fine, but we
@@ -105,7 +108,17 @@ export default function App() {
           no active timers. Hidden at desktop (rail handles it). */}
       {!isDesktop && <BonusTimerBanner />}
       <PwaUpdatePrompt />
-      <DesktopShell>
+      <DesktopShell
+        {...(isDesktop
+          ? {
+              rail: {
+                bonus: <RailBonusWidget />,
+                pot: <PachinkoPotMini />,
+                recent: <RecentPulls />,
+              },
+            }
+          : {})}
+      >
       <main className="app-shell__main" id="main">
         <Suspense fallback={<RouteFallback />}>
           <Routes>

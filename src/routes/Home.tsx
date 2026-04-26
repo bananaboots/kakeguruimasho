@@ -86,7 +86,11 @@ export default function Home() {
 
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
-      <PachinkoPotMini jarId={activeJarId} />
+      {/* The desktop right rail surfaces PachinkoPotMini; hide the inline
+          copy at >=1024px so it isn't doubled. */}
+      <div className="home__pot-inline">
+        <PachinkoPotMini jarId={activeJarId} />
+      </div>
 
       <ActivityFeed jarId={activeJarId} days={7} limit={50} />
     </section>

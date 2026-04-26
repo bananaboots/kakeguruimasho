@@ -19,12 +19,13 @@
  * render (which would cause Zustand to re-render in a loop).
  */
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getAppStore, useAppStore } from '../../state/store.ts';
 import type { BonusTimer } from '../../types/bonus.ts';
 import type { Habit } from '../../types/habit.ts';
 import { BonusTimerCountdown } from './BonusTimerCountdown.tsx';
+import { useBonusTimerSummary } from './useBonusTimerSummary.ts';
 
 function bannerSegmentLabel(timer: BonusTimer): string {
   return `${timer.percent}%`;
@@ -40,29 +41,7 @@ export function BonusTimerBanner() {
   const location = useLocation();
 
   const activeJarId = useAppStore((s) => s.activeJarId);
-  // Subscribe to the STABLE underlying array ref, then filter in-component.
-  const rawTimers = useAppStore(
-    (s) => s.bonusTimerState[s.activeJarId]?.timers,
-  );
-  const habits = useAppStore((s) => s.habits);
-
-  const active = useMemo<BonusTimer[]>(
-    () => (rawTimers ?? []).filter((t) => t.status === 'active'),
-    [rawTimers],
-  );
-
-  // Oldest-spawned first — A3 / §7H.
-  const oldest = useMemo<BonusTimer | null>(() => {
-    if (active.length === 0) return null;
-    return active.reduce((o, t) =>
-      Date.parse(t.spawnedAt) < Date.parse(o.spawnedAt) ? t : o,
-    );
-  }, [active]);
-
-  const originHabit = useMemo(() => {
-    if (!oldest || !oldest.originHabitId) return null;
-    return habits.find((h) => h.id === oldest.originHabitId) ?? null;
-  }, [oldest, habits]);
+  const { oldest, originHabit, activeCount } = useBonusTimerSummary();
 
   const onExpire = useCallback(() => {
     if (!oldest) return;
@@ -76,7 +55,7 @@ export function BonusTimerBanner() {
 
   if (!oldest) return null;
 
-  const moreCount = active.length - 1;
+  const moreCount = activeCount - 1;
 
   return (
     <button

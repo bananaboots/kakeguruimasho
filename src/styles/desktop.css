@@ -41,6 +41,13 @@
   }
 }
 
+/* Home's inline PachinkoPotMini hides at desktop -- right rail handles it. */
+@media (min-width: 1024px) {
+  .home__pot-inline {
+    display: none;
+  }
+}
+
 /* ---------- Left rail ---------- */
 
 .left-rail {
@@ -145,5 +152,108 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-card);
     padding: 16px;
+  }
+}
+
+/* ---------- Recent pulls (right rail) ---------- */
+
+@media (min-width: 1024px) {
+  .recent-pulls__title {
+    font-family: var(--font-mono);
+    font-size: calc(10px * var(--mono-scale));
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    margin-bottom: 10px;
+  }
+  .recent-pulls__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .recent-pulls__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: calc(11px * var(--mono-scale));
+    color: var(--color-ink-muted);
+  }
+  .recent-pulls__tier {
+    color: var(--color-gold);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .recent-pulls__landed {
+    color: var(--color-ink);
+    font-style: italic;
+  }
+  .recent-pulls__time {
+    color: var(--color-ink-faint);
+  }
+  .recent-pulls__empty {
+    color: var(--color-ink-faint);
+    font-style: italic;
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Rail bonus widget ---------- */
+
+@media (min-width: 1024px) {
+  .rail-bonus {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    row-gap: 6px;
+    text-align: left;
+  }
+  .rail-bonus__title {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: calc(10px * var(--mono-scale));
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+  .rail-bonus__badge {
+    grid-column: 2;
+    grid-row: 2;
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--color-gold);
+    line-height: 1;
+  }
+  .rail-bonus__countdown {
+    grid-column: 1;
+    grid-row: 2;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: calc(14px * var(--mono-scale));
+  }
+  .rail-bonus__habit {
+    grid-column: 1 / -1;
+    font-style: italic;
+    color: var(--color-ink-muted);
+    font-size: 13px;
+  }
+  .rail-bonus__more {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: calc(9px * var(--mono-scale));
+    color: var(--color-near-miss);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 }
