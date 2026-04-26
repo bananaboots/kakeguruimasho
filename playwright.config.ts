@@ -36,6 +36,16 @@ export default defineConfig({
     {
       name: 'chromium-mobile',
     },
+    {
+      name: 'desktop-chromium',
+      use: {
+        browserName: 'chromium',
+        viewport: { width: 1440, height: 900 },
+        isMobile: false,
+        hasTouch: false,
+        deviceScaleFactor: 1,
+      },
+    },
   ],
   webServer: {
     command: `npx vite preview --port ${PORT} --strictPort`,
