@@ -1,0 +1,42 @@
+/*
+ * desktop.css — Desktop chassis + breakpoint rules.
+ *
+ * Activates at >=1024px. Below that, every rule here is dormant and the
+ * mobile shell renders unchanged.
+ *
+ * Breakpoints:
+ *   - <=1023px    mobile shell (rules in shell.css + per-feature CSS)
+ *   - >=1024px    three-pane chassis (this file)
+ *   - >=1440px    chassis with content max-width 1280, centered
+ */
+
+/* Three-pane chassis. Wraps <main>; CSS hides the rails at <1024px so
+ * mobile renders unchanged. */
+.desktop-shell {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .desktop-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    min-height: 100dvh;
+  }
+  .desktop-shell__main {
+    min-width: 0;
+  }
+}
+
+@media (min-width: 1440px) {
+  .desktop-shell {
+    max-width: 1280px;
+    margin-inline: auto;
+  }
+}
+
+/* Bottom nav vanishes at desktop -- left rail takes over. */
+@media (min-width: 1024px) {
+  .bottom-nav {
+    display: none;
+  }
+}

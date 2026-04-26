@@ -37,8 +37,13 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   width: 100%;
-  max-width: 720px;
   height: 100%;
+}
+
+@media (max-width: 1023px) {
+  .bottom-nav__inner {
+    max-width: 720px;
+  }
 }
 
 .bottom-nav__item {
@@ -89,8 +94,13 @@
 
 .route {
   padding: var(--space-5) var(--space-4);
-  max-width: 720px;
-  margin: 0 auto;
+}
+
+@media (max-width: 1023px) {
+  .route {
+    max-width: 720px;
+    margin: 0 auto;
+  }
 }
 
 .route__header {

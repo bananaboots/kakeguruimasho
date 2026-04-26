@@ -2,6 +2,7 @@
 @import './styles/themes.css';
 @import 'tailwindcss';
 @import './styles/globals.css';
+@import './styles/desktop.css';
 
 /*
  * Tailwind v4 @theme bridge. Theme-driven values stay as CSS variables so
