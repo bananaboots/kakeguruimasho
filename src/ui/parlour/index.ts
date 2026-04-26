@@ -52,3 +52,5 @@ export type { DesktopShellProps } from './DesktopShell.tsx';
 export { LeftRail } from './LeftRail.tsx';
 export { RightRail } from './RightRail.tsx';
 export type { RightRailProps } from './RightRail.tsx';
+
+export { CinematicShell } from './CinematicShell.tsx';
