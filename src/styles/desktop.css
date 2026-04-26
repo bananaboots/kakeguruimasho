@@ -48,6 +48,42 @@
   }
 }
 
+/* ---------- Per-screen reflows ---------- */
+
+@media (min-width: 1024px) {
+  /* Home: rituals quick-log grid -> 3-col */
+  .quicklog-grid {
+    grid-template-columns: repeat(3, minmax(0, 360px)) !important;
+    justify-content: start;
+  }
+
+  /* Habits: list of cards -> 3-col grid */
+  .habit-list__items {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 360px));
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .habit-list__item {
+    list-style: none;
+  }
+
+  /* Vault / Rewards: 3 tier columns side-by-side */
+  .reward-tiers {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  /* History: cap width and breathe */
+  .route--history {
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+  }
+}
+
 /* ---------- Left rail ---------- */
 
 .left-rail {

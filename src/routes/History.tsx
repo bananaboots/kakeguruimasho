@@ -20,7 +20,7 @@ export default function History() {
   const [days, setDays] = useState<number>(30);
 
   return (
-    <section className="route" aria-labelledby="history-title">
+    <section className="route route--history" aria-labelledby="history-title">
       <header className="route__header">
         <h1 id="history-title" className="route__title">
           History
