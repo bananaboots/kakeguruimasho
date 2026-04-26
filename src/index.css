@@ -2,7 +2,7 @@
 @import './styles/themes.css';
 @import 'tailwindcss';
 @import './styles/globals.css';
-@import './styles/desktop.css';
+/* desktop.css is imported in main.tsx AFTER shell.css so cascade wins. */
 
 /*
  * Tailwind v4 @theme bridge. Theme-driven values stay as CSS variables so

@@ -57,10 +57,11 @@
     justify-content: start;
   }
 
-  /* Habits: list of cards -> 3-col grid */
+  /* Habits: list of cards -> 3-col grid (override habits.css flex-column) */
   .habit-list__items {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 360px));
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 360px)) !important;
+    flex-direction: row !important;
     gap: var(--space-3);
     align-items: start;
   }

@@ -26,6 +26,9 @@ import { ThemeProvider } from './styles/theme-provider.tsx';
 import './index.css';
 import './ui/ui.css';
 import './shell.css';
+// desktop.css must come AFTER shell.css so its >=1024px rules
+// (e.g. .bottom-nav { display: none }) outrank the mobile defaults.
+import './styles/desktop.css';
 import { getAppStore } from './state/store.ts';
 import { loadPersistedAppState } from './state/persist.ts';
 import { DEFAULT_HABIT_IDS } from './data/defaults.ts';
