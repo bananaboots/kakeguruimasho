@@ -240,6 +240,7 @@ const settingsSchema = z.object({
   workTimerOptIn: z.record(z.string(), z.boolean()),
   pwaRefreshPromptDismissedUntil: brandedString.nullable(),
   personalName: z.string().nullable(),
+  spinStyle: z.enum(['wheel', 'reels']).default('wheel'),
 });
 
 // History event — discriminated union (R7). Keep in sync with src/types/history.ts.

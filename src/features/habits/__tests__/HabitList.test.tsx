@@ -35,7 +35,7 @@ describe('HabitList', () => {
     expect(screen.getByText('Workout')).toBeInTheDocument();
     expect(screen.getByText('Cleaning')).toBeInTheDocument();
     expect(screen.getByText('Focused work')).toBeInTheDocument();
-    expect(screen.getByText('Hygiene bundle')).toBeInTheDocument();
+    expect(screen.getByText('Self care bundle')).toBeInTheDocument();
   });
 
   it('hides archived habits', () => {

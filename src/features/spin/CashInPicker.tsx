@@ -1,25 +1,18 @@
 /**
- * CashInPicker — select 0 or 2 or 3 of the same color from the hand (Wave 3, 3E).
+ * CashInPicker — Pachinko tier ladder (Wave 3, 3E + Vintage Pachinko design).
+ *
+ * Replaces the per-color +2/+3 grid with a 3-row tier ladder (T1 / T2 / T3),
+ * matching `pachinko-screens.jsx:539` (PachinkoTierRow). The system auto-picks
+ * the user's most-abundant matching color when the user selects T2 or T3 —
+ * granular per-color picking is no longer surfaced.
  *
  * Rules (spec §5.5, A7):
- *   - "Nothing" → T1-only
- *   - 2 same-color → T1+T2
- *   - 3 same-color → T1+T2+T3
- *   - 1 gold → handled SEPARATELY by <GoldInstantT3Button>; this picker does
- *     NOT let the user combine gold with regular clips.
- *
- * UX:
- *   - Picker shows one tappable row per color present in the hand with at
- *     least 2 clips. If a color only has 1 clip, it's shown disabled (cannot
- *     unlock anything by itself).
- *   - Each color row has "+2" and "+3" buttons (the latter disabled if the
- *     user doesn't have ≥ 3 of that color).
- *   - Invalid combinations (e.g. 2 red + 1 blue) are prevented by the
- *     radio-style selection model: tapping a different color's "+2/+3"
- *     replaces the current selection.
- *   - Gold is excluded from this view entirely — the "Use gold (instant T3)"
- *     button is a sibling component.
- *   - A "Skip" button sets the selection to empty (T1-only).
+ *   - T1 selected → empty selection (T1-only, equivalent to "skip")
+ *   - T2 → auto-pick 2 of the most-abundant color with ≥ 2 clips; disabled
+ *     otherwise
+ *   - T3 → auto-pick 3 of the most-abundant color with ≥ 3 clips; disabled
+ *     otherwise
+ *   - Gold is handled SEPARATELY by <GoldInstantT3Button>; not surfaced here.
  *
  * Disabled when the parent tells us (A9 — A9-freeze during spinning).
  */
@@ -31,24 +24,15 @@ import type { ClipId } from '../../types/ids.ts';
 import type { CashInMatchKind, SpinSelection } from './spin.machine.ts';
 import type { Tier } from '../../types/wheel.ts';
 
-import { Chip } from '../../ui/parlour/index.ts';
-import { CLIP_HEX } from './clip-colors.ts';
-
 import './spin.css';
 
 export type CashInPickerProps = {
-  /** The user's current hand (regular + gold clips). Gold is not selectable here. */
   hand: Clip[];
-  /** Current selection; the picker is a controlled component. */
   selection: SpinSelection;
-  /** Called with a new selection whenever the user changes their pick. */
   onChange: (next: SpinSelection) => void;
-  /** When true (A9-frozen), all interactions are disabled. */
   disabled?: boolean;
   className?: string;
 };
-
-type ColorCounts = Record<ClipColor, Clip[]>;
 
 const ALL_COLORS: ClipColor[] = [
   'red',
@@ -58,6 +42,8 @@ const ALL_COLORS: ClipColor[] = [
   'purple',
   'pink',
 ];
+
+type ColorCounts = Record<ClipColor, Clip[]>;
 
 function groupRegular(hand: Clip[]): ColorCounts {
   const g: ColorCounts = {
@@ -74,54 +60,93 @@ function groupRegular(hand: Clip[]): ColorCounts {
   return g;
 }
 
-function classifyLocal(matchKind: CashInMatchKind): Tier {
+/** Most-abundant color with ≥ `n` clips. Alphabetical tiebreak. Null if none. */
+function bestColorFor(groups: ColorCounts, n: number): ClipColor | null {
+  let best: { color: ClipColor; count: number } | null = null;
+  for (const color of ALL_COLORS) {
+    const count = groups[color].length;
+    if (count < n) continue;
+    if (
+      best === null ||
+      count > best.count ||
+      (count === best.count && color < best.color)
+    ) {
+      best = { color, count };
+    }
+  }
+  return best?.color ?? null;
+}
+
+function classifyTier(matchKind: CashInMatchKind): Tier {
   if (matchKind === 'three-match' || matchKind === 'gold-instant-T3') return 'T3';
   if (matchKind === 'two-match') return 'T2';
   return 'T1';
 }
 
-/**
- * Build a new selection from a pick of `n` clips of `color`. Picks the
- * first `n` clips of that color from the hand (ordering is stable, so
- * repeated picks of the same size don't thrash the selection set).
- */
+function emptySelection(): SpinSelection {
+  return { selectedIds: [], matchKind: 'none', unlockedTier: 'T1' };
+}
+
 function buildSelection(
   groups: ColorCounts,
   color: ClipColor,
   n: 2 | 3,
 ): SpinSelection {
-  const picks = groups[color].slice(0, n);
-  const ids: ClipId[] = picks.map((c) => c.id);
+  const ids: ClipId[] = groups[color].slice(0, n).map((c) => c.id);
   const matchKind: CashInMatchKind = n === 3 ? 'three-match' : 'two-match';
-  return {
-    selectedIds: ids,
-    matchKind,
-    unlockedTier: classifyLocal(matchKind),
-  };
+  return { selectedIds: ids, matchKind, unlockedTier: classifyTier(matchKind) };
 }
 
-function emptySelection(): SpinSelection {
-  return {
-    selectedIds: [],
-    matchKind: 'none',
-    unlockedTier: 'T1',
-  };
+const TIER_GLYPH: Record<Tier, string> = { T1: '一', T2: '二', T3: '三' };
+
+const TIER_DESC: Record<Tier, string> = {
+  T1: 'Quick wins only',
+  T2: 'Mid rewards in play',
+  T3: 'Big game unlocked',
+};
+
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-// Summarize the selection grouped by color for the "selected count" display.
-function selectionSummary(
-  selection: SpinSelection,
-  groups: ColorCounts,
-): { color: ClipColor; count: number } | null {
-  if (selection.selectedIds.length === 0) return null;
+function nearestColor(groups: ColorCounts, n: number): {
+  color: ClipColor;
+  have: number;
+} | null {
+  let nearest: { color: ClipColor; have: number } | null = null;
   for (const color of ALL_COLORS) {
-    const ids = new Set(groups[color].map((c) => c.id));
-    const selectedOfColor = selection.selectedIds.filter((id) => ids.has(id));
-    if (selectedOfColor.length > 0) {
-      return { color, count: selectedOfColor.length };
+    const have = groups[color].length;
+    if (have === 0) continue;
+    if (
+      nearest === null ||
+      have > nearest.have ||
+      (have === nearest.have && color < nearest.color)
+    ) {
+      nearest = { color, have };
     }
   }
-  return null;
+  if (nearest === null || nearest.have >= n) return nearest;
+  return nearest;
+}
+
+function costCopyFor(
+  tier: Tier,
+  groups: ColorCounts,
+  bestForTwo: ClipColor | null,
+  bestForThree: ClipColor | null,
+): string {
+  if (tier === 'T1') return 'Nothing';
+  if (tier === 'T2') {
+    if (bestForTwo) return `2 matching · ${capitalize(bestForTwo)} ×2 ready`;
+    const near = nearestColor(groups, 2);
+    if (!near) return '2 matching · need 2 of any color';
+    return `2 matching · need ${2 - near.have} more ${capitalize(near.color)}`;
+  }
+  // T3
+  if (bestForThree) return `3 matching · ${capitalize(bestForThree)} ×3 ready`;
+  const near = nearestColor(groups, 3);
+  if (!near) return '3 matching · need 3 of any color';
+  return `3 matching · need ${3 - near.have} more ${capitalize(near.color)}`;
 }
 
 export function CashInPicker({
@@ -132,28 +157,47 @@ export function CashInPicker({
   className,
 }: CashInPickerProps): ReactElement {
   const groups = useMemo(() => groupRegular(hand), [hand]);
-  const summary = useMemo(() => selectionSummary(selection, groups), [selection, groups]);
+  const bestForTwo = useMemo(() => bestColorFor(groups, 2), [groups]);
+  const bestForThree = useMemo(() => bestColorFor(groups, 3), [groups]);
 
-  const selectedColor = summary?.color ?? null;
+  const selectedTier = classifyTier(selection.matchKind);
 
-  const handlePick = (color: ClipColor, n: 2 | 3): void => {
+  const handlePickTier = (tier: Tier): void => {
     if (disabled) return;
-    // Re-tapping the same picked combo clears the selection (toggle off).
-    if (
-      selectedColor === color &&
-      selection.selectedIds.length === n &&
-      selection.matchKind === (n === 3 ? 'three-match' : 'two-match')
-    ) {
+    if (tier === 'T1') {
       onChange(emptySelection());
       return;
     }
-    onChange(buildSelection(groups, color, n));
+    if (tier === selectedTier) {
+      // Re-tap → toggle back to T1.
+      onChange(emptySelection());
+      return;
+    }
+    if (tier === 'T2' && bestForTwo) {
+      onChange(buildSelection(groups, bestForTwo, 2));
+      return;
+    }
+    if (tier === 'T3' && bestForThree) {
+      onChange(buildSelection(groups, bestForThree, 3));
+      return;
+    }
   };
 
-  const handleSkip = (): void => {
-    if (disabled) return;
-    onChange(emptySelection());
+  const tierStatus = (tier: Tier): {
+    enabled: boolean;
+    selected: boolean;
+    glyph: '●' | '○' | '✕';
+  } => {
+    const enabled =
+      tier === 'T1' ||
+      (tier === 'T2' && bestForTwo !== null) ||
+      (tier === 'T3' && bestForThree !== null);
+    const selected = tier === selectedTier;
+    const glyph: '●' | '○' | '✕' = selected ? '●' : enabled ? '○' : '✕';
+    return { enabled, selected, glyph };
   };
+
+  const tiers: Tier[] = ['T1', 'T2', 'T3'];
 
   return (
     <section
@@ -164,94 +208,65 @@ export function CashInPicker({
     >
       <header className="cash-in-picker__header">
         <h3 id="cash-in-picker-title" className="cash-in-picker__title">
-          Cash in
+          段 · Unlock the Tiers
         </h3>
         <p className="cash-in-picker__subtitle">
-          Match 2 for T2, 3 for T3. Skip to keep it T1-only.
+          Pick a tier — the house picks the colour.
         </p>
       </header>
 
-      <ul className="cash-in-picker__rows" role="list">
-        {ALL_COLORS.map((color) => {
-          const count = groups[color].length;
-          if (count === 0) return null;
-          const canTwo = count >= 2;
-          const canThree = count >= 3;
-          const isSelectedTwo =
-            selectedColor === color &&
-            selection.matchKind === 'two-match' &&
-            selection.selectedIds.length === 2;
-          const isSelectedThree =
-            selectedColor === color &&
-            selection.matchKind === 'three-match' &&
-            selection.selectedIds.length === 3;
+      <ul className="tier-ladder" role="list">
+        {tiers.map((tier) => {
+          const { enabled, selected, glyph } = tierStatus(tier);
+          const cost = costCopyFor(tier, groups, bestForTwo, bestForThree);
+          const desc = TIER_DESC[tier];
           return (
-            <li
-              key={color}
-              className="cash-in-picker__row"
-              data-color={color}
-            >
-              <Chip color={CLIP_HEX[color]} size={24} ariaLabel={`${color} clip`} />
-              <span className="cash-in-picker__color-label">
-                <span className="cash-in-picker__color-name">{color}</span>
-                <span className="cash-in-picker__color-count">({count})</span>
-              </span>
-              <div className="cash-in-picker__actions">
-                <button
-                  type="button"
-                  disabled={!canTwo || disabled}
-                  aria-pressed={isSelectedTwo}
-                  aria-label={`Cash in 2 ${color}`}
-                  className={cn(
-                    'cash-in-picker__pick',
-                    isSelectedTwo && 'cash-in-picker__pick--active',
-                  )}
-                  onClick={() => handlePick(color, 2)}
-                  data-testid={`cash-in-pick-${color}-2`}
+            <li key={tier}>
+              <button
+                type="button"
+                className={cn(
+                  'tier-row',
+                  selected && 'tier-row--selected',
+                  !enabled && 'tier-row--locked',
+                )}
+                onClick={() => handlePickTier(tier)}
+                disabled={disabled || !enabled}
+                aria-pressed={selected}
+                aria-label={`${tier} — ${desc}. ${cost}.`}
+                data-testid={`cash-in-tier-${tier}`}
+              >
+                <span
+                  className="tier-row__badge"
+                  aria-hidden
                 >
-                  +2
-                </button>
-                <button
-                  type="button"
-                  disabled={!canThree || disabled}
-                  aria-pressed={isSelectedThree}
-                  aria-label={`Cash in 3 ${color}`}
-                  className={cn(
-                    'cash-in-picker__pick',
-                    isSelectedThree && 'cash-in-picker__pick--active',
-                  )}
-                  onClick={() => handlePick(color, 3)}
-                  data-testid={`cash-in-pick-${color}-3`}
+                  {TIER_GLYPH[tier]}
+                </span>
+                <span className="tier-row__body">
+                  <span className="tier-row__desc">{desc}</span>
+                  <span className="tier-row__cost">{cost}</span>
+                </span>
+                <span
+                  className="tier-row__status"
+                  aria-hidden
+                  data-state={selected ? 'selected' : enabled ? 'unlocked' : 'locked'}
                 >
-                  +3
-                </button>
-              </div>
+                  {glyph}
+                </span>
+              </button>
             </li>
           );
         })}
       </ul>
 
-      <footer className="cash-in-picker__footer">
-        <button
-          type="button"
-          onClick={handleSkip}
-          disabled={disabled}
-          className="cash-in-picker__skip"
-          aria-pressed={selection.matchKind === 'none'}
-          data-testid="cash-in-picker__skip"
-        >
-          Skip (T1-only)
-        </button>
-        <span
-          className="cash-in-picker__status"
-          aria-live="polite"
-          data-testid="cash-in-picker__status"
-        >
-          {selection.matchKind === 'none'
-            ? 'No match selected — T1 only'
-            : `Unlocks up to ${selection.unlockedTier} (${selection.selectedIds.length} ${selectedColor ?? ''})`}
-        </span>
-      </footer>
+      <p
+        className="cash-in-picker__status"
+        aria-live="polite"
+        data-testid="cash-in-picker__status"
+      >
+        {selection.matchKind === 'none'
+          ? 'No stake — Tier I only'
+          : `Stake locked · ${selection.unlockedTier}`}
+      </p>
     </section>
   );
 }

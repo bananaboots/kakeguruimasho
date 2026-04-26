@@ -28,6 +28,7 @@ import './ui/ui.css';
 import './shell.css';
 import { getAppStore } from './state/store.ts';
 import { loadPersistedAppState } from './state/persist.ts';
+import { DEFAULT_HABIT_IDS } from './data/defaults.ts';
 
 // Side-effect import so 3A can `import { requestPersistentStorage } from '@/lib/storage-persist'`
 // at wire-up time without a cold path load. The function itself is idempotent
@@ -47,6 +48,34 @@ if (!rootEl) throw new Error('Root element #root missing from index.html');
  * and swallowed — a stale/corrupt snapshot should not keep the app from
  * booting (worst case, the user sees onboarding again).
  */
+/**
+ * One-shot legacy-name rename: the default self-care habit was named
+ * "Hygiene bundle" in seed data prior to 2026-04-25. Existing persisted
+ * state still carries that name. Rewrite it once at boot if the canonical
+ * default habit hasn't been customized away from the legacy default.
+ * No effect on internal IDs (`habit_hygiene`, `pendingHygieneBundle`,
+ * `streaks.hygiene`) — those stay legacy to avoid a schema migration.
+ */
+function patchLegacyHygieneName(): void {
+  const { habits, actions } = getAppStore().getState();
+  const target = habits.find((h) => h.id === DEFAULT_HABIT_IDS.hygiene);
+  if (target && target.name === 'Hygiene bundle') {
+    actions.updateHabit(target.id, { name: 'Self care bundle' });
+  }
+}
+
+/**
+ * Fill in optional settings fields added after initial release. Persisted
+ * state from older builds may be missing them; patching here lets us avoid
+ * a schema-version bump for purely additive cosmetic settings.
+ */
+function patchOptionalSettings(): void {
+  const { settings, actions } = getAppStore().getState();
+  if (settings.spinStyle === undefined) {
+    actions.updateSettings({ spinStyle: 'wheel' });
+  }
+}
+
 async function bootRehydrate(): Promise<void> {
   try {
     const persisted = await loadPersistedAppState();
@@ -54,9 +83,10 @@ async function bootRehydrate(): Promise<void> {
       getAppStore().getState().actions.hydrate(persisted);
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('[boot] rehydrate failed', err);
   }
+  patchLegacyHygieneName();
+  patchOptionalSettings();
 }
 
 function mount(): void {

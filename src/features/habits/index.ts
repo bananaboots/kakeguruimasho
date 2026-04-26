@@ -10,6 +10,8 @@ import './habits.css';
 export { HabitList } from './HabitList.tsx';
 export { HabitEditor } from './HabitEditor.tsx';
 export { QuickLogButton } from './QuickLogButton.tsx';
+export { RitualCard } from './RitualCard.tsx';
+export type { RitualCardProps } from './RitualCard.tsx';
 export { StepEntry } from './StepEntry.tsx';
 export { HygieneBundle } from './HygieneBundle.tsx';
 export { InlineTimer } from './InlineTimer.tsx';

@@ -17,11 +17,12 @@
  */
 
 import { useCallback } from 'react';
-import { Button } from '../../ui/button.tsx';
 import { getAppStore, useAppStore } from '../../state/store.ts';
 import type { Habit } from '../../types/habit.ts';
 import type { BonusTimer } from '../../types/bonus.ts';
 import type { HabitId } from '../../types/ids.ts';
+import { RitualGlyph } from '../../ui/parlour/index.ts';
+import type { RitualGlyphKind } from '../../ui/parlour/index.ts';
 import { JustALittleBitMore } from './JustALittleBitMore.tsx';
 
 export interface DiscountHabitPickerProps {
@@ -34,6 +35,25 @@ function isNumericHabit(h: Habit): boolean {
     h.unit.kind === 'minutes' ||
     h.unit.kind === 'sets'
   );
+}
+
+function glyphFor(habit: Habit): RitualGlyphKind {
+  if (habit.unit.kind === 'count') return 'walk';
+  if (habit.unit.kind === 'sets') return 'dumb';
+  // minutes — distinguish broom (cleaning) from hourglass (focused work)
+  // by name when possible.
+  const lower = habit.name.toLowerCase();
+  if (lower.includes('clean') || lower.includes('tidy')) return 'broom';
+  return 'hourglass';
+}
+
+function unitLabel(habit: Habit): string {
+  if (habit.unit.kind === 'count') {
+    return `${habit.unit.target} ${habit.unit.unit}`;
+  }
+  if (habit.unit.kind === 'minutes') return `${habit.unit.target} min`;
+  if (habit.unit.kind === 'sets') return `${habit.unit.target} sets`;
+  return '';
 }
 
 export function DiscountHabitPicker({ timer: initialTimer }: DiscountHabitPickerProps) {
@@ -73,29 +93,27 @@ export function DiscountHabitPicker({ timer: initialTimer }: DiscountHabitPicker
   return (
     <div className="bonus-picker" data-testid="discount-habit-picker">
       <p className="bonus-picker__prompt">
-        Pick a habit for your {liveTimer.percent}% discount:
+        Pick a ritual for your {liveTimer.percent}% discount.
       </p>
-      <ul className="bonus-picker__list" role="list">
+      <ul className="bonus-picker__grid" role="list">
         {eligible.map((h) => (
-          <li key={h.id} className="bonus-picker__item">
-            <Button
-              variant="secondary"
-              size="lg"
+          <li key={h.id} className="bonus-picker__cell">
+            <button
+              type="button"
               onClick={() => onPick(h.id)}
               data-testid={`discount-pick-${h.id}`}
               className="bonus-picker__btn"
             >
-              <span className="bonus-picker__name">{h.name}</span>
-              <span className="bonus-picker__unit">
-                {h.unit.kind === 'count'
-                  ? `${h.unit.target} ${h.unit.unit}`
-                  : h.unit.kind === 'minutes'
-                    ? `${h.unit.target} min`
-                    : h.unit.kind === 'sets'
-                      ? `${h.unit.target} sets`
-                      : ''}
+              <RitualGlyph
+                kind={glyphFor(h)}
+                size={20}
+                color="var(--color-ink-muted)"
+              />
+              <span className="bonus-picker__cell-body">
+                <span className="bonus-picker__name">{h.name}</span>
+                <span className="bonus-picker__unit">{unitLabel(h)}</span>
               </span>
-            </Button>
+            </button>
           </li>
         ))}
       </ul>

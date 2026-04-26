@@ -203,6 +203,53 @@
     inset 0 0 0 3px var(--color-bg);
   border-radius: var(--radius-card);
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.reveal-stage__rays {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.35;
+  z-index: 1;
+}
+
+.reveal-stage__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.reveal-stage__confetti-item {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+.reveal-stage__confetti-square {
+  display: block;
+  width: 4px;
+  height: 8px;
+  opacity: 0.85;
+}
+
+.reveal-stage__confetti-square[data-tone='gold'] {
+  background: var(--color-gold);
+}
+
+.reveal-stage__confetti-square[data-tone='red'] {
+  background: var(--clip-red);
+}
+
+.reveal-stage__content {
+  position: relative;
+  z-index: 3;
 }
 
 .reveal-stage__bloom {

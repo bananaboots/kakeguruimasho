@@ -45,7 +45,13 @@ export function SpinButton({
       data-testid="spin-button"
       aria-disabled={disabled || undefined}
     >
-      <span className="spin-button__label">{resolvedLabel}</span>
+      <span className="spin-button__knob" aria-hidden>
+        <span className="spin-button__knob-mark">◆</span>
+      </span>
+      <span className="spin-button__track">
+        <span className="spin-button__label">{resolvedLabel}</span>
+        <span className="spin-button__rail" aria-hidden />
+      </span>
     </button>
   );
 }

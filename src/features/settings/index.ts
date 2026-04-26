@@ -10,6 +10,7 @@ export type { WheelConfigEditorProps } from './WheelConfigEditor.tsx';
 export { BagCompositionEditor } from './BagCompositionEditor.tsx';
 export { HygieneCutoffEditor } from './HygieneCutoffEditor.tsx';
 export { SfxHapticsToggles } from './SfxHapticsToggles.tsx';
+export { SpinStyleToggle } from './SpinStyleToggle.tsx';
 
 export { ExportImportPanel } from './ExportImportPanel.tsx';
 export type { ExportImportPanelProps } from './ExportImportPanel.tsx';

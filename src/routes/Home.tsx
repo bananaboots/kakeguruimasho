@@ -10,20 +10,26 @@
  */
 
 import { useAppStore } from '../state/store.ts';
-import { QuickLogButton } from '../features/habits/index.ts';
+import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
-  JarVisual,
-  StreakDisplay,
   ActivityFeed,
+  PachinkoStreak,
+  PachinkoPotMini,
 } from '../features/jar/index.ts';
-import { HandSummary } from '../features/spin/index.ts';
+import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
+import { DEFAULT_HABIT_IDS } from '../data/defaults.ts';
 
 export default function Home() {
   const allHabits = useAppStore((s) => s.habits);
   const activeJarId = useAppStore((s) => s.activeJarId);
-  const habits = allHabits.filter((h) => !h.archived);
+  const habits = allHabits.filter(
+    (h) => !h.archived && h.id !== DEFAULT_HABIT_IDS.hygiene,
+  );
+  const selfCare = allHabits.find(
+    (h) => h.id === DEFAULT_HABIT_IDS.hygiene && !h.archived,
+  );
   const { themeMeta } = useTheme();
 
   return (
@@ -52,21 +58,26 @@ export default function Home() {
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <StreakDisplay jarId={activeJarId} />
+      <PachinkoStreak jarId={activeJarId} />
 
-      <div className="slot" data-slot="[3D] QuickLogButton *5">
-        <div className="quicklog-grid" role="group" aria-label="Quick log">
-          {habits.map((habit) => (
-            <QuickLogButton key={habit.id} habit={habit} />
-          ))}
-        </div>
+      <HandTrayCard jarId={activeJarId} />
+
+      <SectionTitle
+        jp="行"
+        en="Rituals · Tap to Log"
+        style={{ marginTop: 'var(--space-5)' }}
+      />
+      <div className="quicklog-grid" role="group" aria-label="Quick log">
+        {habits.map((habit) => (
+          <RitualCard key={habit.id} habit={habit} />
+        ))}
       </div>
 
-      <HandSummary jarId={activeJarId} />
+      {selfCare ? <HygieneBundle habit={selfCare} jarId={activeJarId} /> : null}
 
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
-      <JarVisual jarId={activeJarId} condensed />
+      <PachinkoPotMini jarId={activeJarId} />
 
       <ActivityFeed jarId={activeJarId} days={7} limit={50} />
     </section>

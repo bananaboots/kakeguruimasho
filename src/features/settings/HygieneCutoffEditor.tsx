@@ -37,10 +37,10 @@ export function HygieneCutoffEditor(): ReactElement {
     >
       <header>
         <h2 id="hygiene-cutoff-title" className="settings__title">
-          Hygiene cutoff
+          Self care cutoff
         </h2>
         <p className="settings__hint">
-          Complete your hygiene bundle by this time (local) to get
+          Complete your self care bundle by this time (local) to get
           credit for the day. Default 01:00.
         </p>
       </header>
@@ -51,7 +51,7 @@ export function HygieneCutoffEditor(): ReactElement {
           type="time"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          aria-label="Hygiene cutoff time"
+          aria-label="Self care cutoff time"
         />
       </label>
 

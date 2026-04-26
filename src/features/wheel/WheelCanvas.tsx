@@ -12,7 +12,7 @@
 // - Mobile-first: viewBox is square; fills container width up to a max size.
 //   Tap-safe spin button is rendered by 3E, not here.
 
-import { motion, useAnimationControls, useReducedMotion } from 'framer-motion';
+import { animate, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
 
 import {
@@ -116,11 +116,9 @@ function rotationForIndex(index: number, count: number): number {
 
 export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
   const { targetSegmentIndex, nearMissDriftIndex, onAnimationComplete, idle } = props;
-  const controls = useAnimationControls();
   const reduceMotion = useReducedMotion();
-  const lastPlayedRef = useRef<number | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // The animation operates on the 50-slice visual indexing.
   const targetTier = MAIN_WHEEL_SEGMENT_ORDER[targetSegmentIndex];
   const driftTier =
     nearMissDriftIndex !== undefined && nearMissDriftIndex !== targetSegmentIndex
@@ -131,49 +129,63 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
 
   useEffect(() => {
     if (idle) return;
-    const playKey = targetSegmentIndex * 1000 + (nearMissDriftIndex ?? -1);
-    if (lastPlayedRef.current === playKey) return;
-    lastPlayedRef.current = playKey;
+
+    const el = svgRef.current;
+    if (!el) return;
 
     const N = MAIN_WHEEL_SLICE_SEQUENCE.length; // 50
     const finalRot = rotationForIndex(targetVisualIdx, N);
 
-    if (reduceMotion) {
-      void controls
-        .start({
-          rotate: finalRot,
-          transition: { duration: 0.3, ease: 'easeOut' },
-        })
-        .then(() => onAnimationComplete?.());
-      return;
-    }
-
+    // Framer Motion's imperative `animate(el, ...)` auto-supersedes any prior
+    // animation on the same element/value, so React 18 StrictMode's
+    // mount → unmount → mount cycle is safe: the second mount's animations
+    // simply replace the first's, and only the second's await chain reaches
+    // `onAnimationComplete`. Effect deps include `targetSegmentIndex`/etc,
+    // which only change between distinct spins (the parent unmounts the wheel
+    // between spins), so re-firing on the same spin is not a concern.
+    // Framer Motion v12's `animate(el, ...).finished` Promise can hang
+    // indefinitely when animations get preempted (e.g. React 18 StrictMode
+    // dev double-mount). The animations themselves play correctly — we just
+    // can't trust the Promise. Instead, fire-and-forget the animate calls
+    // and use a timeout matched to the planned duration to drive the
+    // post-spin handler. The DOM end-state (transform) is correct either way.
     const run = async (): Promise<void> => {
+      const wait = (sec: number) => new Promise<void>((r) => window.setTimeout(r, sec * 1000));
+      if (reduceMotion) {
+        animate(el, { rotate: finalRot }, { duration: 0.3, ease: 'easeOut' });
+        await wait(0.3);
+        onAnimationComplete?.();
+        return;
+      }
       if (driftVisualIdx !== undefined) {
         const driftRot = rotationForIndex(driftVisualIdx, N);
         const overshootSweep = (360 / N) * NEAR_MISS_OVERSHOOT_FACTOR;
         const phase1End = driftRot - overshootSweep - 360 * MAIN_WHEEL_REVOLUTIONS;
-        await controls.start({
-          rotate: phase1End,
-          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.75, ease: [0.15, 0.5, 0.3, 1] },
+        animate(el, { rotate: phase1End }, {
+          duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.75,
+          ease: [0.15, 0.5, 0.3, 1],
         });
+        await wait(MAIN_WHEEL_SPIN_DURATION_SEC * 0.75);
         const remainder = ((phase1End - finalRot) % 360 + 360) % 360;
         const phase2End = phase1End - remainder;
-        await controls.start({
-          rotate: phase2End,
-          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.25, ease: 'easeOut' },
+        animate(el, { rotate: phase2End }, {
+          duration: MAIN_WHEEL_SPIN_DURATION_SEC * 0.25,
+          ease: 'easeOut',
         });
+        await wait(MAIN_WHEEL_SPIN_DURATION_SEC * 0.25);
       } else {
         const endRot = finalRot - 360 * MAIN_WHEEL_REVOLUTIONS;
-        await controls.start({
-          rotate: endRot,
-          transition: { duration: MAIN_WHEEL_SPIN_DURATION_SEC, ease: [0.2, 0.8, 0.2, 1] },
+        animate(el, { rotate: endRot }, {
+          duration: MAIN_WHEEL_SPIN_DURATION_SEC,
+          ease: [0.2, 0.8, 0.2, 1],
         });
+        await wait(MAIN_WHEEL_SPIN_DURATION_SEC);
       }
-      await controls.start({
-        scale: [1, 1.04, 1],
-        transition: { duration: WIN_PULSE_DURATION_SEC, ease: 'easeInOut' },
+      animate(el, { scale: [1, 1.04, 1] }, {
+        duration: WIN_PULSE_DURATION_SEC,
+        ease: 'easeInOut',
       });
+      await wait(WIN_PULSE_DURATION_SEC);
       onAnimationComplete?.();
     };
     void run();
@@ -184,7 +196,6 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
     targetVisualIdx,
     driftVisualIdx,
     reduceMotion,
-    controls,
     onAnimationComplete,
   ]);
 
@@ -216,10 +227,9 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
         <BrassPointer size="main" />
       </div>
 
-      <motion.svg
+      <svg
+        ref={svgRef}
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        animate={controls}
-        initial={{ rotate: 0, scale: 1 }}
         style={{ width: '100%', height: '100%', transformOrigin: '50% 50%' }}
         role="img"
         aria-label="Main reward wheel"
@@ -333,7 +343,7 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
             />
           ))}
         </g>
-      </motion.svg>
+      </svg>
 
       {/* Hub overlay (Chrysanthemum + wordmark) — rendered outside the spinning <svg>
           so the brand mark stays upright while the wheel rotates. */}
@@ -376,44 +386,43 @@ export type BonusWheelCanvasProps = {
 
 export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactElement {
   const { targetSegmentIndex, onAnimationComplete } = props;
-  const controls = useAnimationControls();
   const reduceMotion = useReducedMotion();
-  const lastPlayedRef = useRef<number | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   const targetSegment = BONUS_WHEEL_SEGMENT_ORDER[targetSegmentIndex];
   const targetVisualIdx = targetSegment ? bonusSegmentToVisualSlice(targetSegment) : 0;
 
   useEffect(() => {
-    if (lastPlayedRef.current === targetSegmentIndex) return;
-    lastPlayedRef.current = targetSegmentIndex;
+    const el = svgRef.current;
+    if (!el) return;
 
     const N = BONUS_WHEEL_SLICE_SEQUENCE.length; // 24
     const finalRot = rotationForIndex(targetVisualIdx, N);
 
-    if (reduceMotion) {
-      void controls
-        .start({
-          rotate: finalRot,
-          transition: { duration: 0.3, ease: 'easeOut' },
-        })
-        .then(() => onAnimationComplete?.());
-      return;
-    }
-
-    const endRot = finalRot - 360 * BONUS_WHEEL_REVOLUTIONS;
+    // See WheelCanvas: fire-and-forget animate() + timeout-based wait.
     const run = async (): Promise<void> => {
-      await controls.start({
-        rotate: endRot,
-        transition: { duration: BONUS_WHEEL_SPIN_DURATION_SEC, ease: [0.2, 0.8, 0.2, 1] },
+      const wait = (sec: number) => new Promise<void>((r) => window.setTimeout(r, sec * 1000));
+      if (reduceMotion) {
+        animate(el, { rotate: finalRot }, { duration: 0.3, ease: 'easeOut' });
+        await wait(0.3);
+        onAnimationComplete?.();
+        return;
+      }
+      const endRot = finalRot - 360 * BONUS_WHEEL_REVOLUTIONS;
+      animate(el, { rotate: endRot }, {
+        duration: BONUS_WHEEL_SPIN_DURATION_SEC,
+        ease: [0.2, 0.8, 0.2, 1],
       });
-      await controls.start({
-        scale: [1, 1.05, 1],
-        transition: { duration: WIN_PULSE_DURATION_SEC, ease: 'easeInOut' },
+      await wait(BONUS_WHEEL_SPIN_DURATION_SEC);
+      animate(el, { scale: [1, 1.05, 1] }, {
+        duration: WIN_PULSE_DURATION_SEC,
+        ease: 'easeInOut',
       });
+      await wait(WIN_PULSE_DURATION_SEC);
       onAnimationComplete?.();
     };
     void run();
-  }, [targetSegmentIndex, targetVisualIdx, reduceMotion, controls, onAnimationComplete]);
+  }, [targetSegmentIndex, targetVisualIdx, reduceMotion, onAnimationComplete]);
 
   const N = BONUS_WHEEL_SLICE_SEQUENCE.length;
   const slice = 360 / N;
@@ -439,10 +448,9 @@ export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactEleme
         <BrassPointer size="bonus" />
       </div>
 
-      <motion.svg
+      <svg
+        ref={svgRef}
         viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
-        animate={controls}
-        initial={{ rotate: 0, scale: 1 }}
         style={{ width: '100%', height: '100%', transformOrigin: '50% 50%' }}
         role="img"
         aria-label="Bonus reward wheel"
@@ -551,7 +559,7 @@ export function BonusWheelCanvas(props: BonusWheelCanvasProps): React.ReactEleme
             />
           ))}
         </g>
-      </motion.svg>
+      </svg>
 
       {/* Plum-blossom hub — outside motion.svg so it stays upright. */}
       <div

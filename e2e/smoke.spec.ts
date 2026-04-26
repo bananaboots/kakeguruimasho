@@ -154,9 +154,10 @@ test.describe('Kakeguruimasho smoke', () => {
     await expect(page.getByTestId('quicklog-habit_walk')).toBeVisible({ timeout: 15_000 });
 
     // Hand summary reflects post-spin state. We skipped cash-in so the
-    // clip is still in hand.
+    // clip is still in hand. The HandTrayCard says "N caught" (玉受け)
+    // post the Vintage Pachinko design pass; both wordings are accepted.
     const handText = await page.getByTestId('hand-summary').textContent();
-    expect(handText).toMatch(/\d+\s+clip/);
+    expect(handText).toMatch(/\d+\s+(clip|caught)/);
 
     // ---- Console sanity ----
     expect(errors, `Console errors captured: ${errors.join('\n')}`).toEqual([]);
