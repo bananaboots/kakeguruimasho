@@ -17,6 +17,8 @@ import { expireCheck } from './features/bonus/expireCheck.ts';
 import { PwaUpdatePrompt } from './PwaUpdatePrompt.tsx';
 import { checkRetroactiveHygiene } from './features/habits/checkRetroactiveHygiene.ts';
 import { useAppStore } from './state/store.ts';
+import { DesktopShell } from './ui/parlour/index.ts';
+import { useIsDesktop } from './lib/useIsDesktop.ts';
 
 // Lazy-load routes so the initial bundle stays lean. Each route ends up in
 // its own chunk. The home chunk is small enough that eager is fine, but we
@@ -92,12 +94,18 @@ export default function App() {
     };
   }, []);
 
+  // [Desktop] At >=1024px the right rail surfaces the bonus widget, so the
+  // sticky cross-route banner only mounts on mobile. Right-rail wiring lives
+  // in Phase 2.4.
+  const isDesktop = useIsDesktop();
+
   return (
     <div className="app-shell">
       {/* [3H] BonusTimerBanner — sticky across all routes; renders null when
-          no active timers. */}
-      <BonusTimerBanner />
+          no active timers. Hidden at desktop (rail handles it). */}
+      {!isDesktop && <BonusTimerBanner />}
       <PwaUpdatePrompt />
+      <DesktopShell>
       <main className="app-shell__main" id="main">
         <Suspense fallback={<RouteFallback />}>
           <Routes>
@@ -178,6 +186,7 @@ export default function App() {
           </Routes>
         </Suspense>
       </main>
+      </DesktopShell>
       <BottomNav />
     </div>
   );

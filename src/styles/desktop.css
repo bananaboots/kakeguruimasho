@@ -40,3 +40,110 @@
     display: none;
   }
 }
+
+/* ---------- Left rail ---------- */
+
+.left-rail {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .left-rail {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--color-felt-deep), var(--color-bg));
+    border-right: 1px solid var(--color-border);
+    padding: 24px 22px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+  .left-rail__mark {
+    margin-bottom: 24px;
+  }
+  .left-rail__kanji {
+    font-family: 'Shippori Mincho', 'Noto Serif TC', serif;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--color-gold);
+    letter-spacing: 0.4em;
+  }
+  .left-rail__brand {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--color-ink);
+    line-height: 1.05;
+    margin-top: 4px;
+  }
+  .left-rail__brand-sub {
+    display: block;
+    font-style: italic;
+    color: var(--color-gold);
+    font-size: 16px;
+  }
+  .left-rail__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .left-rail__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+    transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+  }
+  .left-rail__item:hover {
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+  }
+  .left-rail__item--active {
+    color: var(--color-gold);
+    border-left-color: var(--color-gold);
+    background: var(--color-surface-2);
+  }
+  .left-rail__label {
+    font-family: var(--font-mono);
+    font-size: calc(11px * var(--mono-scale));
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .left-rail__footer {
+    margin-top: auto;
+  }
+}
+
+/* ---------- Right rail ---------- */
+
+.right-rail {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .right-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 22px;
+    background: linear-gradient(180deg, var(--color-bg), var(--color-felt-deep));
+    border-left: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+  .right-rail[data-empty='true'] {
+    display: none;
+  }
+  .right-rail__section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 16px;
+  }
+}
