@@ -349,6 +349,61 @@
   padding: var(--space-2) 0 0;
 }
 
+/* ---------- Desktop spin layout (>=1024px) ---------- */
+
+@media (min-width: 1024px) {
+  /* Cash-in step: HandView+Picker on the left, odds+CTA+ledger on the right.
+   * Mobile keeps the stacked layout via display: contents below 1024px (the
+   * wrapper divs collapse and children render inline in source order). */
+  .spin-flow__cash {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .spin-flow__cash-hand,
+  .spin-flow__cash-action {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* Pull step: scale up the wheel canvas. The canvas SVG inside is set in
+   * its own stylesheet; we just give the wrapper more room. */
+  .spin-flow__wheel,
+  .spin-flow__bonus-wheel {
+    padding: var(--space-5) 0;
+  }
+  .spin-flow__wheel > * {
+    transform: scale(1.4);
+    transform-origin: center;
+    margin: var(--space-6) 0;
+  }
+}
+
+/* Below desktop, the new wrapper divs should collapse so content stacks
+ * exactly as it did before. display: contents removes them from layout. */
+@media (max-width: 1023px) {
+  .spin-flow__cash,
+  .spin-flow__cash-hand,
+  .spin-flow__cash-action {
+    display: contents;
+  }
+}
+
+/* Reveal step: widen the reward picker into a 2-col grid at desktop. */
+@media (min-width: 1024px) {
+  .reveal-screen {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .reveal-screen__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

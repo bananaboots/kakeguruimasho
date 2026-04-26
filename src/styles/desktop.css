@@ -82,6 +82,39 @@
     margin-inline: auto;
     padding-inline: var(--space-6);
   }
+
+  /* Jar: visual on the left, editor + activity feed on the right */
+  .jar-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .jar-layout__visual,
+  .jar-layout__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+/* Mobile: collapse the wrapper divs so the layout is unchanged. */
+@media (max-width: 1023px) {
+  .jar-layout,
+  .jar-layout__visual,
+  .jar-layout__side {
+    display: contents;
+  }
+}
+
+/* Bonus detail at desktop: cap the cabinet width and let multiple active
+ * timers render in a 2-col grid. */
+@media (min-width: 1024px) {
+  .bonus-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: var(--space-4);
+  }
 }
 
 /* ---------- Left rail ---------- */

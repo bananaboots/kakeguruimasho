@@ -82,35 +82,40 @@ export default function Jar() {
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <StreakDisplay jarId={activeJarId} />
+      <div className="jar-layout">
+        <div className="jar-layout__visual">
+          <StreakDisplay jarId={activeJarId} />
+          <JarVisual jarId={activeJarId} />
+        </div>
 
-      <JarVisual jarId={activeJarId} />
+        <div className="jar-layout__side">
+          {editorOpen ? (
+            firstRun ? (
+              <MilestoneEditor
+                jarId={activeJarId}
+                forceFirstRun
+                onSave={() => setEditorOpen(false)}
+              />
+            ) : (
+              <MilestoneEditor
+                jarId={activeJarId}
+                onSave={() => setEditorOpen(false)}
+                onCancel={() => setEditorOpen(false)}
+              />
+            )
+          ) : (
+            <Button
+              variant="secondary"
+              onClick={() => setEditorOpen(true)}
+              data-testid="jar-edit-milestones"
+            >
+              Edit milestones
+            </Button>
+          )}
 
-      {editorOpen ? (
-        firstRun ? (
-          <MilestoneEditor
-            jarId={activeJarId}
-            forceFirstRun
-            onSave={() => setEditorOpen(false)}
-          />
-        ) : (
-          <MilestoneEditor
-            jarId={activeJarId}
-            onSave={() => setEditorOpen(false)}
-            onCancel={() => setEditorOpen(false)}
-          />
-        )
-      ) : (
-        <Button
-          variant="secondary"
-          onClick={() => setEditorOpen(true)}
-          data-testid="jar-edit-milestones"
-        >
-          Edit milestones
-        </Button>
-      )}
-
-      <ActivityFeed jarId={activeJarId} days={7} />
+          <ActivityFeed jarId={activeJarId} days={7} />
+        </div>
+      </div>
     </section>
   );
 }

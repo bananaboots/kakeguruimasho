@@ -640,44 +640,44 @@ export function PostSpinFlow({
 
       {/* ---- Step I · Cash In ---- */}
       {subStep === 'cash' ? (
-        <>
-          <HandView jarId={jarId} />
-
-          <CashInPicker
-            hand={hand}
-            selection={state.selection}
-            onChange={handleSelectionChange}
-            disabled={frozen}
-          />
-
-          {hasGold ? (
-            <GoldInstantT3Button
+        <div className="spin-flow__cash">
+          <div className="spin-flow__cash-hand">
+            <HandView jarId={jarId} />
+            <CashInPicker
               hand={hand}
-              onRedeemGold={handleRedeemGold}
+              selection={state.selection}
+              onChange={handleSelectionChange}
               disabled={frozen}
             />
-          ) : null}
-
-          <WheelOddsStrip jarId={jarId} />
-
-          <div className="spin-flow__actions">
-            {spinButtonLabel !== undefined ? (
-              <SpinButton
-                onSpin={handleStartSpin}
-                disabled={spinButtonDisabled}
-                label={spinButtonLabel}
+            {hasGold ? (
+              <GoldInstantT3Button
+                hand={hand}
+                onRedeemGold={handleRedeemGold}
+                disabled={frozen}
               />
-            ) : (
-              <SpinButton
-                onSpin={handleStartSpin}
-                disabled={spinButtonDisabled}
-              />
-            )}
+            ) : null}
           </div>
 
-          <ParlourLedger jarId={jarId} />
-          <HouseRule />
-        </>
+          <div className="spin-flow__cash-action">
+            <WheelOddsStrip jarId={jarId} />
+            <div className="spin-flow__actions">
+              {spinButtonLabel !== undefined ? (
+                <SpinButton
+                  onSpin={handleStartSpin}
+                  disabled={spinButtonDisabled}
+                  label={spinButtonLabel}
+                />
+              ) : (
+                <SpinButton
+                  onSpin={handleStartSpin}
+                  disabled={spinButtonDisabled}
+                />
+              )}
+            </div>
+            <ParlourLedger jarId={jarId} />
+            <HouseRule />
+          </div>
+        </div>
       ) : null}
 
       {/* ---- Step II · Pull (wheel or reels animating) ---- */}
