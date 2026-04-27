@@ -45,4 +45,8 @@ describe('THEMES catalog', () => {
       masthead: 'neon-vertical',
     });
   });
+
+  it('kowloon is now status: ready (full bespoke flow shipped)', () => {
+    expect(THEMES.kowloon.status).toBe('ready');
+  });
 });

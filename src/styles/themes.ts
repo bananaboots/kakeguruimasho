@@ -108,7 +108,7 @@ export const THEMES: Record<ThemeKey, ThemeMeta> = {
     name: 'Kowloon Electric',
     tagline: '九龍電氣 · Triad Neon, 1985',
     symbol: 'mahjong',
-    status: 'stub',
+    status: 'ready',
     copy: {
       spinCta: 'Drop the Coin',
       earned: 'Banked',
