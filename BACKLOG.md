@@ -27,14 +27,13 @@ on its own; bundling for a follow-up PR.
       no payout, so the chip carried no signal. Re-add later if/when
       a streak payoff (e.g. free bonus spin every N chain) is designed.
 
-- [ ] **Streaks need actual mechanics.** Daily, hygiene (now removed),
-      and bonus-chain (now removed) are/were all *display-only*
-      counters: tracked in state, written to history, but never read by
-      any reward path. Either tie a payout to the daily streak (e.g. a
-      free spin every N consecutive days, a multiplier on the next
-      pull, a milestone unlock) or be honest that streaks are pure
-      vanity and trim accordingly. Source:
-      [src/state/slices/streaks.ts](src/state/slices/streaks.ts).
+- [x] ~~**Streaks need actual mechanics.**~~ Shipped 2026-04-26 as
+      century / millennium milestone payouts. Daily streak now
+      dispenses 10 random clips + 1 gold every 100 days, 25 clips +
+      10 gold every 1000 days (1000 replaces 100, not on top of), with
+      a celebration modal. Hygiene + bonus-chain remain removed from
+      the UI; if a payoff is ever designed for either we can re-add.
+      Source: [src/features/jar/streakMilestone.ts](src/features/jar/streakMilestone.ts).
 
 ## Design audit follow-ups (2026-04-25)
 
