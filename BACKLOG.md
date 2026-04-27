@@ -5,28 +5,17 @@ relevant section.
 
 ## Desktop polish (2026-04-26 punch list)
 
-Surfaced after the desktop chassis shipped. Each item is small-to-medium
-on its own; bundling for a follow-up PR.
-
-- [ ] **Home activity feed scrollable.** The chronological feed on the
-      Home / Salon route grows tall as the history accumulates and pushes
-      the rest of the page down. Cap `<ActivityFeed>` at a max-height
-      (~480px) at all viewports with `overflow-y: auto` so the feed
-      scrolls inside its own card. Source:
-      [src/features/jar/ActivityFeed.tsx](src/features/jar/ActivityFeed.tsx).
-- [ ] **CashInPicker — let the user pick chip colors.** Today the picker
-      auto-selects the user's most-abundant matching color when they tap
-      T2 / T3. This silently consumed clips the user wanted to keep
-      (e.g. spent 2 blues toward T2 when they intended to save them for
-      a 3-blue T3 cash-in). Restore manual picking: when a tier is
-      tapped, surface a tier-eligible color choice (radio chips) before
-      committing the stake. Auto-pick stays as a default but is
-      overridable. Source:
-      [src/features/spin/CashInPicker.tsx](src/features/spin/CashInPicker.tsx).
+- [x] ~~**Home activity feed scrollable.**~~ Shipped 2026-04-26 — cap
+      at `max-height: 480px` with `overflow-y: auto` and a soft
+      mask-image fade at the bottom edge.
+- [x] ~~**CashInPicker — let the user pick chip colors.**~~ Shipped
+      2026-04-26 — "色 · Choose a Colour" sub-row with one chip
+      button per eligible color appears once a tier above T1 is picked.
+      Auto-pick remains the default; any eligible color is a tap-to-
+      override.
 - [x] ~~**Bonus chain pill.**~~ Removed 2026-04-26 — was a counter with
       no payout, so the chip carried no signal. Re-add later if/when
       a streak payoff (e.g. free bonus spin every N chain) is designed.
-
 - [x] ~~**Streaks need actual mechanics.**~~ Shipped 2026-04-26 as
       century / millennium milestone payouts. Daily streak now
       dispenses 10 random clips + 1 gold every 100 days, 25 clips +
@@ -268,16 +257,17 @@ Plan: [docs/superpowers/plans/2026-04-26-desktop-adaptation.md](docs/superpowers
       `BonusTimerBanner` only mounts at `<1024px`.
 - [x] ~~**Salon framing** — content max-width 1280 at `≥1440px`.~~
       Shipped 2026-04-26.
-- [ ] **Tablet (480–1024px) two-pane.** Deferred — today's mobile shell
-      handles tablet sizes acceptably; revisit if user research surfaces
-      gaps. Tracked as a v1.1 polish item.
+- [x] ~~**Tablet (480–1024px) two-pane.**~~ Shipped 2026-04-26 in the
+      polish batch — at 768–1023px the chassis becomes a 240/1fr grid
+      with the left rail visible and the right rail hidden. Below
+      768px the pure mobile shell continues unchanged.
 
 #### Per-screen passes
 
 - [x] ~~**Spin** — cash-in side-by-side, wheel scaled up at desktop,
-      reveal 2-col picker.~~ Shipped 2026-04-26. Note: stake summary
-      stays inline at desktop for v1; right-rail-aware stake summary is
-      a v1.1 polish item.
+      reveal 2-col picker.~~ Shipped 2026-04-26. Stake summary moved
+      to the desktop right rail in the polish batch (`RailStakeAndOdds`
+      reads from `SpinRailContext`).
 - [x] ~~**Habits / Vault** — multi-column grids.~~ Shipped 2026-04-26
       (Home rituals 3-col; Habits 3-col; Vault 3 tier columns).
 - [x] ~~**Jar / BonusTimerDetail** — split layouts.~~ Shipped
@@ -287,9 +277,10 @@ Plan: [docs/superpowers/plans/2026-04-26-desktop-adaptation.md](docs/superpowers
       editor-style modals: `RewardEditor`, `HabitEditor`, `StepEntry`.
 - [x] ~~**Hover & focus states.**~~ Shipped 2026-04-26 under
       `@media (hover: hover) and (min-width: 1024px)`.
-- [x] ~~**Cinematic Onboarding shell** — corner motifs + framed card.~~
-      Shipped 2026-04-26. Velvet swag along the top edge deferred to
-      v1.1.
+- [x] ~~**Cinematic Onboarding shell** — corner motifs + framed card +
+      velvet swag.~~ Shipped 2026-04-26. Swag added in the polish
+      batch as a pure-SVG opera-house valance with gold piping +
+      tassels.
 
 #### Constraints from the design rules card
 
