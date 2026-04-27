@@ -22,6 +22,8 @@ import { RecentPulls } from './ui/parlour/RecentPulls.tsx';
 import { useIsDesktop } from './lib/useIsDesktop.ts';
 import { PachinkoPotMini, StreakMilestoneCelebration } from './features/jar/index.ts';
 import { RailBonusWidget } from './features/bonus/RailBonusWidget.tsx';
+import { SpinRailProvider } from './features/spin/SpinRailContext.tsx';
+import { RailStakeAndOdds } from './features/spin/RailStakeAndOdds.tsx';
 
 // Lazy-load routes so the initial bundle stays lean. Each route ends up in
 // its own chunk. The home chunk is small enough that eager is fine, but we
@@ -101,8 +103,11 @@ export default function App() {
   // sticky cross-route banner only mounts on mobile. Right-rail wiring lives
   // in Phase 2.4.
   const isDesktop = useIsDesktop();
+  const appLocation = useLocation();
+  const onSpinRoute = appLocation.pathname.startsWith('/spin');
 
   return (
+    <SpinRailProvider>
     <div className="app-shell">
       {/* [3H] BonusTimerBanner — sticky across all routes; renders null when
           no active timers. Hidden at desktop (rail handles it). */}
@@ -114,7 +119,10 @@ export default function App() {
               rail: {
                 bonus: <RailBonusWidget />,
                 pot: <PachinkoPotMini />,
-                recent: <RecentPulls />,
+                // On the spin flow, swap "recent pulls" for the live
+                // stake summary + odds strip. Other routes show the
+                // recent-pulls list as before.
+                recent: onSpinRoute ? <RailStakeAndOdds /> : <RecentPulls />,
               },
             }
           : {})}
@@ -205,5 +213,6 @@ export default function App() {
           milestone. Renders null when there's no pending celebration. */}
       <StreakMilestoneCelebration />
     </div>
+    </SpinRailProvider>
   );
 }

@@ -10,10 +10,23 @@
  *   - >=1440px    chassis with content max-width 1280, centered
  */
 
-/* Three-pane chassis. Wraps <main>; CSS hides the rails at <1024px so
+/* Three-pane chassis. Wraps <main>; CSS hides the rails at <768px so
  * mobile renders unchanged. */
 .desktop-shell {
   display: block;
+}
+
+/* Tablet two-pane: left rail visible, right rail hidden, bottom nav stays.
+ * Targeted at 768-1023; below 768 the pure mobile shell continues. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .desktop-shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100dvh;
+  }
+  .desktop-shell__main {
+    min-width: 0;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -34,8 +47,8 @@
   }
 }
 
-/* Bottom nav vanishes at desktop -- left rail takes over. */
-@media (min-width: 1024px) {
+/* Bottom nav vanishes once the left rail is visible (tablet + desktop). */
+@media (min-width: 768px) {
   .bottom-nav {
     display: none;
   }
@@ -206,6 +219,19 @@
     border-left: none;
     border-top: none;
   }
+
+  /* Velvet swag along the top of the viewport. SVG fills width, fixed
+   * height, sits above the backdrop grain but below the framed card. */
+  .cinematic-shell__swag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 120px;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  }
 }
 
 /* ---------- Hover affordances (desktop only, hover-capable input) ----------
@@ -270,13 +296,14 @@
   display: none;
 }
 
-@media (min-width: 1024px) {
+/* Tablet+desktop shared rail styles. */
+@media (min-width: 768px) {
   .left-rail {
     display: flex;
     flex-direction: column;
     background: linear-gradient(180deg, var(--color-felt-deep), var(--color-bg));
     border-right: 1px solid var(--color-border);
-    padding: 24px 22px;
+    padding: 24px 18px;
     position: sticky;
     top: 0;
     height: 100dvh;
@@ -288,13 +315,13 @@
   .left-rail__kanji {
     font-family: 'Shippori Mincho', 'Noto Serif TC', serif;
     font-weight: 800;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-gold);
     letter-spacing: 0.4em;
   }
   .left-rail__brand {
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 18px;
     color: var(--color-ink);
     line-height: 1.05;
     margin-top: 4px;
@@ -303,7 +330,7 @@
     display: block;
     font-style: italic;
     color: var(--color-gold);
-    font-size: 16px;
+    font-size: 14px;
   }
   .left-rail__nav {
     display: flex;
@@ -313,8 +340,8 @@
   .left-rail__item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 10px;
+    padding: 10px 10px;
     color: var(--color-ink-muted);
     text-decoration: none;
     border-radius: 4px;
@@ -332,12 +359,35 @@
   }
   .left-rail__label {
     font-family: var(--font-mono);
-    font-size: calc(11px * var(--mono-scale));
+    font-size: calc(10px * var(--mono-scale));
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
   .left-rail__footer {
     margin-top: auto;
+  }
+}
+
+/* Desktop: bigger type + more padding. */
+@media (min-width: 1024px) {
+  .left-rail {
+    padding: 24px 22px;
+  }
+  .left-rail__kanji {
+    font-size: 14px;
+  }
+  .left-rail__brand {
+    font-size: 22px;
+  }
+  .left-rail__brand-sub {
+    font-size: 16px;
+  }
+  .left-rail__item {
+    gap: 12px;
+    padding: 10px 12px;
+  }
+  .left-rail__label {
+    font-size: calc(11px * var(--mono-scale));
   }
 }
 

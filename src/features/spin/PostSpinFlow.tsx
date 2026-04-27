@@ -79,6 +79,10 @@ import {
   reduce,
   type SpinSelection,
 } from './spin.machine.ts';
+import {
+  useSpinRail,
+  type SpinStakeSummary,
+} from './SpinRailContext.shared.ts';
 
 import './spin.css';
 
@@ -154,6 +158,7 @@ export function PostSpinFlow({
   const navigate = useNavigate();
 
   const subStep: SubStep = subStepFromPath(location.pathname);
+  const { setStake } = useSpinRail();
 
   const [state, dispatch] = useReducer(reduce, INITIAL_STATE);
   // Ground-truth drift/target indices to hand to <WheelCanvas>. Set when
@@ -200,6 +205,19 @@ export function PostSpinFlow({
     },
     [navigate],
   );
+
+  // Push the current stake selection into the rail context so the desktop
+  // right-rail panel (RailStakeAndOdds) reflects what the user has picked.
+  // Cleared on unmount so other routes don't see stale stake data.
+  useEffect(() => {
+    const desc = describeStake(state.selection, hand);
+    const next: SpinStakeSummary | null =
+      desc === null
+        ? null
+        : { ...desc, unlockedTier: state.selection.unlockedTier };
+    setStake(next);
+    return () => setStake(null);
+  }, [state.selection, hand, setStake]);
 
   // Route guard — if the user lands on /spin/pull or /spin/reveal without
   // an active spin (e.g. cold-load, manual URL, browser back-forward), bounce
