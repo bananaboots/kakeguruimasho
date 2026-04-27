@@ -1,3 +1,5 @@
+import './kowloon.css';
+
 export { NeonSign } from './NeonSign.tsx';
 export type { NeonSignProps } from './NeonSign.tsx';
 export { CRTBezel } from './CRTBezel.tsx';
@@ -16,4 +18,3 @@ export { MosaicFloor } from './MosaicFloor.tsx';
 export type { MosaicFloorProps } from './MosaicFloor.tsx';
 export { PixelSprite } from './PixelSprite.tsx';
 export type { PixelSpriteProps } from './PixelSprite.tsx';
-import './kowloon.css';

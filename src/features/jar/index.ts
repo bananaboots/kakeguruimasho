@@ -25,6 +25,9 @@ export type { StreakDisplayProps } from './StreakDisplay.tsx';
 export { PachinkoStreak } from './PachinkoStreak.tsx';
 export type { PachinkoStreakProps } from './PachinkoStreak.tsx';
 
+export { Streak } from './Streak.tsx';
+export type { StreakProps } from './Streak.tsx';
+
 export { PachinkoPotMini } from './PachinkoPotMini.tsx';
 export type { PachinkoPotMiniProps } from './PachinkoPotMini.tsx';
 

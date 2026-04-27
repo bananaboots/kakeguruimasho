@@ -15,7 +15,7 @@ import { useAppStore } from '../state/store.ts';
 import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
   ActivityFeed,
-  PachinkoStreak,
+  Streak,
   PachinkoPotMini,
 } from '../features/jar/index.ts';
 import { HandTrayCard } from '../features/spin/index.ts';
@@ -67,7 +67,7 @@ export default function Home() {
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <PachinkoStreak jarId={activeJarId} />
+      <Streak jarId={activeJarId} />
 
       <HandTrayCard jarId={activeJarId} />
 

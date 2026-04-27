@@ -58,6 +58,7 @@ export function PachinkoStreak({
   return (
     <div
       className="pachinko-streak"
+      data-testid="pachinko-streak"
       role="group"
       aria-label={`Daily streak ${current}, best ${best}`}
     >

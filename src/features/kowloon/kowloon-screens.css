@@ -1,0 +1,43 @@
+.kowloon-streak {
+  width: 100%;
+  padding: 8px 0;
+}
+
+.kowloon-streak__bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  font-family: var(--font-pixel, var(--font-mono));
+  color: var(--kowloon-cyan, #22e3ff);
+  text-shadow: 0 0 6px var(--kowloon-cyan, #22e3ff);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.kowloon-streak__label {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--color-ink-faint);
+  text-shadow: none;
+}
+
+.kowloon-streak__count {
+  font-size: 22px;
+  color: var(--color-gold);
+  text-shadow: 0 0 8px var(--color-gold);
+}
+
+.kowloon-streak__sep {
+  color: var(--color-ink-faint);
+  text-shadow: none;
+}
+
+.kowloon-streak__best {
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  text-shadow: none;
+}
