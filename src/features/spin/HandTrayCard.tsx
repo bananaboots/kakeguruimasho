@@ -16,6 +16,7 @@ import type { JarId } from '../../types/ids.ts';
 import type { Clip } from '../../types/clip.ts';
 import { localDateOf, todayLocal } from '../../lib/time.ts';
 import { Chip, Engraved, GoldChip, Label } from '../../ui/parlour/index.ts';
+import { ArcadeToken } from '../../ui/kowloon/index.ts';
 import { useTheme } from '../../styles/theme-context.ts';
 import { CLIP_HEX } from './clip-colors.ts';
 
@@ -47,6 +48,29 @@ export function HandTrayCard({ jarId }: HandTrayCardProps = {}): ReactElement {
 
   const goldCount = hand.filter((c) => c.kind === 'gold').length;
   const pile = hand.slice(0, PILE_MAX);
+  const chipVariant = themeMeta.visual?.chip ?? 'lacquer';
+
+  const renderClip = (c: Clip): ReactElement => {
+    switch (chipVariant) {
+      case 'arcade-token':
+        return c.kind === 'gold' ? (
+          <ArcadeToken key={c.id} color="#e8c682" denom="★" size={22} />
+        ) : (
+          <ArcadeToken
+            key={c.id}
+            color={CLIP_HEX[c.color]}
+            denom=""
+            size={22}
+          />
+        );
+      case 'lacquer':
+        return c.kind === 'gold' ? (
+          <GoldChip key={c.id} size={22} />
+        ) : (
+          <Chip key={c.id} color={CLIP_HEX[c.color]} size={22} />
+        );
+    }
+  };
 
   return (
     <Link
@@ -76,13 +100,7 @@ export function HandTrayCard({ jarId }: HandTrayCardProps = {}): ReactElement {
 
       {pile.length > 0 ? (
         <div className="hand-tray__pile" aria-hidden>
-          {pile.map((c: Clip) =>
-            c.kind === 'gold' ? (
-              <GoldChip key={c.id} size={22} />
-            ) : (
-              <Chip key={c.id} color={CLIP_HEX[c.color]} size={22} />
-            ),
-          )}
+          {pile.map((c: Clip) => renderClip(c))}
           {hand.length > PILE_MAX ? (
             <span className="hand-tray__more">+{hand.length - PILE_MAX}</span>
           ) : null}
