@@ -8,6 +8,7 @@
 
 import type { ReactElement } from 'react';
 
+import './kowloon-screens.css';
 import { useAppStore } from '../../state/store.ts';
 import { DEFAULT_JAR_ID } from '../../types/ids.ts';
 import type { JarId } from '../../types/ids.ts';

@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import './kowloon.css';
+
 export interface NeonSignProps {
   /** Cantonese / Japanese character displayed vertically. */
   ch: string;

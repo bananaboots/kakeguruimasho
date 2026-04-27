@@ -12,6 +12,8 @@
  */
 
 import type { ReactElement, ReactNode } from 'react';
+
+import './kowloon-screens.css';
 import { cn } from '../../ui/utils.ts';
 
 export interface KowloonMastheadProps {

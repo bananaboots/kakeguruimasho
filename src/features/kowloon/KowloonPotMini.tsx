@@ -9,6 +9,7 @@
 import type { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 
+import './kowloon-screens.css';
 import { useAppStore } from '../../state/store.ts';
 import { selectJarTotal } from '../../state/selectors.ts';
 import { DEFAULT_JAR_ID } from '../../types/ids.ts';

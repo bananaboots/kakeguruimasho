@@ -2,6 +2,8 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 
 import { RevealStage } from '../RevealStage.tsx';
+import { ThemeContext } from '../../../styles/theme-context.ts';
+import { THEMES } from '../../../styles/themes.ts';
 
 describe('<RevealStage />', () => {
   afterEach(cleanup);
@@ -17,6 +19,57 @@ describe('<RevealStage />', () => {
 
   it('renders nothing for T1/T2', () => {
     const { container } = render(<RevealStage tier="T1" />);
+    expect(container.firstChild).toBeNull();
+  });
+});
+
+describe('RevealStage Kowloon branch', () => {
+  afterEach(cleanup);
+
+  it('renders the CRT phosphor reveal at theme=kowloon for T3', () => {
+    const { container } = render(
+      <ThemeContext.Provider
+        value={{
+          theme: 'kowloon',
+          themeMeta: THEMES.kowloon,
+          setTheme: () => {},
+        }}
+      >
+        <RevealStage tier="T3" />
+      </ThemeContext.Provider>,
+    );
+    expect(container.querySelector('[data-testid="kowloon-reveal"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="reveal-stage"]')).toBeNull();
+  });
+
+  it('renders the existing Pachinko reveal at theme=pachinko for T3', () => {
+    const { container } = render(
+      <ThemeContext.Provider
+        value={{
+          theme: 'pachinko',
+          themeMeta: THEMES.pachinko,
+          setTheme: () => {},
+        }}
+      >
+        <RevealStage tier="T3" />
+      </ThemeContext.Provider>,
+    );
+    expect(container.querySelector('[data-testid="reveal-stage"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="kowloon-reveal"]')).toBeNull();
+  });
+
+  it('returns null at any theme for non-T3 tiers', () => {
+    const { container } = render(
+      <ThemeContext.Provider
+        value={{
+          theme: 'kowloon',
+          themeMeta: THEMES.kowloon,
+          setTheme: () => {},
+        }}
+      >
+        <RevealStage tier="T1" />
+      </ThemeContext.Provider>,
+    );
     expect(container.firstChild).toBeNull();
   });
 });

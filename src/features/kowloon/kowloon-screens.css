@@ -104,3 +104,47 @@
   font-family: var(--font-body);
   color: var(--color-ink-muted);
 }
+
+.reveal-stage--kowloon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.reveal-stage--kowloon__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+.reveal-stage--kowloon__kicker {
+  font-family: var(--font-pixel, var(--font-mono));
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  color: var(--kowloon-cyan, #22e3ff);
+  text-shadow: 0 0 6px var(--kowloon-cyan, #22e3ff);
+}
+
+.reveal-stage--kowloon__kanji {
+  font-family: var(--font-hk, 'Noto Serif HK', serif);
+  font-size: 56px;
+  color: var(--color-gold);
+  text-shadow:
+    0 0 12px var(--color-gold),
+    0 0 32px var(--color-gold-glow);
+  line-height: 1;
+}
+
+.reveal-stage--kowloon__sub {
+  font-family: var(--font-pixel, var(--font-mono));
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--color-accent);
+  text-shadow: 0 0 8px var(--color-accent);
+  margin-top: 8px;
+}

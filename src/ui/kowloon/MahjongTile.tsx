@@ -9,6 +9,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import './kowloon.css';
+
 export interface MahjongTileProps {
   /** Cantonese / Japanese character (e.g. "東", "中"). */
   ch: string;

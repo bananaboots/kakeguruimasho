@@ -9,6 +9,8 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 
+import './kowloon.css';
+
 export interface CRTBezelProps {
   children: ReactNode;
   /** Channel label (e.g. "CH 03 · LIVE"). */

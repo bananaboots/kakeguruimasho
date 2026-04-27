@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import './kowloon.css';
+
 export interface StampProps {
   /** Cantonese / Japanese character (e.g. "檢", "廠"). */
   ch: string;
