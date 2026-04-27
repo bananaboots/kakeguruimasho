@@ -19,8 +19,10 @@ import type { Tier } from '../../types/wheel.ts';
 import { Chrysanthemum } from '../wheel/Chrysanthemum.tsx';
 import { PlumBlossom } from '../wheel/PlumBlossom.tsx';
 import { useTheme } from '../../styles/theme-context.ts';
+import { CRTBezel } from '../../ui/kowloon/CRTBezel.tsx';
 
 import '../rewards/rewards.css'; // keyframe + reveal classes live here
+import '../kowloon/kowloon-screens.css'; // .reveal-stage--kowloon* rules
 
 const RAY_COUNT = 24;
 const CONFETTI_COUNT = 30;
@@ -53,6 +55,26 @@ export interface RevealStageProps {
 export function RevealStage({ tier }: RevealStageProps): ReactElement | null {
   const { themeMeta } = useTheme();
   if (tier !== 'T3') return null;
+
+  const isKowloon = themeMeta.visual?.cover === 'arcade-closet';
+
+  if (isKowloon) {
+    return (
+      <div
+        className="reveal-stage--kowloon"
+        data-testid="kowloon-reveal"
+      >
+        <CRTBezel label="JACKPOT · TIER ★" tally width={320} height={280}>
+          <div className="reveal-stage--kowloon__inner">
+            <div className="reveal-stage--kowloon__kicker">{themeMeta.copy.jackpot}</div>
+            <div className="reveal-stage--kowloon__kanji">大</div>
+            <div className="reveal-stage--kowloon__kanji">獎</div>
+            <div className="reveal-stage--kowloon__sub">PRESS START</div>
+          </div>
+        </CRTBezel>
+      </div>
+    );
+  }
 
   return (
     <div className="reveal-stage" data-testid="reveal-stage">

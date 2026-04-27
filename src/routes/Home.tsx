@@ -15,12 +15,12 @@ import { useAppStore } from '../state/store.ts';
 import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
   ActivityFeed,
-  PachinkoStreak,
-  PachinkoPotMini,
+  Streak,
+  PotMini,
 } from '../features/jar/index.ts';
 import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif, SectionTitle } from '../ui/parlour/index.ts';
 import { DEFAULT_HABIT_IDS } from '../data/defaults.ts';
 
 export default function Home() {
@@ -39,7 +39,7 @@ export default function Home() {
       className="route route--home parlour-grain parlour-halftone"
       aria-labelledby="home-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <Link
           to="/settings"
           className="parlour-masthead__cog"
@@ -63,11 +63,11 @@ export default function Home() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
-      <PachinkoStreak jarId={activeJarId} />
+      <Streak jarId={activeJarId} />
 
       <HandTrayCard jarId={activeJarId} />
 
@@ -86,10 +86,10 @@ export default function Home() {
 
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
-      {/* The desktop right rail surfaces PachinkoPotMini; hide the inline
+      {/* The desktop right rail surfaces PotMini; hide the inline
           copy at >=1024px so it isn't doubled. */}
       <div className="home__pot-inline">
-        <PachinkoPotMini jarId={activeJarId} />
+        <PotMini jarId={activeJarId} />
       </div>
 
       <ActivityFeed jarId={activeJarId} days={7} limit={50} />

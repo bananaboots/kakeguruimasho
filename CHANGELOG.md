@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Kowloon Electric** — second bespoke theme. Triad Neon palette (hot magenta + ice cyan + acid jade + sodium yellow) over ink-black backgrounds; vertical Cantonese signage; CRT-bezel spin cabinet with three-reel mahjong tiles; magenta digital bonus countdown; LED-bar streak; arcade-token chips. Pickable via localStorage `kakegurui:theme` (theme picker UI deferred to a future cycle); `status: 'ready'` in `THEMES`.
+  - **`ThemeVisual` interface on `ThemeMeta`.** Strictly-typed variant keys (`streak`, `potMini`, `chip`, `spin`, `cover`, `overlay`, `masthead`) consumed by thin dispatcher components. Stub themes (`house`, `riding`, etc.) leave `visual` undefined and fall through to Pachinko variants — behavior unchanged.
+  - **New primitives** in `src/ui/kowloon/`: `NeonSign`, `CRTBezel`, `Scanlines`, `MahjongTile`, `ArcadeToken`, `Stamp`, `WireBundle`, `MosaicFloor`, `PixelSprite`.
+  - **New variants** in `src/features/kowloon/`: `KowloonStreak`, `KowloonPotMini`, `KowloonMasthead`, `KowloonCover`.
+  - **`MahjongReelsCanvas`** — three-reel mahjong cabinet variant for the spin flow, dispatched when `visual.spin === 'mahjong'`.
+  - **Fonts** — `Noto Serif HK` and `Shippori Mincho` loaded for HK signage.
+  - **`e2e/kowloon.spec.ts`** — Playwright regression test covering theme-flip and Kowloon-only element clearing.
+
+### Refactored
+
+- **Masthead extracted to a dispatcher.** Inline `<header className="parlour-masthead">…</header>` in every route replaced by `<Masthead>` dispatcher + `<PachinkoMasthead>` wrapper. Snapshot regression test confirms byte-identical Pachinko render.
+- **`pickNextMilestoneId` extracted** to `src/features/jar/pickNextMilestone.ts` for shared use between Pachinko and Kowloon pot-mini variants.
+
 - **Desktop adaptation.** Three-pane salon chassis at `>=1024px`: persistent left rail (house mark + nav + brand), center stage (the active route), right rail (Bonus widget + Pot + Recent Pulls). Mobile shell unchanged below `1024px`.
   - **Per-screen passes.** Home/Habits/Vault reflow to multi-column grids via CSS. Spin cash-in renders HandView+CashInPicker side-by-side; Spin pull scales the wheel up; Spin reveal shows a 2-col reward picker. Jar splits visual+streak left, editor+activity-feed right. BonusTimerDetail multi-timer cards reflow to a 2-col grid.
   - **Drawer primitive.** `<Drawer>` (`src/ui/Drawer.tsx`) renders as a bottom-sheet at mobile and a 480px right-slide drawer at desktop, built on the existing Dialog primitive (same focus-trap + ESC + a11y). `RewardEditor`, `HabitEditor`, and `StepEntry` swapped from `<Dialog>` to `<Drawer>`.

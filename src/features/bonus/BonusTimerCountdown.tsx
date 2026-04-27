@@ -21,6 +21,9 @@ import {
 } from 'react';
 import type { ISOTimestamp } from '../../types/ids.ts';
 import { formatRemaining } from './BonusTimerCountdown.util.ts';
+import { useTheme } from '../../styles/theme-context.ts';
+import { CRTBezel } from '../../ui/kowloon/CRTBezel.tsx';
+import '../kowloon/kowloon-screens.css';
 
 export interface BonusTimerCountdownProps {
   /** Authoritative end timestamp as ISO. */
@@ -46,6 +49,9 @@ export function BonusTimerCountdown({
   compact = false,
   children,
 }: BonusTimerCountdownProps) {
+  const { themeMeta } = useTheme();
+  const isKowloon = themeMeta.visual?.overlay === 'scanlines';
+
   const [remainingMs, setRemainingMs] = useState<number>(() =>
     computeRemainingMs(endTimestamp),
   );
@@ -134,6 +140,31 @@ export function BonusTimerCountdown({
   const wrapperClass =
     `bonus-countdown${compact ? ' bonus-countdown--compact' : ''}` +
     (className ? ` ${className}` : '');
+
+  if (isKowloon) {
+    return (
+      <CRTBezel label="BONUS · ACTIVE" tally width="100%" height={140}>
+        <div
+          role="timer"
+          aria-live="off"
+          aria-label={
+            remainingMs > 0
+              ? `${minutesLeft} minutes left`
+              : 'Bonus timer expired'
+          }
+          className="bonus-countdown--kowloon"
+          data-testid="bonus-countdown"
+        >
+          <span className="bonus-countdown--kowloon__digits">{label}</span>
+          {children ? (
+            <span className="bonus-countdown--kowloon__sublabel">
+              {children}
+            </span>
+          ) : null}
+        </div>
+      </CRTBezel>
+    );
+  }
 
   return (
     <span

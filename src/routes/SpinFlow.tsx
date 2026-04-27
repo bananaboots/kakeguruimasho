@@ -9,7 +9,7 @@
 
 import { PostSpinFlow } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
 
 export default function SpinFlow() {
   const { themeMeta } = useTheme();
@@ -18,7 +18,7 @@ export default function SpinFlow() {
       className="route route--spin parlour-grain parlour-halftone"
       aria-labelledby="spin-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="spin-title" className="parlour-masthead__title">
           The Pull
@@ -35,7 +35,7 @@ export default function SpinFlow() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 

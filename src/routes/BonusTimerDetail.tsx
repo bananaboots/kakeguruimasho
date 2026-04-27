@@ -25,6 +25,7 @@ import {
   DecoDivider,
   Engraved,
   Label,
+  Masthead,
   Motif,
   RitualGlyph,
 } from '../ui/parlour/index.ts';
@@ -113,7 +114,7 @@ export default function BonusTimerDetail() {
       className="route route--bonus parlour-grain parlour-halftone"
       aria-labelledby="bonus-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <div className="parlour-masthead__kicker">
           Side Wheel · Time Pressure
         </div>
@@ -130,7 +131,7 @@ export default function BonusTimerDetail() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 

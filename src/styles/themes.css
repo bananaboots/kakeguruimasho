@@ -237,3 +237,80 @@
   --color-accent-pressed: #a48954;
   --color-accent-contrast: #080a08;
 }
+
+[data-theme='kowloon'] {
+  --color-bg: #0b0a14;
+  --color-bg-grad:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 46, 136, 0.18) 0%, transparent 55%),
+    radial-gradient(110% 80% at 90% 100%, rgba(34, 227, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(140% 100% at 50% 50%, rgba(200, 85, 255, 0.10) 0%, transparent 65%),
+    #0b0a14;
+  --color-felt: #1f1c33;
+  --color-felt-deep: #161423;
+  --color-surface: #191628;
+  --color-surface-2: #231e3a;
+  --color-surface-3: #2c2547;
+  --color-border: rgba(245, 213, 71, 0.20);
+  --color-border-strong: rgba(245, 213, 71, 0.45);
+
+  --color-ink: #f0e8d4;
+  --color-ink-muted: #9c907a;
+  --color-ink-faint: #5a5340;
+
+  --color-gold: #f5d547;
+  --color-gold-deep: #c9a82a;
+  --color-gold-glow: rgba(245, 213, 71, 0.55);
+
+  --color-accent: #ff2e88;
+  --color-accent-hover: #ff4a9a;
+  --color-accent-pressed: #d61f6f;
+  --color-accent-contrast: #06050a;
+
+  /* Triad Neon supporting accents (Kowloon-only). */
+  --kowloon-cyan: #22e3ff;
+  --kowloon-jade: #1bd182;
+  --kowloon-lilac: #c855ff;
+
+  --color-win: #22e3ff;
+  --color-near-miss: #ff2e88;
+  --color-success: #1bd182;
+  --color-danger: #ff3a3a;
+  --color-warning: #ff2e88;
+
+  --clip-red: #ff3a3a;
+  --clip-blue: #22e3ff;
+  --clip-green: #1bd182;
+  --clip-yellow: #f5d547;
+  --clip-purple: #c855ff;
+  --clip-pink: #ff2e88;
+
+  --font-display: 'DM Serif Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Cormorant Garamond', 'DM Serif Text', Georgia, serif;
+  --font-mono: 'VT323', 'Courier Prime', ui-monospace, monospace;
+  --font-hk: 'Noto Serif HK', 'Shippori Mincho', serif;
+  --font-pixel: 'VT323', monospace;
+  --mono-scale: 1.35;
+}
+
+/* Page-level overlay rules — driven by [data-theme]; pure CSS, no JSX. */
+[data-theme='pachinko'] body::after,
+[data-theme='kowloon'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+[data-theme='kowloon'] body::after {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.04) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.6;
+}
+[data-theme='pachinko'] body::after {
+  /* Pachinko keeps its existing paper-grain treatment elsewhere; this overlay is no-op. */
+  display: none;
+}

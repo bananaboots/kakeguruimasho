@@ -3,6 +3,22 @@
 Future work earmarked but not yet built. Add new items at the top of the
 relevant section.
 
+## Test coverage gaps
+
+- [ ] Integration test for kowloon spin dispatch: confirm `PostSpinFlow`
+      renders `MahjongReelsCanvas` when `theme=kowloon`. The unit test
+      at `src/features/wheel/__tests__/MahjongReelsCanvas.test.tsx`
+      covers the canvas in isolation but the dispatcher's branch
+      ordering is unverified.
+- [ ] Kowloon CRT bezel labels are hardcoded English/romaji literals
+      not flowing through `themeMeta.copy`. Affected strings:
+      `"BONUS · ACTIVE"` in `src/features/bonus/BonusTimerCountdown.tsx`,
+      `"JACKPOT · TIER ★"` + `"PRESS START"` in `src/features/spin/RevealStage.tsx`,
+      `"CH 03 · LIVE"` in `src/features/wheel/MahjongReelsCanvas.tsx`.
+      Either parameterize via `themeMeta.copy` or introduce a
+      `themeMeta.copy.bezelLabels` sub-object. Consolidates 4
+      string literals across 3 files.
+
 ## Desktop polish (2026-04-26 punch list)
 
 - [x] ~~**Home activity feed scrollable.**~~ Shipped 2026-04-26 — cap
@@ -156,7 +172,7 @@ The chassis is in place; these are bespoke widgets that go inside it.
 
 ## Themes
 
-### Kowloon Electric (Triad Neon, 1985)
+### Kowloon Electric (Triad Neon, 1985) — SHIPPED 2026-04-27
 
 The eighth theme — full bespoke flow alongside Vintage Pachinko. The
 Kowloon Walled City as a bootleg arcade closet on the 9th floor: tangled
@@ -170,72 +186,98 @@ Design source: [kowloon-screens.jsx](/tmp/design-fresh/kakeguruimasho/project/ko
 [kowloon-neon.jsx](/tmp/design-fresh/kakeguruimasho/project/kowloon-neon.jsx),
 section `03 · Kowloon Electric · Full Flow` in the canvas.
 
+Architecture note: shipped via a strictly-typed `ThemeVisual` interface
+on `ThemeMeta` plus ~7 thin dispatcher components, instead of the
+per-route `theme === 'kowloon'` branching originally sketched below.
+Stub themes (`house`, `riding`, etc.) leave `visual` undefined and fall
+through to Pachinko variants — behavior unchanged.
+
 #### Theme tokens
 
-- [ ] Add `'kowloon'` to the `ThemeKey` union and a `THEMES.kowloon` entry
-      in [src/styles/themes.ts](src/styles/themes.ts) with the user-facing
-      copy: `spinCta: 'Drop the Coin'`, `earned: 'Banked'`,
-      `hand: 'Token Tray'`, `bag: 'Cassette'`,
-      `jackpot: '大獎 · Daai-Jeung'`, `nearMiss: 'One slot off'`. Tagline
-      `'九龍電氣 · Triad Neon, 1985'`. `status: 'ready'` once screens land.
-- [ ] Add `'mahjong'` to the `MotifSymbol` union and the corresponding
-      glyph to [Motif.tsx](src/ui/parlour/Motif.tsx).
-- [ ] Add `[data-theme='kowloon']` token block to
-      [src/styles/themes.css](src/styles/themes.css). Palette:
-      bg `#0b0a14`, felt `#1f1c33`, surface `#191628`, gold `#f5d547`
-      (sodium yellow), accent magenta `#ff2e88`, cyan `#22e3ff`,
-      jade `#1bd182`, purple `#c855ff`. May need a tokens schema bump
-      to expose `--accent-2/3/4` since the palette is multi-neon.
-- [ ] Layer in the `'electric'` tone: CRT scanline overlay app-wide on
+- [x] ~~Add `'kowloon'` to the `ThemeKey` union and a `THEMES.kowloon` entry
+      in [src/styles/themes.ts](src/styles/themes.ts).~~ Shipped 2026-04-27
+      with the user-facing copy: `spinCta: 'Drop the Coin'`,
+      `earned: 'Banked'`, `hand: 'Token Tray'`, `bag: 'Cassette'`,
+      `jackpot: '大獎 · Daai-Jeung'`, `nearMiss: 'One slot off'`.
+      Tagline `'九龍電氣 · Triad Neon, 1985'`. `status: 'ready'`.
+- [x] ~~Add `'mahjong'` to the `MotifSymbol` union and the corresponding
+      glyph to [Motif.tsx](src/ui/parlour/Motif.tsx).~~ Shipped 2026-04-27.
+- [x] ~~Add `[data-theme='kowloon']` token block to
+      [src/styles/themes.css](src/styles/themes.css).~~ Shipped 2026-04-27.
+      Palette: bg `#0b0a14`, felt `#1f1c33`, surface `#191628`, gold
+      `#f5d547` (sodium yellow), accent magenta `#ff2e88`, cyan `#22e3ff`,
+      jade `#1bd182`, purple `#c855ff`. Tokens schema bumped to expose
+      `--accent-2/3/4` for the multi-neon palette.
+- [x] ~~Layer in the `'electric'` tone: CRT scanline overlay app-wide on
       Kowloon, low-opacity phosphor bloom, occasional flicker on neon
-      headers — turn the dopamine up without going gaudy.
+      headers.~~ Shipped 2026-04-27 via the `Scanlines` overlay primitive.
 
 #### Bespoke primitives (mirror `src/ui/parlour/`)
 
-- [ ] CRT bezel wrapper — curved corners, phosphor bloom, scanlines, "ON
-      AIR" tally light. Wraps the wheel/reels cabinet.
-- [ ] Neon shop sign — vertical Cantonese + horizontal English subline,
-      faux-glow tubing, mounting bracket. Used for section headers.
-- [ ] Mahjong tile component — bamboo / circles / characters / dragons.
-      Slot-reel symbols.
-- [ ] Pixel sprite primitive (16×16) — fortune cat, cassette, koi,
-      cleaver, neon arrow, padlock, joystick. 3-color max, flat.
-- [ ] Wire-bundle divider — replaces brass filigree dividers.
-- [ ] Mosaic floor surface — 12×12px ceramic tiles in two shades, used
-      as cabinet base.
-- [ ] Arcade token chip — round, embossed, slot for thumbnail. Replaces
-      the casino chip on Kowloon.
-- [ ] Dot-matrix receipt — ledger style for Vault on Kowloon.
-- [ ] Inspection stamp / bootleg sticker — random-rotate per render for
-      cheap texture.
+- [x] ~~CRT bezel wrapper — curved corners, phosphor bloom, scanlines, "ON
+      AIR" tally light. Wraps the wheel/reels cabinet.~~ Shipped 2026-04-27
+      as `<CRTBezel>` in `src/ui/kowloon/`.
+- [x] ~~Neon shop sign — vertical Cantonese + horizontal English subline,
+      faux-glow tubing, mounting bracket. Used for section headers.~~
+      Shipped 2026-04-27 as `<NeonSign>` in `src/ui/kowloon/`.
+- [x] ~~Mahjong tile component — bamboo / circles / characters / dragons.
+      Slot-reel symbols.~~ Shipped 2026-04-27 as `<MahjongTile>`.
+- [x] ~~Pixel sprite primitive (16×16) — fortune cat, cassette, koi,
+      cleaver, neon arrow, padlock, joystick. 3-color max, flat.~~
+      Shipped 2026-04-27 as `<PixelSprite>`.
+- [x] ~~Wire-bundle divider — replaces brass filigree dividers.~~
+      Shipped 2026-04-27 as `<WireBundle>`.
+- [x] ~~Mosaic floor surface — 12×12px ceramic tiles in two shades, used
+      as cabinet base.~~ Shipped 2026-04-27 as `<MosaicFloor>`.
+- [x] ~~Arcade token chip — round, embossed, slot for thumbnail. Replaces
+      the casino chip on Kowloon.~~ Shipped 2026-04-27 as `<ArcadeToken>`,
+      dispatched on `visual.chip === 'arcade-token'`.
+- [x] ~~Dot-matrix receipt — ledger style for Vault on Kowloon.~~
+      Shipped 2026-04-27 — folded into the receipt-styled reward menu
+      on the Kowloon reveal screen.
+- [x] ~~Inspection stamp / bootleg sticker — random-rotate per render for
+      cheap texture.~~ Shipped 2026-04-27 as `<Stamp>`.
 
 #### Bespoke screens (mirror Pachinko coverage)
 
-- [ ] `KowloonHome` (Hall) — neon "ON AIR" streak counter, gold-bezel
+- [x] ~~`KowloonHome` (Hall) — neon "ON AIR" streak counter, gold-bezel
       token tray with mahjong-tile drill cards, Closing Sequence ritual
-      with cyan glow, cassette-icon Tin.
-- [ ] `KowloonSpinCashIn` (Drop I) — token tray + four-tier ladder
-      using mahjong-tile tier badges (一/二/三/★).
-- [ ] `KowloonSpinReels` (Drop II) — 3-reel mahjong slot in CRT bezel
+      with cyan glow, cassette-icon Tin.~~ Shipped 2026-04-27 via
+      `KowloonStreak`, `KowloonMasthead`, and arcade-token chip dispatch
+      on the existing `HandTrayCard`.
+- [x] ~~`KowloonSpinCashIn` (Drop I) — token tray + four-tier ladder
+      using mahjong-tile tier badges (一/二/三/★).~~ Shipped 2026-04-27
+      via theme-aware chip and tray variants.
+- [x] ~~`KowloonSpinReels` (Drop II) — 3-reel mahjong slot in CRT bezel
       cabinet (East/South/West · One/Two/Three · Center/Fortune/White),
-      magenta payline glow, channel-3 tally, coin-slot lever.
-- [ ] `KowloonReveal` (Drop III) — spinning mahjong tile with "大",
+      magenta payline glow, channel-3 tally, coin-slot lever.~~ Shipped
+      2026-04-27 as `<MahjongReelsCanvas>`, dispatched on
+      `visual.spin === 'mahjong-reels'`.
+- [x] ~~`KowloonReveal` (Drop III) — spinning mahjong tile with "大",
       flickering neon 大獎 wordmark, multicolor rays, pixel confetti,
-      receipt-styled reward menu.
-- [ ] `KowloonBonus` — magenta digital countdown, mahjong-tile drill
-      cards, bonus wheel restyled in triad colors.
-- [ ] `KowloonCover` (optional) — landing/cover artwork: vertical
+      receipt-styled reward menu.~~ Shipped 2026-04-27 as the
+      `RevealStage` CRT-phosphor branch.
+- [x] ~~`KowloonBonus` — magenta digital countdown, mahjong-tile drill
+      cards, bonus wheel restyled in triad colors.~~ Shipped 2026-04-27
+      as the `BonusTimerCountdown` CRT magenta-digital branch.
+- [x] ~~`KowloonCover` (optional) — landing/cover artwork: vertical
       Cantonese sign, English wordmark, tangled wires, mosaic floor,
-      corner inspection stamps.
+      corner inspection stamps.~~ Shipped 2026-04-27 as `<KowloonCover>`
+      for the theme picker.
 
 #### Wiring
 
-- [ ] Theme-gated branch in routes — same pattern as `'pachinko'`. Any
-      route that has both a generic and a Pachinko bespoke version
-      should also route to Kowloon when `theme === 'kowloon'`.
-- [ ] Update Settings copy "Vintage Pachinko" → multi-theme picker once
-      Kowloon is `status: 'ready'` (the deferred item 2 from the
-      2026-04-25 audit).
+- [x] ~~Theme-gated branch in routes — same pattern as `'pachinko'`.~~
+      Shipped 2026-04-27, but via a different shape than originally
+      sketched: a strictly-typed `ThemeVisual` interface on `ThemeMeta`
+      with ~7 thin dispatcher components (`Streak`, `PotMini`, `Chip`,
+      spin-canvas, `Cover`, overlay, `Masthead`) instead of per-route
+      `theme === 'kowloon'` branching. Stub themes leave `visual`
+      undefined and fall through to Pachinko variants.
+- [x] ~~Update Settings copy "Vintage Pachinko" → multi-theme picker once
+      Kowloon is `status: 'ready'`.~~ Shipped 2026-04-27 — the deferred
+      item 2 from the 2026-04-25 audit. Kowloon is now pickable
+      alongside Vintage Pachinko in Settings.
 
 ## Desktop adaptation (added 2026-04-26)
 

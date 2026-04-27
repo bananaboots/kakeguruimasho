@@ -132,6 +132,25 @@ export function Motif({ symbol, size = 60, color, className, style }: MotifProps
           />
         </svg>
       );
+    case 'mahjong':
+      return (
+        <svg {...props}>
+          <circle cx="30" cy="30" r="26" stroke={c} strokeWidth="0.8" opacity="0.5" />
+          {/* Tile body */}
+          <rect
+            x="14" y="10" width="32" height="40" rx="2"
+            fill={c} fillOpacity="0.12"
+            stroke={c} strokeWidth="1"
+          />
+          {/* Hatch lines for tile face */}
+          <line x1="20" y1="20" x2="40" y2="20" stroke={c} strokeWidth="0.6" opacity="0.5" />
+          <line x1="20" y1="40" x2="40" y2="40" stroke={c} strokeWidth="0.6" opacity="0.5" />
+          {/* 中 glyph stylized as crossbars + center square */}
+          <rect x="26" y="22" width="8" height="16" fill="none" stroke={c} strokeWidth="1.5" />
+          <line x1="22" y1="30" x2="38" y2="30" stroke={c} strokeWidth="1.5" />
+          <line x1="30" y1="14" x2="30" y2="46" stroke={c} strokeWidth="1.5" />
+        </svg>
+      );
     case 'fleur':
     default:
       return (

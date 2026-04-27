@@ -1,0 +1,210 @@
+/* ─── Kowloon primitive styles ───────────────────────────────── */
+
+.kowloon-neon-sign {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  background: #06050a;
+  position: relative;
+}
+
+.kowloon-neon-sign__bracket {
+  width: 8px;
+  background: linear-gradient(180deg, #2a2520, #18140f);
+  border-right: 1px solid #000;
+}
+
+.kowloon-neon-sign__ch {
+  padding: 14px 10px;
+  font-family: var(--font-hk, 'Noto Serif HK', serif);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: 0;
+  line-height: 1;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.kowloon-neon-sign__body {
+  padding: 14px 16px;
+  border-left: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 96px;
+}
+
+.kowloon-neon-sign__en {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.kowloon-neon-sign__sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+/* CRT bezel */
+
+.kowloon-crt-bezel {
+  background: linear-gradient(135deg, #2a2438, #15121f);
+  padding: 14px;
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 #4a3f6a,
+    inset 0 -2px 0 #06050a,
+    0 6px 0 #06050a;
+}
+
+.kowloon-crt-bezel__cavity {
+  width: 100%;
+  height: 100%;
+  background: #06050a;
+  border-radius: 16px;
+  box-shadow:
+    inset 0 0 30px rgba(255, 46, 136, 0.13),
+    inset 0 0 6px rgba(0, 0, 0, 0.9);
+  position: relative;
+  overflow: hidden;
+}
+
+.kowloon-crt-bezel__screen {
+  position: absolute;
+  inset: 6px;
+  background: radial-gradient(ellipse at center, #110a1c 0%, #050308 100%);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.kowloon-crt-bezel__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.4) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+.kowloon-crt-bezel__vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  border-radius: 12px;
+}
+
+.kowloon-crt-bezel__label-row {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kowloon-crt-bezel__tally {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent, #ff2e88);
+  box-shadow: 0 0 8px var(--color-accent, #ff2e88);
+}
+
+.kowloon-crt-bezel__label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-ink-faint);
+  letter-spacing: 0.2em;
+}
+
+/* Mahjong tile */
+.kowloon-mahjong-tile {
+  background: linear-gradient(180deg, #f4ecd6, #e0d5b8);
+  border: 1px solid #b8a978;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -2px 0 #c2b48a,
+    0 2px 0 #4a4030;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 0;
+  position: relative;
+}
+
+.kowloon-mahjong-tile__glyph {
+  font-family: var(--font-hk, 'Noto Serif HK', serif);
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.kowloon-mahjong-tile__sub {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: #7a6a3a;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+/* Stamp */
+.kowloon-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.kowloon-stamp__ch {
+  font-family: var(--font-hk, 'Noto Serif HK', serif);
+  font-size: 14px;
+}
+
+/* Mahjong reels canvas */
+.kowloon-mahjong-reels {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+}
+
+.kowloon-mahjong-reel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kowloon-mahjong-reels__payline {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 50%;
+  height: 2px;
+  background: var(--color-accent, #ff2e88);
+  box-shadow: 0 0 8px var(--color-accent, #ff2e88);
+  transform: translateY(-1px);
+  pointer-events: none;
+}

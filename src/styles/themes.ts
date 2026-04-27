@@ -18,6 +18,7 @@
 
 export type ThemeKey =
   | 'pachinko'
+  | 'kowloon'
   | 'house'
   | 'riding'
   | 'imperial'
@@ -32,7 +33,8 @@ export type MotifSymbol =
   | 'dragon'
   | 'wave'
   | 'star'
-  | 'keyhole';
+  | 'keyhole'
+  | 'mahjong';
 
 export interface ThemeCopy {
   /** Primary CTA on the spin screen. */
@@ -49,6 +51,24 @@ export interface ThemeCopy {
   nearMiss: string;
 }
 
+export type StreakVariant = 'lantern' | 'led-bar';
+export type PotMiniVariant = 'koi-jar' | 'token-tray';
+export type ChipVariant = 'lacquer' | 'arcade-token';
+export type SpinVariant = 'wheel' | 'reels' | 'mahjong';
+export type CoverVariant = 'parlour' | 'arcade-closet';
+export type OverlayVariant = 'paper-grain' | 'scanlines';
+export type MastheadVariant = 'engraved' | 'neon-vertical';
+
+export interface ThemeVisual {
+  streak: StreakVariant;
+  potMini: PotMiniVariant;
+  chip: ChipVariant;
+  spin: SpinVariant;
+  cover: CoverVariant;
+  overlay: OverlayVariant;
+  masthead: MastheadVariant;
+}
+
 export interface ThemeMeta {
   name: string;
   tagline: string;
@@ -56,6 +76,8 @@ export interface ThemeMeta {
   symbol: MotifSymbol;
   /** `ready` themes have full bespoke art; `stub` themes are token-only. */
   status: 'ready' | 'stub';
+  /** Optional. When absent, dispatchers fall back to Pachinko variants. */
+  visual?: ThemeVisual;
 }
 
 export const THEMES: Record<ThemeKey, ThemeMeta> = {
@@ -71,6 +93,38 @@ export const THEMES: Record<ThemeKey, ThemeMeta> = {
       bag: 'Hopper',
       jackpot: '大当たり · Ōatari',
       nearMiss: 'Inches short',
+    },
+    visual: {
+      streak: 'lantern',
+      potMini: 'koi-jar',
+      chip: 'lacquer',
+      spin: 'wheel',
+      cover: 'parlour',
+      overlay: 'paper-grain',
+      masthead: 'engraved',
+    },
+  },
+  kowloon: {
+    name: 'Kowloon Electric',
+    tagline: '九龍電氣 · Triad Neon, 1985',
+    symbol: 'mahjong',
+    status: 'ready',
+    copy: {
+      spinCta: 'Drop the Coin',
+      earned: 'Banked',
+      hand: 'Token Tray',
+      bag: 'Cassette',
+      jackpot: '大獎 · Daai-Jeung',
+      nearMiss: 'One slot off',
+    },
+    visual: {
+      streak: 'led-bar',
+      potMini: 'token-tray',
+      chip: 'arcade-token',
+      spin: 'mahjong',
+      cover: 'arcade-closet',
+      overlay: 'scanlines',
+      masthead: 'neon-vertical',
     },
   },
   house: {
