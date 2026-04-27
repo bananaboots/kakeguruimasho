@@ -16,7 +16,7 @@ import { HygieneBundle, RitualCard } from '../features/habits/index.ts';
 import {
   ActivityFeed,
   Streak,
-  PachinkoPotMini,
+  PotMini,
 } from '../features/jar/index.ts';
 import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
@@ -86,10 +86,10 @@ export default function Home() {
 
       <DecoDivider style={{ margin: 'var(--space-5) 0' }} />
 
-      {/* The desktop right rail surfaces PachinkoPotMini; hide the inline
+      {/* The desktop right rail surfaces PotMini; hide the inline
           copy at >=1024px so it isn't doubled. */}
       <div className="home__pot-inline">
-        <PachinkoPotMini jarId={activeJarId} />
+        <PotMini jarId={activeJarId} />
       </div>
 
       <ActivityFeed jarId={activeJarId} days={7} limit={50} />

@@ -10,6 +10,14 @@ relevant section.
       at `src/features/wheel/__tests__/MahjongReelsCanvas.test.tsx`
       covers the canvas in isolation but the dispatcher's branch
       ordering is unverified.
+- [ ] Kowloon CRT bezel labels are hardcoded English/romaji literals
+      not flowing through `themeMeta.copy`. Affected strings:
+      `"BONUS · ACTIVE"` in `src/features/bonus/BonusTimerCountdown.tsx`,
+      `"JACKPOT · TIER ★"` + `"PRESS START"` in `src/features/spin/RevealStage.tsx`,
+      `"CH 03 · LIVE"` in `src/features/wheel/MahjongReelsCanvas.tsx`.
+      Either parameterize via `themeMeta.copy` or introduce a
+      `themeMeta.copy.bezelLabels` sub-object. Consolidates 4
+      string literals across 3 files.
 
 ## Desktop polish (2026-04-26 punch list)
 

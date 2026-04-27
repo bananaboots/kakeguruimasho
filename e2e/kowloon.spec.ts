@@ -67,6 +67,15 @@ test.describe('Kowloon Electric theme', () => {
 
     // Confirm Kowloon streak is mounted.
     await expect(page.locator('[data-testid="kowloon-streak"]').first()).toBeVisible();
+
+    // PotMini dispatcher should resolve to Kowloon variant.
+    // Note: at desktop both Home's inline pot-mini AND the right-rail copy
+    // mount with this testid; the inline is hidden by CSS at >=1024px.
+    // At mobile only the inline copy mounts. Filter to visible so either
+    // mount counts.
+    await expect(
+      page.locator('[data-testid="kowloon-pot-mini"]:visible').first(),
+    ).toBeVisible();
   });
 
   test('flip back to pachinko clears Kowloon-only elements', async ({ page }) => {

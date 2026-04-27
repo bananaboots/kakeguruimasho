@@ -1,10 +1,13 @@
 /**
- * KowloonCover — theme-picker cover art.
+ * KowloonCover — theme-picker cover art (staged, not yet mounted).
  *
- * Used by the Settings theme picker to preview the Kowloon aesthetic.
- * Renders the cinematic header: vertical Cantonese sign + wordmark,
- * mosaic floor strip at bottom, tangled wires across the top,
- * inspection stamps in opposite corners.
+ * Renders the cinematic Kowloon header: vertical Cantonese sign +
+ * wordmark, mosaic floor strip at bottom, tangled wires across the
+ * top, inspection stamps in opposite corners.
+ *
+ * Will be consumed by the Settings theme picker once that ships
+ * (BACKLOG: Select Your Parlour theme picker — deferred from
+ * 2026-04-25 audit).
  */
 
 import type { ReactElement } from 'react';

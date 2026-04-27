@@ -9,11 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Kowloon Electric** — second bespoke theme. Triad Neon palette (hot magenta + ice cyan + acid jade + sodium yellow) over ink-black backgrounds; vertical Cantonese signage; CRT-bezel spin cabinet with three-reel mahjong tiles; magenta digital bonus countdown; LED-bar streak; arcade-token chips. Pickable in Settings; `status: 'ready'` in `THEMES`.
+- **Kowloon Electric** — second bespoke theme. Triad Neon palette (hot magenta + ice cyan + acid jade + sodium yellow) over ink-black backgrounds; vertical Cantonese signage; CRT-bezel spin cabinet with three-reel mahjong tiles; magenta digital bonus countdown; LED-bar streak; arcade-token chips. Pickable via localStorage `kakegurui:theme` (theme picker UI deferred to a future cycle); `status: 'ready'` in `THEMES`.
   - **`ThemeVisual` interface on `ThemeMeta`.** Strictly-typed variant keys (`streak`, `potMini`, `chip`, `spin`, `cover`, `overlay`, `masthead`) consumed by thin dispatcher components. Stub themes (`house`, `riding`, etc.) leave `visual` undefined and fall through to Pachinko variants — behavior unchanged.
   - **New primitives** in `src/ui/kowloon/`: `NeonSign`, `CRTBezel`, `Scanlines`, `MahjongTile`, `ArcadeToken`, `Stamp`, `WireBundle`, `MosaicFloor`, `PixelSprite`.
   - **New variants** in `src/features/kowloon/`: `KowloonStreak`, `KowloonPotMini`, `KowloonMasthead`, `KowloonCover`.
-  - **`MahjongReelsCanvas`** — three-reel mahjong cabinet variant for the spin flow, dispatched when `visual.spin === 'mahjong-reels'`.
+  - **`MahjongReelsCanvas`** — three-reel mahjong cabinet variant for the spin flow, dispatched when `visual.spin === 'mahjong'`.
   - **Fonts** — `Noto Serif HK` and `Shippori Mincho` loaded for HK signage.
   - **`e2e/kowloon.spec.ts`** — Playwright regression test covering theme-flip and Kowloon-only element clearing.
 
