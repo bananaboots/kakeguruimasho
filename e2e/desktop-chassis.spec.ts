@@ -1,7 +1,9 @@
 /**
  * Playwright — desktop chassis assertions.
  *
- * Runs only under the desktop-chromium project (1440x900). Asserts that:
+ * Runs only under the desktop-chromium project (1440x900). The chromium-
+ * mobile project skips this file via `testIgnore` in playwright.config.ts.
+ * Asserts that:
  *   - Left rail and right rail are visible at >=1024px.
  *   - Bottom nav is hidden.
  *   - Vault renders 3 tier columns at desktop.
@@ -13,11 +15,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
 test.describe('Desktop chassis', () => {
-  test.skip(
-    ({ project }) => project.name !== 'desktop-chromium',
-    'desktop-only spec',
-  );
-
   async function clearAndOnboard(page: Page): Promise<void> {
     await page.goto('/');
     await page.evaluate(async () => {
