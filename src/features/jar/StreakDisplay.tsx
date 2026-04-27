@@ -1,13 +1,16 @@
 /**
- * StreakDisplay — three chips: daily, hygiene, active bonus chain.
- * Shows current + longest. Horizontally scrolls when the row overflows.
+ * StreakDisplay — daily streak chip.
  *
- * "Complete today" visual emphasis (daily chip) is driven by
+ * Self-care streak removed 2026-04-26 as redundant with the daily streak.
+ * Bonus-chain removed 2026-04-26: it counted consecutive bonus-timer
+ * completions but had no payout attached, so the chip carried no signal.
+ *
+ * "Complete today" visual emphasis is driven by
  * `selectDailyStreakCompleteToday(jarId)`.
  */
 
 import { type ReactElement } from 'react';
-import { Flame, Sparkles, Droplets } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { useAppStore } from '../../state/store.ts';
 import {
   selectDailyStreakCompleteToday,
@@ -19,7 +22,7 @@ type IconCmp = React.ComponentType<
 >;
 
 interface ChipSpec {
-  id: 'daily' | 'hygiene' | 'bonus-chain';
+  id: 'daily';
   label: string;
   icon: IconCmp;
   current: number;
@@ -49,20 +52,6 @@ export function StreakDisplay({ jarId }: StreakDisplayProps): ReactElement {
           current: streakState.daily.current,
           longest: streakState.daily.longest,
           activeToday: dailyComplete,
-        },
-        {
-          id: 'hygiene',
-          label: 'Self care streak',
-          icon: Droplets as unknown as IconCmp,
-          current: streakState.hygiene.current,
-          longest: streakState.hygiene.longest,
-        },
-        {
-          id: 'bonus-chain',
-          label: 'Bonus chain',
-          icon: Sparkles as unknown as IconCmp,
-          current: streakState.bonusChain.current,
-          longest: streakState.bonusChain.longest,
         },
       ];
 

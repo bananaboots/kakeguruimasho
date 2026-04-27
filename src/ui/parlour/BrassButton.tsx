@@ -47,10 +47,11 @@ export const BrassButton = forwardRef<HTMLButtonElement, BrassButtonProps>(
     ref,
   ) {
     const isPrimary = variant === 'primary';
+    const variantClass = isPrimary ? 'brass-button brass-button--primary' : 'brass-button brass-button--ghost';
     return (
       <button
         ref={ref}
-        className={className}
+        className={[variantClass, className].filter(Boolean).join(' ')}
         {...rest}
         style={{
           fontFamily: 'var(--font-mono)',

@@ -349,6 +349,79 @@
   padding: var(--space-2) 0 0;
 }
 
+/* ---------- Desktop spin layout (>=1024px) ---------- */
+
+@media (min-width: 1024px) {
+  /* The center column is ~680px wide at 1440 viewport (1280 - 280 - 320).
+   * Cash-in keeps its mobile stacked order so HandView gets the full width
+   * to show the chip pile clearly. Just cap content + center for breathing
+   * room. */
+  .spin-flow {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  /* Pull step: the wheel canvas is fixed-pixel-sized. Don't scale via
+   * transform (it overflows the container). The cabinet handles its own
+   * sizing; just give the wrapper a touch more vertical room. */
+  .spin-flow__wheel,
+  .spin-flow__bonus-wheel {
+    padding: var(--space-5) 0;
+  }
+}
+
+/* Reveal step: widen the reward picker into a 2-col grid at desktop. */
+@media (min-width: 1024px) {
+  .reveal-screen {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .reveal-screen__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+/* ---------- Rail spin panel ----------
+ * Surfaces the live stake + odds in the desktop right rail when the user
+ * is on /spin. RailStakeAndOdds reads stake from SpinRailContext.
+ */
+.rail-spin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.rail-spin__title {
+  font-family: var(--font-mono);
+  font-size: calc(10px * var(--mono-scale));
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.rail-spin__chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.rail-spin__odds {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Hide the inline WheelOddsStrip during cash-in at desktop -- the right
+ * rail panel surfaces it. Mobile + tablet keep the inline strip. */
+@media (min-width: 1024px) {
+  .spin-flow[data-substep='cash'] > .wheel-odds {
+    display: none;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -530,6 +603,64 @@
   margin: 0;
   font-size: var(--text-sm);
   color: var(--color-ink-muted);
+}
+
+/* Color override row -- visible after a tier above T1 is picked. Each
+ * eligible color is a chip button; the selected one gets a gold ring. */
+.cash-in-picker__colors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) 0 var(--space-2);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-3);
+}
+.cash-in-picker__colors-label {
+  font-family: var(--font-mono);
+  font-size: calc(10px * var(--mono-scale));
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.cash-in-picker__colors-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.cash-in-color-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px 6px 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: calc(11px * var(--mono-scale));
+  letter-spacing: 0.14em;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+  min-height: var(--tap-target-min);
+}
+.cash-in-color-chip:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+}
+.cash-in-color-chip--selected {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 1px var(--color-gold), 0 0 12px var(--color-gold-glow);
+}
+.cash-in-color-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.cash-in-color-chip__count {
+  color: var(--color-ink-muted);
+}
+.cash-in-color-chip--selected .cash-in-color-chip__count {
+  color: var(--color-gold);
 }
 
 .tier-ladder {

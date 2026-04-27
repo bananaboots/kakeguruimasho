@@ -23,6 +23,8 @@ import type { Clip, ClipColor } from '../../types/clip.ts';
 import type { ClipId } from '../../types/ids.ts';
 import type { CashInMatchKind, SpinSelection } from './spin.machine.ts';
 import type { Tier } from '../../types/wheel.ts';
+import { Chip } from '../../ui/parlour/index.ts';
+import { CLIP_HEX } from './clip-colors.ts';
 
 import './spin.css';
 
@@ -75,6 +77,11 @@ function bestColorFor(groups: ColorCounts, n: number): ClipColor | null {
     }
   }
   return best?.color ?? null;
+}
+
+/** All colors with ≥ `n` clips, in palette order. */
+function eligibleColorsFor(groups: ColorCounts, n: number): ClipColor[] {
+  return ALL_COLORS.filter((c) => groups[c].length >= n);
 }
 
 function classifyTier(matchKind: CashInMatchKind): Tier {
@@ -159,8 +166,19 @@ export function CashInPicker({
   const groups = useMemo(() => groupRegular(hand), [hand]);
   const bestForTwo = useMemo(() => bestColorFor(groups, 2), [groups]);
   const bestForThree = useMemo(() => bestColorFor(groups, 3), [groups]);
+  const eligibleForTwo = useMemo(() => eligibleColorsFor(groups, 2), [groups]);
+  const eligibleForThree = useMemo(() => eligibleColorsFor(groups, 3), [groups]);
 
   const selectedTier = classifyTier(selection.matchKind);
+  // The color the user has currently committed (derived from the first
+  // selected clip). null when nothing is staked or the stake is gold.
+  const currentSelectedColor = useMemo<ClipColor | null>(() => {
+    const firstId = selection.selectedIds[0];
+    if (!firstId) return null;
+    const clip = hand.find((c) => c.id === firstId);
+    if (!clip || clip.kind !== 'regular') return null;
+    return clip.color;
+  }, [hand, selection.selectedIds]);
 
   const handlePickTier = (tier: Tier): void => {
     if (disabled) return;
@@ -181,6 +199,13 @@ export function CashInPicker({
       onChange(buildSelection(groups, bestForThree, 3));
       return;
     }
+  };
+
+  const handlePickColor = (color: ClipColor): void => {
+    if (disabled) return;
+    if (selectedTier === 'T1') return;
+    const n = selectedTier === 'T2' ? 2 : 3;
+    onChange(buildSelection(groups, color, n));
   };
 
   const tierStatus = (tier: Tier): {
@@ -211,7 +236,7 @@ export function CashInPicker({
           段 · Unlock the Tiers
         </h3>
         <p className="cash-in-picker__subtitle">
-          Pick a tier — the house picks the colour.
+          Pick a tier — then pick which colour to stake.
         </p>
       </header>
 
@@ -258,6 +283,48 @@ export function CashInPicker({
         })}
       </ul>
 
+      {/* Color picker — visible once a tier above T1 is selected. Lists
+          all eligible colors as chip buttons; user can override the auto-
+          pick by tapping a different color. */}
+      {selectedTier !== 'T1' ? (
+        <div
+          className="cash-in-picker__colors"
+          role="radiogroup"
+          aria-label="Stake colour"
+        >
+          <span className="cash-in-picker__colors-label">
+            色 · Choose a Colour
+          </span>
+          <div className="cash-in-picker__colors-row">
+            {(selectedTier === 'T2' ? eligibleForTwo : eligibleForThree).map(
+              (color) => {
+                const count = groups[color].length;
+                const isSelected = currentSelectedColor === color;
+                return (
+                  <button
+                    key={color}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    aria-label={`${capitalize(color)} (${count} in hand)`}
+                    className={cn(
+                      'cash-in-color-chip',
+                      isSelected && 'cash-in-color-chip--selected',
+                    )}
+                    onClick={() => handlePickColor(color)}
+                    disabled={disabled}
+                    data-testid={`cash-in-color-${color}`}
+                  >
+                    <Chip color={CLIP_HEX[color]} size={28} />
+                    <span className="cash-in-color-chip__count">×{count}</span>
+                  </button>
+                );
+              },
+            )}
+          </div>
+        </div>
+      ) : null}
+
       <p
         className="cash-in-picker__status"
         aria-live="polite"
@@ -265,7 +332,7 @@ export function CashInPicker({
       >
         {selection.matchKind === 'none'
           ? 'No stake — Tier I only'
-          : `Stake locked · ${selection.unlockedTier}`}
+          : `Stake locked · ${selection.unlockedTier} · ${currentSelectedColor ? capitalize(currentSelectedColor) : '—'}`}
       </p>
     </section>
   );

@@ -17,6 +17,13 @@ import { expireCheck } from './features/bonus/expireCheck.ts';
 import { PwaUpdatePrompt } from './PwaUpdatePrompt.tsx';
 import { checkRetroactiveHygiene } from './features/habits/checkRetroactiveHygiene.ts';
 import { useAppStore } from './state/store.ts';
+import { DesktopShell } from './ui/parlour/index.ts';
+import { RecentPulls } from './ui/parlour/RecentPulls.tsx';
+import { useIsDesktop } from './lib/useIsDesktop.ts';
+import { PachinkoPotMini, StreakMilestoneCelebration } from './features/jar/index.ts';
+import { RailBonusWidget } from './features/bonus/RailBonusWidget.tsx';
+import { SpinRailProvider } from './features/spin/SpinRailContext.tsx';
+import { RailStakeAndOdds } from './features/spin/RailStakeAndOdds.tsx';
 
 // Lazy-load routes so the initial bundle stays lean. Each route ends up in
 // its own chunk. The home chunk is small enough that eager is fine, but we
@@ -92,12 +99,34 @@ export default function App() {
     };
   }, []);
 
+  // [Desktop] At >=1024px the right rail surfaces the bonus widget, so the
+  // sticky cross-route banner only mounts on mobile. Right-rail wiring lives
+  // in Phase 2.4.
+  const isDesktop = useIsDesktop();
+  const appLocation = useLocation();
+  const onSpinRoute = appLocation.pathname.startsWith('/spin');
+
   return (
+    <SpinRailProvider>
     <div className="app-shell">
       {/* [3H] BonusTimerBanner — sticky across all routes; renders null when
-          no active timers. */}
-      <BonusTimerBanner />
+          no active timers. Hidden at desktop (rail handles it). */}
+      {!isDesktop && <BonusTimerBanner />}
       <PwaUpdatePrompt />
+      <DesktopShell
+        {...(isDesktop
+          ? {
+              rail: {
+                bonus: <RailBonusWidget />,
+                pot: <PachinkoPotMini />,
+                // On the spin flow, swap "recent pulls" for the live
+                // stake summary + odds strip. Other routes show the
+                // recent-pulls list as before.
+                recent: onSpinRoute ? <RailStakeAndOdds /> : <RecentPulls />,
+              },
+            }
+          : {})}
+      >
       <main className="app-shell__main" id="main">
         <Suspense fallback={<RouteFallback />}>
           <Routes>
@@ -178,7 +207,12 @@ export default function App() {
           </Routes>
         </Suspense>
       </main>
+      </DesktopShell>
       <BottomNav />
+      {/* Global -- shows whenever the daily streak hits a 100/1000-day
+          milestone. Renders null when there's no pending celebration. */}
+      <StreakMilestoneCelebration />
     </div>
+    </SpinRailProvider>
   );
 }

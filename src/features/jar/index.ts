@@ -27,3 +27,5 @@ export type { PachinkoStreakProps } from './PachinkoStreak.tsx';
 
 export { PachinkoPotMini } from './PachinkoPotMini.tsx';
 export type { PachinkoPotMiniProps } from './PachinkoPotMini.tsx';
+
+export { StreakMilestoneCelebration } from './StreakMilestoneCelebration.tsx';

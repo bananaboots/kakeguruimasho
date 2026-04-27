@@ -205,6 +205,25 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  /* Cap so the chronological log doesn't push the rest of the page
+   * off-screen as history accumulates. Internal scroll preserves the
+   * masthead + jar visual + edit-milestones controls above it. */
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+  /* Subtle visual cue at the bottom edge that there's more to scroll. */
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
 }
 
 .activity-feed__empty {

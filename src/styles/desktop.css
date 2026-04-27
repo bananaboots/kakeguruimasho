@@ -1,0 +1,525 @@
+/*
+ * desktop.css — Desktop chassis + breakpoint rules.
+ *
+ * Activates at >=1024px. Below that, every rule here is dormant and the
+ * mobile shell renders unchanged.
+ *
+ * Breakpoints:
+ *   - <=1023px    mobile shell (rules in shell.css + per-feature CSS)
+ *   - >=1024px    three-pane chassis (this file)
+ *   - >=1440px    chassis with content max-width 1280, centered
+ */
+
+/* Three-pane chassis. Wraps <main>; CSS hides the rails at <768px so
+ * mobile renders unchanged. */
+.desktop-shell {
+  display: block;
+}
+
+/* Tablet two-pane: left rail visible, right rail hidden, bottom nav stays.
+ * Targeted at 768-1023; below 768 the pure mobile shell continues. */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .desktop-shell {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100dvh;
+  }
+  .desktop-shell__main {
+    min-width: 0;
+  }
+}
+
+/* At desktop the chassis fills the viewport at any width — the rails stay
+ * fixed (280 left, 320 right) and the center column grows. Earlier we
+ * capped at 1280 with margin-inline auto for "salon centering"; in
+ * practice that left big felt voids on wide screens and squeezed the
+ * center column (the wheel looked cramped on /spin/pull). Per-route
+ * content caps (e.g. .spin-flow max-width 720) keep line lengths
+ * readable inside the now-wider center pane. */
+@media (min-width: 1024px) {
+  .desktop-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    min-height: 100dvh;
+  }
+  .desktop-shell__main {
+    min-width: 0;
+  }
+}
+
+/* Bottom nav vanishes once the left rail is visible (tablet + desktop). */
+@media (min-width: 768px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* Home's inline PachinkoPotMini hides at desktop -- right rail handles it. */
+@media (min-width: 1024px) {
+  .home__pot-inline {
+    display: none;
+  }
+}
+
+/* ---------- Per-screen reflows ---------- */
+
+@media (min-width: 1024px) {
+  /* Home: rituals quick-log grid -> 3-col */
+  .quicklog-grid {
+    grid-template-columns: repeat(3, minmax(0, 360px)) !important;
+    justify-content: start;
+  }
+
+  /* Habits: list of cards -> 3-col grid (override habits.css flex-column) */
+  .habit-list__items {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 360px)) !important;
+    flex-direction: row !important;
+    gap: var(--space-3);
+    align-items: start;
+  }
+  .habit-list__item {
+    list-style: none;
+  }
+
+  /* Vault / Rewards: 3 tier columns side-by-side */
+  .reward-tiers {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: var(--space-4);
+    align-items: start;
+  }
+  /* Tier columns are narrow (~280px each at 1440 desktop). Stack the
+   * label above the Edit/Archive actions inside each reward row so the
+   * row is readable instead of crammed onto one line. */
+  .reward-menu__item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  .reward-menu__item::before {
+    /* The vertical gold bar reads better on the left edge as a stripe. */
+    position: absolute;
+    left: 0;
+    top: var(--space-2);
+    bottom: var(--space-2);
+    height: auto;
+    margin-right: 0;
+  }
+  .reward-menu__label {
+    padding-left: var(--space-3);
+  }
+  .reward-menu__actions {
+    margin-left: auto;
+  }
+
+  /* History: cap width and breathe */
+  .route--history {
+    max-width: 720px;
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+  }
+
+  /* Jar: visual on the left, editor + activity feed on the right */
+  .jar-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-5);
+    align-items: start;
+  }
+  .jar-layout__visual,
+  .jar-layout__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+/* Mobile: collapse the wrapper divs so the layout is unchanged. */
+@media (max-width: 1023px) {
+  .jar-layout,
+  .jar-layout__visual,
+  .jar-layout__side {
+    display: contents;
+  }
+}
+
+/* Bonus detail at desktop: cap the cabinet width and let multiple active
+ * timers render in a 2-col grid. */
+@media (min-width: 1024px) {
+  .bonus-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: var(--space-4);
+  }
+}
+
+/* ---------- Cinematic Onboarding shell (desktop only) ---------- */
+
+.cinematic-shell {
+  display: contents;
+}
+
+@media (min-width: 1024px) {
+  .cinematic-shell {
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg-grad);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    overflow-y: auto;
+    padding: 40px;
+  }
+  .cinematic-shell::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+  .cinematic-shell__card {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    z-index: 1;
+  }
+  .cinematic-shell__corner {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 1px solid var(--color-gold);
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  .cinematic-shell__corner--tl {
+    top: 24px;
+    left: 24px;
+    border-right: none;
+    border-bottom: none;
+  }
+  .cinematic-shell__corner--tr {
+    top: 24px;
+    right: 24px;
+    border-left: none;
+    border-bottom: none;
+  }
+  .cinematic-shell__corner--bl {
+    bottom: 24px;
+    left: 24px;
+    border-right: none;
+    border-top: none;
+  }
+  .cinematic-shell__corner--br {
+    bottom: 24px;
+    right: 24px;
+    border-left: none;
+    border-top: none;
+  }
+
+  /* Velvet swag along the top of the viewport. SVG fills width, fixed
+   * height, sits above the backdrop grain but below the framed card. */
+  .cinematic-shell__swag {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 120px;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  }
+}
+
+/* ---------- Hover affordances (desktop only, hover-capable input) ----------
+ * Scope: @media (hover: hover) and (min-width: 1024px). Touch devices and
+ * mobile viewports never see these rules; mobile press states (`:active`)
+ * stay untouched per primitive.
+ */
+
+@media (hover: hover) and (min-width: 1024px) {
+  /* BrassButton primary: brighter gradient + glow + 1px lift */
+  .brass-button--primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, var(--color-win) 0%, var(--color-gold) 100%) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+      0 0 12px var(--color-gold-glow),
+      0 2px 0 rgba(0, 0, 0, 0.5) !important;
+    transform: translateY(-1px);
+  }
+  /* BrassButton ghost: bolder border + gold ink */
+  .brass-button--ghost:hover:not(:disabled) {
+    box-shadow: inset 0 0 0 1px var(--color-border-strong) !important;
+    color: var(--color-gold) !important;
+  }
+
+  /* RitualCard: brighten border + nudge plus icon */
+  .ritual-card:hover {
+    border-color: var(--color-border-strong) !important;
+    box-shadow: inset 0 0 0 1px var(--color-gold-glow);
+  }
+  .ritual-card:hover .ritual-card__plus {
+    transform: scale(1.06);
+  }
+
+  /* Chip: drop-shadow strengthens on hover; cursor pointer */
+  .chip,
+  svg.chip {
+    transition: transform var(--motion-fast) ease, filter var(--motion-fast) ease;
+    cursor: pointer;
+  }
+  .chip:hover,
+  svg.chip:hover {
+    transform: translateY(-1px);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+  }
+
+  /* Tier rows in Vault */
+  .reward-tier:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  /* Lever knob cursor */
+  .pachinko-lever__knob,
+  .spin-button {
+    cursor: pointer;
+  }
+}
+
+/* ---------- Left rail ---------- */
+
+.left-rail {
+  display: none;
+}
+
+/* Tablet+desktop shared rail styles. */
+@media (min-width: 768px) {
+  .left-rail {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--color-felt-deep), var(--color-bg));
+    border-right: 1px solid var(--color-border);
+    padding: 24px 18px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+  .left-rail__mark {
+    margin-bottom: 24px;
+  }
+  .left-rail__kanji {
+    font-family: 'Shippori Mincho', 'Noto Serif TC', serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--color-gold);
+    letter-spacing: 0.4em;
+  }
+  .left-rail__brand {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--color-ink);
+    line-height: 1.05;
+    margin-top: 4px;
+  }
+  .left-rail__brand-sub {
+    display: block;
+    font-style: italic;
+    color: var(--color-gold);
+    font-size: 14px;
+  }
+  .left-rail__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .left-rail__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 10px;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    border-radius: 4px;
+    border-left: 2px solid transparent;
+    transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+  }
+  .left-rail__item:hover {
+    background: var(--color-surface-2);
+    color: var(--color-ink);
+  }
+  .left-rail__item--active {
+    color: var(--color-gold);
+    border-left-color: var(--color-gold);
+    background: var(--color-surface-2);
+  }
+  .left-rail__label {
+    font-family: var(--font-mono);
+    font-size: calc(10px * var(--mono-scale));
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .left-rail__footer {
+    margin-top: auto;
+  }
+}
+
+/* Desktop: bigger type + more padding. */
+@media (min-width: 1024px) {
+  .left-rail {
+    padding: 24px 22px;
+  }
+  .left-rail__kanji {
+    font-size: 14px;
+  }
+  .left-rail__brand {
+    font-size: 22px;
+  }
+  .left-rail__brand-sub {
+    font-size: 16px;
+  }
+  .left-rail__item {
+    gap: 12px;
+    padding: 10px 12px;
+  }
+  .left-rail__label {
+    font-size: calc(11px * var(--mono-scale));
+  }
+}
+
+/* ---------- Right rail ---------- */
+
+.right-rail {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .right-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px 22px;
+    background: linear-gradient(180deg, var(--color-bg), var(--color-felt-deep));
+    border-left: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow-y: auto;
+  }
+  .right-rail[data-empty='true'] {
+    display: none;
+  }
+  .right-rail__section {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    padding: 16px;
+  }
+}
+
+/* ---------- Recent pulls (right rail) ---------- */
+
+@media (min-width: 1024px) {
+  .recent-pulls__title {
+    font-family: var(--font-mono);
+    font-size: calc(10px * var(--mono-scale));
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+    margin-bottom: 10px;
+  }
+  .recent-pulls__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .recent-pulls__row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: baseline;
+    font-family: var(--font-mono);
+    font-size: calc(11px * var(--mono-scale));
+    color: var(--color-ink-muted);
+  }
+  .recent-pulls__tier {
+    color: var(--color-gold);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .recent-pulls__landed {
+    color: var(--color-ink);
+    font-style: italic;
+  }
+  .recent-pulls__time {
+    color: var(--color-ink-faint);
+  }
+  .recent-pulls__empty {
+    color: var(--color-ink-faint);
+    font-style: italic;
+    margin: 0;
+    font-size: 13px;
+  }
+}
+
+/* ---------- Rail bonus widget ---------- */
+
+@media (min-width: 1024px) {
+  .rail-bonus {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 10px;
+    row-gap: 6px;
+    text-align: left;
+  }
+  .rail-bonus__title {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: calc(10px * var(--mono-scale));
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-ink-muted);
+  }
+  .rail-bonus__badge {
+    grid-column: 2;
+    grid-row: 2;
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--color-gold);
+    line-height: 1;
+  }
+  .rail-bonus__countdown {
+    grid-column: 1;
+    grid-row: 2;
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: calc(14px * var(--mono-scale));
+  }
+  .rail-bonus__habit {
+    grid-column: 1 / -1;
+    font-style: italic;
+    color: var(--color-ink-muted);
+    font-size: 13px;
+  }
+  .rail-bonus__more {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: calc(9px * var(--mono-scale));
+    color: var(--color-near-miss);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+}

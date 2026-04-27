@@ -3,6 +3,27 @@
 Future work earmarked but not yet built. Add new items at the top of the
 relevant section.
 
+## Desktop polish (2026-04-26 punch list)
+
+- [x] ~~**Home activity feed scrollable.**~~ Shipped 2026-04-26 — cap
+      at `max-height: 480px` with `overflow-y: auto` and a soft
+      mask-image fade at the bottom edge.
+- [x] ~~**CashInPicker — let the user pick chip colors.**~~ Shipped
+      2026-04-26 — "色 · Choose a Colour" sub-row with one chip
+      button per eligible color appears once a tier above T1 is picked.
+      Auto-pick remains the default; any eligible color is a tap-to-
+      override.
+- [x] ~~**Bonus chain pill.**~~ Removed 2026-04-26 — was a counter with
+      no payout, so the chip carried no signal. Re-add later if/when
+      a streak payoff (e.g. free bonus spin every N chain) is designed.
+- [x] ~~**Streaks need actual mechanics.**~~ Shipped 2026-04-26 as
+      century / millennium milestone payouts. Daily streak now
+      dispenses 10 random clips + 1 gold every 100 days, 25 clips +
+      10 gold every 1000 days (1000 replaces 100, not on top of), with
+      a celebration modal. Hygiene + bonus-chain remain removed from
+      the UI; if a payoff is ever designed for either we can re-add.
+      Source: [src/features/jar/streakMilestone.ts](src/features/jar/streakMilestone.ts).
+
 ## Design audit follow-ups (2026-04-25)
 
 A second-pass audit against `/tmp/design1/kakeguruimasho/project/` flagged
@@ -135,24 +156,146 @@ The chassis is in place; these are bespoke widgets that go inside it.
 
 ## Themes
 
-### Kowloon Walled City / Bladerunner (cyber-grunge)
+### Kowloon Electric (Triad Neon, 1985)
 
-A future seventh theme — opposite vibe from Vintage Pachinko. Toxic teal,
-neon magenta, smoke-grey, rust; rain-streaked windows; flickering CRT.
+The eighth theme — full bespoke flow alongside Vintage Pachinko. The
+Kowloon Walled City as a bootleg arcade closet on the 9th floor: tangled
+wires, dripping AC condensate, hand-painted Cantonese signage, CRT
+scanlines, mahjong-tile slot reels. Tone: conspiratorial, fast, pulsing
+("one more credit"). Palette confirmed by user as **Triad Neon**
+(magenta + cyan + acid-jade neons over ink-black) — Rain & Receipt is
+archived as an alternative.
+
+Design source: [kowloon-screens.jsx](/tmp/design-fresh/kakeguruimasho/project/kowloon-screens.jsx),
+[kowloon-neon.jsx](/tmp/design-fresh/kakeguruimasho/project/kowloon-neon.jsx),
+section `03 · Kowloon Electric · Full Flow` in the canvas.
+
+#### Theme tokens
 
 - [ ] Add `'kowloon'` to the `ThemeKey` union and a `THEMES.kowloon` entry
-      in [src/styles/themes.ts](src/styles/themes.ts) — name, tagline,
-      copy strings (e.g. `spinCta: 'Pull the Cord'`), motif key, status.
-- [ ] Add a `[data-theme='kowloon']` block to
-      [src/styles/themes.css](src/styles/themes.css) with the cyber-grunge
-      palette: toxic teal (`#1be0c8`), neon magenta (`#ff2a8d`),
-      smoke-grey surface, rust accents. Override `--font-display` toward
-      something more industrial (e.g. JetBrains Mono Display, or a
-      condensed grotesk).
-- [ ] Optional: Add a `'kowloon'` motif glyph to
-      [src/ui/parlour/Motif.tsx](src/ui/parlour/Motif.tsx) — a stylized
-      rain-streaked window, neon noodle-bowl, or stacked-tenement
-      silhouette. Add it to the `MotifSymbol` union in `themes.ts`.
+      in [src/styles/themes.ts](src/styles/themes.ts) with the user-facing
+      copy: `spinCta: 'Drop the Coin'`, `earned: 'Banked'`,
+      `hand: 'Token Tray'`, `bag: 'Cassette'`,
+      `jackpot: '大獎 · Daai-Jeung'`, `nearMiss: 'One slot off'`. Tagline
+      `'九龍電氣 · Triad Neon, 1985'`. `status: 'ready'` once screens land.
+- [ ] Add `'mahjong'` to the `MotifSymbol` union and the corresponding
+      glyph to [Motif.tsx](src/ui/parlour/Motif.tsx).
+- [ ] Add `[data-theme='kowloon']` token block to
+      [src/styles/themes.css](src/styles/themes.css). Palette:
+      bg `#0b0a14`, felt `#1f1c33`, surface `#191628`, gold `#f5d547`
+      (sodium yellow), accent magenta `#ff2e88`, cyan `#22e3ff`,
+      jade `#1bd182`, purple `#c855ff`. May need a tokens schema bump
+      to expose `--accent-2/3/4` since the palette is multi-neon.
+- [ ] Layer in the `'electric'` tone: CRT scanline overlay app-wide on
+      Kowloon, low-opacity phosphor bloom, occasional flicker on neon
+      headers — turn the dopamine up without going gaudy.
+
+#### Bespoke primitives (mirror `src/ui/parlour/`)
+
+- [ ] CRT bezel wrapper — curved corners, phosphor bloom, scanlines, "ON
+      AIR" tally light. Wraps the wheel/reels cabinet.
+- [ ] Neon shop sign — vertical Cantonese + horizontal English subline,
+      faux-glow tubing, mounting bracket. Used for section headers.
+- [ ] Mahjong tile component — bamboo / circles / characters / dragons.
+      Slot-reel symbols.
+- [ ] Pixel sprite primitive (16×16) — fortune cat, cassette, koi,
+      cleaver, neon arrow, padlock, joystick. 3-color max, flat.
+- [ ] Wire-bundle divider — replaces brass filigree dividers.
+- [ ] Mosaic floor surface — 12×12px ceramic tiles in two shades, used
+      as cabinet base.
+- [ ] Arcade token chip — round, embossed, slot for thumbnail. Replaces
+      the casino chip on Kowloon.
+- [ ] Dot-matrix receipt — ledger style for Vault on Kowloon.
+- [ ] Inspection stamp / bootleg sticker — random-rotate per render for
+      cheap texture.
+
+#### Bespoke screens (mirror Pachinko coverage)
+
+- [ ] `KowloonHome` (Hall) — neon "ON AIR" streak counter, gold-bezel
+      token tray with mahjong-tile drill cards, Closing Sequence ritual
+      with cyan glow, cassette-icon Tin.
+- [ ] `KowloonSpinCashIn` (Drop I) — token tray + four-tier ladder
+      using mahjong-tile tier badges (一/二/三/★).
+- [ ] `KowloonSpinReels` (Drop II) — 3-reel mahjong slot in CRT bezel
+      cabinet (East/South/West · One/Two/Three · Center/Fortune/White),
+      magenta payline glow, channel-3 tally, coin-slot lever.
+- [ ] `KowloonReveal` (Drop III) — spinning mahjong tile with "大",
+      flickering neon 大獎 wordmark, multicolor rays, pixel confetti,
+      receipt-styled reward menu.
+- [ ] `KowloonBonus` — magenta digital countdown, mahjong-tile drill
+      cards, bonus wheel restyled in triad colors.
+- [ ] `KowloonCover` (optional) — landing/cover artwork: vertical
+      Cantonese sign, English wordmark, tangled wires, mosaic floor,
+      corner inspection stamps.
+
+#### Wiring
+
+- [ ] Theme-gated branch in routes — same pattern as `'pachinko'`. Any
+      route that has both a generic and a Pachinko bespoke version
+      should also route to Kowloon when `theme === 'kowloon'`.
+- [ ] Update Settings copy "Vintage Pachinko" → multi-theme picker once
+      Kowloon is `status: 'ready'` (the deferred item 2 from the
+      2026-04-25 audit).
+
+## Desktop adaptation (added 2026-04-26)
+
+Shipped 2026-04-26 in PR for the desktop chassis. Source design:
+[desktop-wires.jsx](/tmp/design-fresh/kakeguruimasho/project/desktop-wires.jsx).
+Spec: [docs/superpowers/specs/2026-04-26-desktop-adaptation-design.md](docs/superpowers/specs/2026-04-26-desktop-adaptation-design.md).
+Plan: [docs/superpowers/plans/2026-04-26-desktop-adaptation.md](docs/superpowers/plans/2026-04-26-desktop-adaptation.md).
+
+#### Chassis
+
+- [x] ~~**Three-pane shell** at `≥1024px`.~~ Shipped 2026-04-26 as
+      `<DesktopShell>` (`src/ui/parlour/DesktopShell.tsx`). Grid columns
+      `280px 1fr 320px`; capped to 1280 max-width at `≥1440px`.
+- [x] ~~**Rail nav.**~~ Shipped 2026-04-26 as `<LeftRail>`. Both
+      `BottomNav` and `LeftRail` consume `src/lib/navItems.ts`.
+- [x] ~~**Right-rail widgets.**~~ Shipped 2026-04-26: Bonus widget
+      (`<RailBonusWidget>`), Pot (`<PachinkoPotMini>`), Recent Pulls
+      (`<RecentPulls>`). Shared selector `useBonusTimerSummary`.
+      `BonusTimerBanner` only mounts at `<1024px`.
+- [x] ~~**Salon framing** — content max-width 1280 at `≥1440px`.~~
+      Shipped 2026-04-26.
+- [x] ~~**Tablet (480–1024px) two-pane.**~~ Shipped 2026-04-26 in the
+      polish batch — at 768–1023px the chassis becomes a 240/1fr grid
+      with the left rail visible and the right rail hidden. Below
+      768px the pure mobile shell continues unchanged.
+
+#### Per-screen passes
+
+- [x] ~~**Spin** — cash-in side-by-side, wheel scaled up at desktop,
+      reveal 2-col picker.~~ Shipped 2026-04-26. Stake summary moved
+      to the desktop right rail in the polish batch (`RailStakeAndOdds`
+      reads from `SpinRailContext`).
+- [x] ~~**Habits / Vault** — multi-column grids.~~ Shipped 2026-04-26
+      (Home rituals 3-col; Habits 3-col; Vault 3 tier columns).
+- [x] ~~**Jar / BonusTimerDetail** — split layouts.~~ Shipped
+      2026-04-26.
+- [x] ~~**Cash-in picker → drawer.**~~ N/A — `CashInPicker` is inline
+      today, not a sheet/dialog. Drawer pattern applied to the actual
+      editor-style modals: `RewardEditor`, `HabitEditor`, `StepEntry`.
+- [x] ~~**Hover & focus states.**~~ Shipped 2026-04-26 under
+      `@media (hover: hover) and (min-width: 1024px)`.
+- [x] ~~**Cinematic Onboarding shell** — corner motifs + framed card +
+      velvet swag.~~ Shipped 2026-04-26. Swag added in the polish
+      batch as a pure-SVG opera-house valance with gold piping +
+      tassels.
+
+#### Constraints from the design rules card
+
+- Tokens are universal — desktop reads from the same `THEMES.pachinko`
+  object; no fork.
+- Component primitives reused — `Chip`, `BrassButton`, `OrnateFrame`,
+  `Halftone`, `PaperGrain`, `PachinkoWheel`, etc. all render at any
+  size; pass a larger `size` prop where it makes sense.
+- Vertical density unchanged — body text stays 14–16px; desktop is
+  wider, not denser.
+- Parlour metaphor unchanged — cabinets, ledgers, kanji crests, peg
+  rings, lacquer panels stay. Desktop is "the salon floor"; mobile is
+  "a private booth".
+- Breakpoints: phone ≤480 · tablet 480–1024 · desktop 1024–1440 ·
+  salon ≥1440 (content max 1280).
 
 ### Other earmarked themes (token-only stubs today)
 

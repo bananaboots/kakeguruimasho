@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import './rewards.css';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog.tsx';
+import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from '../../ui/Drawer.tsx';
 import { Button } from '../../ui/button.tsx';
 import { Input } from '../../ui/input.tsx';
 
@@ -57,12 +57,12 @@ export function RewardEditor({
   const valid = label.trim().length > 0;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="reward-editor" aria-label={title}>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogDescription>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
+      <DrawerContent className="reward-editor" aria-label={title}>
+        <DrawerTitle>{title}</DrawerTitle>
+        <DrawerDescription>
           A single line label. Judgment is on you — the 3 reward rules are a sidebar, not a validator.
-        </DialogDescription>
+        </DrawerDescription>
         <form onSubmit={handleSubmit} className="reward-editor__form">
           <label className="reward-editor__field">
             <span className="reward-editor__label-text">Reward label</span>
@@ -85,7 +85,7 @@ export function RewardEditor({
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }

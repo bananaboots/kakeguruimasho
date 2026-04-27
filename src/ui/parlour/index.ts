@@ -45,3 +45,12 @@ export type { LanternProps } from './Lantern.tsx';
 
 export { Koi } from './Koi.tsx';
 export type { KoiProps } from './Koi.tsx';
+
+export { DesktopShell } from './DesktopShell.tsx';
+export type { DesktopShellProps } from './DesktopShell.tsx';
+
+export { LeftRail } from './LeftRail.tsx';
+export { RightRail } from './RightRail.tsx';
+export type { RightRailProps } from './RightRail.tsx';
+
+export { CinematicShell } from './CinematicShell.tsx';

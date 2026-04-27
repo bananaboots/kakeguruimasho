@@ -18,11 +18,11 @@
 import { useCallback, useState } from 'react';
 import { Button } from '../../ui/button.tsx';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '../../ui/dialog.tsx';
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerTitle,
+} from '../../ui/Drawer.tsx';
 import { Input } from '../../ui/input.tsx';
 import { getAppStore } from '../../state/store.ts';
 import type { Habit, HabitUnit } from '../../types/habit.ts';
@@ -114,13 +114,13 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
   const isHygieneDefault = habit?.id === DEFAULT_HABIT_IDS.hygiene;
 
   return (
-    <Dialog open={open} onOpenChange={(n) => (!n ? onClose() : undefined)}>
-      <DialogContent>
-        <DialogTitle>{isEdit ? `Edit ${habit?.name}` : 'New habit'}</DialogTitle>
-        <DialogDescription>
+    <Drawer open={open} onOpenChange={(n) => (!n ? onClose() : undefined)}>
+      <DrawerContent>
+        <DrawerTitle>{isEdit ? `Edit ${habit?.name}` : 'New habit'}</DrawerTitle>
+        <DrawerDescription>
           A habit earns one clip per completed unit. Pick a unit type the
           friction feels right for.
-        </DialogDescription>
+        </DrawerDescription>
 
         <div className="habit-editor__field">
           <label htmlFor="habit-editor-name" className="habit-editor__label">
@@ -174,8 +174,8 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
             Save
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </DrawerContent>
+    </Drawer>
   );
 }
 

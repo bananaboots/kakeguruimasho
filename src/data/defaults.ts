@@ -262,6 +262,7 @@ export function seedInitialAppState(): AppState {
     activeJarId: jarId,
     installPromptShown: false,
     firstRunCompleted: false,
+    pendingStreakCelebration: null,
   };
 }
 

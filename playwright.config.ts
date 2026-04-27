@@ -35,6 +35,20 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium-mobile',
+      // Desktop-chassis assertions only make sense at >=1024px viewports.
+      // The chromium-mobile project ignores them; chassis spec runs in the
+      // desktop-chromium project below.
+      testIgnore: ['**/desktop-chassis.spec.ts'],
+    },
+    {
+      name: 'desktop-chromium',
+      use: {
+        browserName: 'chromium',
+        viewport: { width: 1440, height: 900 },
+        isMobile: false,
+        hasTouch: false,
+        deviceScaleFactor: 1,
+      },
     },
   ],
   webServer: {

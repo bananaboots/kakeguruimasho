@@ -45,6 +45,10 @@ import type { WheelConfig } from '../types/wheel.ts';
 import { rng as getRng, type Rng } from '../lib/rng.ts';
 import { createPersistHandle, type PersistHandle } from './persist.ts';
 import { drawClip as drawClipFromBagPure, refillBag } from '../features/bag/bag.engine.ts';
+import {
+  pickRandomClipColors,
+  streakMilestonePayout,
+} from '../features/jar/streakMilestone.ts';
 
 // ---- Re-exports (stable API for Wave 2 agents) ----
 
@@ -163,6 +167,13 @@ export type Actions = {
   tickHygieneStreak: (jarId: JarId, date: LocalDate) => void;
   /** Explicitly break a streak (daily / hygiene / bonus-chain) — used by the bonus expire path and the end-of-day hygiene sweep. */
   breakStreak: (jarId: JarId, kind: StreakKind) => void;
+  /**
+   * Acknowledge the pending streak milestone celebration — clears
+   * `state.pendingStreakCelebration` after the user dismisses the modal.
+   * The clips themselves were already minted into hand by the originating
+   * `tickDailyStreak` call; this action is purely for the modal lifecycle.
+   */
+  acknowledgeStreakMilestone: () => void;
 
   // ---- Composite: spec-level flow ----
   /**
@@ -526,13 +537,70 @@ export function createAppStore(initial?: AppState): UseBoundStore<StoreApi<Store
       },
 
       tickDailyStreak(jarId, date) {
+        // Snapshot incremented/value out of the closure so the post-commit
+        // milestone branch can read them. The streak slice is pure; we re-
+        // run it here only to surface the values, not to mutate.
+        let resultIncremented = false;
+        let resultValue = 0;
         commitWithHistory((s) => {
           const { state, incremented, value } = streaksSlice.tickDailyStreak(s, jarId, date);
+          resultIncremented = incremented;
+          resultValue = value;
           const events: HistoryEvent[] = incremented
             ? [stampEvent({ kind: 'streak_incremented', jarId, streak: 'daily', value })]
             : [];
           return { state, events };
         });
+
+        // Milestone payout — only fires when the streak ACTUALLY incremented
+        // to a 100/1000-day boundary. Skipped on no-op ticks (already-ticked
+        // today) and on streak-reset ticks (skip → 1).
+        if (!resultIncremented) return;
+        const payout = streakMilestonePayout(resultValue);
+        if (!payout) return;
+
+        const rng = getRng();
+        const colors = pickRandomClipColors(payout.regularChips, rng);
+        // Mint regular + gold clips into the user's hand. Each call appends
+        // its own `clip_earned` event with source: 'streak-milestone'.
+        for (const color of colors) {
+          const clip: Clip = {
+            id: newClipId(),
+            jarId,
+            kind: 'regular',
+            color,
+          };
+          actions.earnClipToHand(jarId, clip, 'streak-milestone', null);
+        }
+        for (let i = 0; i < payout.goldChips; i++) {
+          const clip: Clip = { id: newClipId(), jarId, kind: 'gold' };
+          actions.earnClipToHand(jarId, clip, 'streak-milestone', null);
+        }
+
+        // Single milestone event for the ledger; pending-celebration state
+        // for the modal. Both committed in the same tx so persistence is
+        // atomic.
+        commitWithHistory((s) => ({
+          state: { ...s, pendingStreakCelebration: {
+            jarId,
+            streakValue: resultValue,
+            tier: payout.tier,
+            regularChips: payout.regularChips,
+            goldChips: payout.goldChips,
+          } },
+          events: [stampEvent({
+            kind: 'streak_milestone_awarded',
+            jarId,
+            streakValue: resultValue,
+            tier: payout.tier,
+            regularChips: payout.regularChips,
+            goldChips: payout.goldChips,
+          })],
+        }));
+      },
+
+      acknowledgeStreakMilestone() {
+        commit((s) => ({ ...s, pendingStreakCelebration: null }));
       },
 
       tickHabitStreak(jarId, habitId, date) {

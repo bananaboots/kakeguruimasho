@@ -1,0 +1,130 @@
+/*
+ * streakMilestone.css — celebration modal styles.
+ *
+ * Builds on the centered .dialog__content. We add a brass border, a
+ * radial gold-burst background, and the layered ray + chip-fan visuals.
+ */
+
+.streak-celebration {
+  /* Override dialog default 480px cap -- celebration deserves room. */
+  max-width: min(94vw, 560px) !important;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 30%, var(--color-felt) 0%, var(--color-bg) 65%),
+    var(--color-bg);
+  border: 1px solid var(--color-gold);
+  box-shadow:
+    0 0 60px var(--color-gold-glow),
+    inset 0 0 0 4px var(--color-bg),
+    inset 0 0 0 5px var(--color-border);
+}
+
+.streak-celebration__rays {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.streak-celebration__ray {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 360px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--color-gold-glow) 30%,
+    var(--color-gold) 50%,
+    var(--color-gold-glow) 70%,
+    transparent 100%
+  );
+  transform-origin: 50% 0%;
+  opacity: 0.55;
+}
+
+.streak-celebration__kicker {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: calc(11px * var(--mono-scale));
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: var(--space-2);
+}
+
+.streak-celebration__title {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 96px;
+  line-height: 1;
+  margin: 0 0 var(--space-2);
+  background: linear-gradient(
+    180deg,
+    var(--color-gold) 0%,
+    var(--color-gold-deep) 60%,
+    var(--color-gold) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.streak-celebration__title-unit {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: calc(13px * var(--mono-scale));
+  letter-spacing: 0.36em;
+  color: var(--color-ink-muted);
+  margin-top: var(--space-1);
+  -webkit-text-fill-color: var(--color-ink-muted); /* unset background-clip transparent fill for the unit */
+}
+
+.streak-celebration__overstamp {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: calc(15px * var(--mono-scale));
+  letter-spacing: 0.45em;
+  color: var(--color-bg);
+  background: var(--color-gold);
+  padding: 4px 16px;
+  margin: 0 0 var(--space-3);
+  transform: rotate(-3deg);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.streak-celebration__description {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--color-ink-muted);
+  font-size: var(--text-base);
+  margin: 0 0 var(--space-4);
+}
+
+.streak-celebration__fan {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--space-3) 0;
+  margin-bottom: var(--space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streak-celebration__ray {
+    animation: none;
+  }
+}

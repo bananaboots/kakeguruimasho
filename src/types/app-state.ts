@@ -48,6 +48,20 @@ export type AppState = {
   activeJarId: JarId; // v1 always DEFAULT_JAR_ID
   installPromptShown: boolean;
   firstRunCompleted: boolean;
+
+  // Set by tickDailyStreak when the streak hits a 100/1000-day milestone.
+  // Read by <StreakMilestoneCelebration> to render the modal; cleared by
+  // `acknowledgeStreakMilestone`. Persisted so a milestone hit while the
+  // user is mid-task can't be lost on reload.
+  pendingStreakCelebration: StreakCelebrationPayload | null;
+};
+
+export type StreakCelebrationPayload = {
+  jarId: JarId;
+  streakValue: number;            // post-tick value (e.g. 100, 200, 1000)
+  tier: 'century' | 'millennium'; // 100-multiple vs 1000-multiple
+  regularChips: number;
+  goldChips: number;
 };
 
 // Constant: schema version. Bump only in migration PRs.
