@@ -23,11 +23,18 @@ on its own; bundling for a follow-up PR.
       committing the stake. Auto-pick stays as a default but is
       overridable. Source:
       [src/features/spin/CashInPicker.tsx](src/features/spin/CashInPicker.tsx).
-- [ ] **Bonus chain pill.** Decide whether to remove the chip or attach
-      a payout. Today it counts consecutive bonus-timer completions and
-      breaks when any active timer expires unclaimed, but there's no
-      reward tied to the streak. Either drop it from `<StreakDisplay>`
-      or design a payoff (e.g. a free bonus spin every N chain).
+- [x] ~~**Bonus chain pill.**~~ Removed 2026-04-26 — was a counter with
+      no payout, so the chip carried no signal. Re-add later if/when
+      a streak payoff (e.g. free bonus spin every N chain) is designed.
+
+- [ ] **Streaks need actual mechanics.** Daily, hygiene (now removed),
+      and bonus-chain (now removed) are/were all *display-only*
+      counters: tracked in state, written to history, but never read by
+      any reward path. Either tie a payout to the daily streak (e.g. a
+      free spin every N consecutive days, a multiplier on the next
+      pull, a milestone unlock) or be honest that streaks are pure
+      vanity and trim accordingly. Source:
+      [src/state/slices/streaks.ts](src/state/slices/streaks.ts).
 
 ## Design audit follow-ups (2026-04-25)
 
