@@ -20,7 +20,7 @@ import { useAppStore } from './state/store.ts';
 import { DesktopShell } from './ui/parlour/index.ts';
 import { RecentPulls } from './ui/parlour/RecentPulls.tsx';
 import { useIsDesktop } from './lib/useIsDesktop.ts';
-import { PachinkoPotMini } from './features/jar/index.ts';
+import { PachinkoPotMini, StreakMilestoneCelebration } from './features/jar/index.ts';
 import { RailBonusWidget } from './features/bonus/RailBonusWidget.tsx';
 
 // Lazy-load routes so the initial bundle stays lean. Each route ends up in
@@ -201,6 +201,9 @@ export default function App() {
       </main>
       </DesktopShell>
       <BottomNav />
+      {/* Global -- shows whenever the daily streak hits a 100/1000-day
+          milestone. Renders null when there's no pending celebration. */}
+      <StreakMilestoneCelebration />
     </div>
   );
 }

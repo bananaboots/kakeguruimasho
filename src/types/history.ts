@@ -114,6 +114,20 @@ export type StreakBrokenEvent = HistoryEventBase & {
   lastValue: number;
 };
 
+/**
+ * Streak milestone payout. Logged when the daily streak hits a 100-day
+ * (10 random + 1 gold) or 1000-day (25 random + 10 gold) milestone.
+ * The clips themselves are minted via separate `clip_earned` events with
+ * `source: 'streak-milestone'`; this event records the milestone itself.
+ */
+export type StreakMilestoneAwardedEvent = HistoryEventBase & {
+  kind: 'streak_milestone_awarded';
+  streakValue: number;          // e.g. 100, 200, 1000
+  tier: 'century' | 'millennium'; // 100-multiple vs 1000-multiple
+  regularChips: number;
+  goldChips: number;
+};
+
 export type RewardClaimedEvent = HistoryEventBase & {
   kind: 'reward_claimed';
   rewardId: RewardId | null; // OR-3: may be null if forfeit
@@ -165,6 +179,7 @@ export type HistoryEvent =
   | JarResetEvent
   | StreakIncrementedEvent
   | StreakBrokenEvent
+  | StreakMilestoneAwardedEvent
   | RewardClaimedEvent
   | HabitCompletedEvent
   | HygieneSubItemCheckedEvent

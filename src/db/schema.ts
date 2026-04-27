@@ -352,6 +352,14 @@ const historyEventSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     ...eventBase,
+    kind: z.literal('streak_milestone_awarded'),
+    streakValue: z.number(),
+    tier: z.enum(['century', 'millennium']),
+    regularChips: z.number(),
+    goldChips: z.number(),
+  }),
+  z.object({
+    ...eventBase,
     kind: z.literal('reward_claimed'),
     rewardId: brandedString.nullable(),
     tier: tierSchema,
@@ -407,6 +415,15 @@ export const appStateSchema = z.object({
   activeJarId: brandedString,
   installPromptShown: z.boolean(),
   firstRunCompleted: z.boolean(),
+  pendingStreakCelebration: z
+    .object({
+      jarId: brandedString,
+      streakValue: z.number(),
+      tier: z.enum(['century', 'millennium']),
+      regularChips: z.number(),
+      goldChips: z.number(),
+    })
+    .nullable(),
 });
 
 // Exported shape of what gets exported to a file. Versioned envelope.

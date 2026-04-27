@@ -33,7 +33,12 @@ export const DEFAULT_CLIP_COLORS: readonly ClipColor[] = Object.freeze([
 ]);
 
 // Source of a newly-earned clip (for history logging).
-export type ClipSource = 'habit' | 'bonus-discount' | 'bonus-free' | 'jackpot-bonus';
+export type ClipSource =
+  | 'habit'
+  | 'bonus-discount'
+  | 'bonus-free'
+  | 'jackpot-bonus'
+  | 'streak-milestone';
 
 // Bag composition (D2). Stored in Settings; described here because it sits
 // next to Clip/ClipColor naturally.

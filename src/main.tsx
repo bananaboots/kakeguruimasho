@@ -93,6 +93,13 @@ async function bootRehydrate(): Promise<void> {
 }
 
 function mount(): void {
+  // Dev-only: expose the Zustand store on window for browser-console
+  // debugging. Stripped in production builds via Vite's tree-shake of
+  // the import.meta.env.DEV branch.
+  if (import.meta.env.DEV) {
+    (window as unknown as { __appStore: unknown }).__appStore = getAppStore();
+  }
+
   createRoot(rootEl!).render(
     <StrictMode>
       <ErrorBoundary>
