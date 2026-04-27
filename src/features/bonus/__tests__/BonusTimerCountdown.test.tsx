@@ -8,6 +8,8 @@ import { render, screen, cleanup, act } from '@testing-library/react';
 import { BonusTimerCountdown } from '../BonusTimerCountdown.tsx';
 import { formatRemaining } from '../BonusTimerCountdown.util.ts';
 import { asISO } from '../../../types/ids.ts';
+import { ThemeContext } from '../../../styles/theme-context.ts';
+import { THEMES } from '../../../styles/themes.ts';
 
 describe('formatRemaining', () => {
   it('renders 0:00 at exactly 0 ms', () => {
@@ -86,5 +88,45 @@ describe('BonusTimerCountdown', () => {
     const label = screen.getByRole('timer').textContent ?? '';
     // 4:59 or 5:00 depending on rounding; either is acceptable.
     expect(label).toMatch(/(4:59|5:00)/);
+  });
+});
+
+describe('BonusTimerCountdown Kowloon branch', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
+  const futureTimestamp = asISO(
+    new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  );
+
+  it('renders inside a CRT bezel at theme=kowloon', () => {
+    const { container } = render(
+      <ThemeContext.Provider
+        value={{
+          theme: 'kowloon',
+          themeMeta: THEMES.kowloon,
+          setTheme: () => {},
+        }}
+      >
+        <BonusTimerCountdown endTimestamp={futureTimestamp} />
+      </ThemeContext.Provider>,
+    );
+    expect(container.querySelector('[data-testid="crt-bezel"]')).not.toBeNull();
+  });
+
+  it('renders without CRT bezel at theme=pachinko', () => {
+    const { container } = render(
+      <ThemeContext.Provider
+        value={{
+          theme: 'pachinko',
+          themeMeta: THEMES.pachinko,
+          setTheme: () => {},
+        }}
+      >
+        <BonusTimerCountdown endTimestamp={futureTimestamp} />
+      </ThemeContext.Provider>,
+    );
+    expect(container.querySelector('[data-testid="crt-bezel"]')).toBeNull();
   });
 });
