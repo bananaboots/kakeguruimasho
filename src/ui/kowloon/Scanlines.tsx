@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
+
 export interface ScanlinesProps {
   /** Stripe opacity. Defaults to 0.04. */
   opacity?: number;
@@ -25,7 +27,7 @@ export function Scanlines({
 }: ScanlinesProps): ReactElement {
   return (
     <div
-      className={`kowloon-scanlines ${className ?? ''}`}
+      className={cn('kowloon-scanlines', className)}
       style={{
         position: 'absolute',
         inset: 0,

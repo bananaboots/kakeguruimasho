@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 
 import { Label } from '../../ui/parlour/index.ts';
+import { cn } from '../../ui/utils.ts';
 
 export type WheelCabinetProps = {
   children: ReactNode;
@@ -21,7 +22,7 @@ export function WheelCabinet({
 }: WheelCabinetProps) {
   return (
     <div
-      className={`wheel-cabinet ${className ?? ''}`}
+      className={cn('wheel-cabinet', className)}
       style={style}
       data-testid="wheel-cabinet"
     >

@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
+
 export interface ArcadeTokenProps {
   /** Token color (hex). */
   color: string;
@@ -33,7 +35,7 @@ export function ArcadeToken({
       width={size}
       height={size}
       viewBox="0 0 100 100"
-      className={`kowloon-arcade-token ${className ?? ''}`}
+      className={cn('kowloon-arcade-token', className)}
       style={{
         filter: `drop-shadow(0 2px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 6px ${color}66)`,
         ...style,

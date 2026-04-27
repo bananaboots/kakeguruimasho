@@ -9,6 +9,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 
+import { cn } from '../utils.ts';
 import './kowloon.css';
 
 export interface CRTBezelProps {
@@ -36,7 +37,7 @@ export function CRTBezel({
 }: CRTBezelProps) {
   return (
     <div
-      className={`kowloon-crt-bezel ${className ?? ''}`}
+      className={cn('kowloon-crt-bezel', className)}
       style={{ width, height, ...style }}
       data-testid="crt-bezel"
     >

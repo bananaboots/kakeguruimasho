@@ -8,6 +8,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
 import './kowloon.css';
 
 export interface NeonSignProps {
@@ -33,7 +34,7 @@ export function NeonSign({
 }: NeonSignProps): ReactElement {
   return (
     <div
-      className={`kowloon-neon-sign ${className ?? ''}`}
+      className={cn('kowloon-neon-sign', className)}
       style={style}
       data-testid="neon-sign"
     >

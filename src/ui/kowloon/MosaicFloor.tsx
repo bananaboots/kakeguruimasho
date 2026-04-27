@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
+
 export interface MosaicFloorProps {
   width?: number | string;
   height?: number;
@@ -23,7 +25,7 @@ export function MosaicFloor({
 }: MosaicFloorProps): ReactElement {
   return (
     <div
-      className={`kowloon-mosaic-floor ${className ?? ''}`}
+      className={cn('kowloon-mosaic-floor', className)}
       style={{
         width,
         height,

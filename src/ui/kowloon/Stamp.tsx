@@ -8,6 +8,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
 import './kowloon.css';
 
 export interface StampProps {
@@ -33,7 +34,7 @@ export function Stamp({
 }: StampProps): ReactElement {
   return (
     <div
-      className={`kowloon-stamp ${className ?? ''}`}
+      className={cn('kowloon-stamp', className)}
       style={{
         border: `1.5px solid ${color}`,
         transform: `rotate(${rotate}deg)`,

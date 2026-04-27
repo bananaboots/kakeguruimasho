@@ -9,6 +9,7 @@
 
 import type { CSSProperties, ReactNode } from 'react';
 
+import { cn } from '../utils.ts';
 import { Label } from './Label.tsx';
 
 export interface SectionTitleProps {
@@ -23,7 +24,7 @@ export interface SectionTitleProps {
 
 export function SectionTitle({ jp, en, right, className, style }: SectionTitleProps) {
   return (
-    <div className={`parlour-section-title ${className ?? ''}`} style={style}>
+    <div className={cn('parlour-section-title', className)} style={style}>
       <span className="parlour-section-title__kanji" aria-hidden>
         {jp}
       </span>

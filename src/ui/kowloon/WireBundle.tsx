@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
+
 export interface WireBundleProps {
   /** Total width in px. Defaults to 280. */
   width?: number;
@@ -32,7 +34,7 @@ export function WireBundle({
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      className={`kowloon-wire-bundle ${className ?? ''}`}
+      className={cn('kowloon-wire-bundle', className)}
       style={{ display: 'block', ...style }}
       aria-hidden
     >

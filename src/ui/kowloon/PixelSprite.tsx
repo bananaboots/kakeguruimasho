@@ -8,6 +8,8 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
+
 export interface PixelSpriteProps {
   /** 16 strings, each 16 chars long. */
   rows: readonly string[];
@@ -34,7 +36,7 @@ export function PixelSprite({
       height={w}
       viewBox={`0 0 ${size} ${size}`}
       shapeRendering="crispEdges"
-      className={`kowloon-pixel-sprite ${className ?? ''}`}
+      className={cn('kowloon-pixel-sprite', className)}
       style={style}
       aria-hidden
     >

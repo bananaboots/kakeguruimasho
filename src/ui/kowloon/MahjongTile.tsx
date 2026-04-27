@@ -9,6 +9,7 @@
 
 import type { CSSProperties, ReactElement } from 'react';
 
+import { cn } from '../utils.ts';
 import './kowloon.css';
 
 export interface MahjongTileProps {
@@ -34,7 +35,7 @@ export function MahjongTile({
 }: MahjongTileProps): ReactElement {
   return (
     <div
-      className={`kowloon-mahjong-tile ${className ?? ''}`}
+      className={cn('kowloon-mahjong-tile', className)}
       style={{
         width: size,
         height: size * 1.35,
