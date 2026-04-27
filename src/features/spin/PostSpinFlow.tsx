@@ -55,7 +55,9 @@ import {
   spinBonusWheel,
   mainSegmentIndex,
   bonusSegmentIndex,
+  MAIN_WHEEL_SEGMENT_ORDER,
 } from '../wheel/index.ts';
+import { MahjongReelsCanvas } from '../wheel/MahjongReelsCanvas.tsx';
 import { rng as getRng } from '../../lib/rng.ts';
 import { useToast } from '../../ui/toast-context.ts';
 import { useTheme } from '../../styles/theme-context.ts';
@@ -709,29 +711,52 @@ export function PostSpinFlow({
               meta={crestMeta}
             >
               <div className="spin-flow__wheel" data-testid="spin-flow__wheel">
-                {spinStyle === 'reels' ? (
-                  <SlotReelsCanvas
-                    targetSegmentIndex={pendingSpin.targetIndex}
-                    onAnimationComplete={() => {
-                      void handleMainSpinAnimationComplete();
-                    }}
-                  />
-                ) : pendingSpin.driftIndex !== null ? (
-                  <WheelCanvas
-                    targetSegmentIndex={pendingSpin.targetIndex}
-                    nearMissDriftIndex={pendingSpin.driftIndex}
-                    onAnimationComplete={() => {
-                      void handleMainSpinAnimationComplete();
-                    }}
-                  />
-                ) : (
-                  <WheelCanvas
-                    targetSegmentIndex={pendingSpin.targetIndex}
-                    onAnimationComplete={() => {
-                      void handleMainSpinAnimationComplete();
-                    }}
-                  />
-                )}
+                {(() => {
+                  const spinVariant = themeMeta.visual?.spin ?? 'wheel';
+                  if (spinVariant === 'mahjong') {
+                    const tier =
+                      MAIN_WHEEL_SEGMENT_ORDER[pendingSpin.targetIndex] ??
+                      'T1';
+                    return (
+                      <MahjongReelsCanvas
+                        outcome={tier}
+                        spinning
+                        onAnimationComplete={() => {
+                          void handleMainSpinAnimationComplete();
+                        }}
+                      />
+                    );
+                  }
+                  if (spinStyle === 'reels') {
+                    return (
+                      <SlotReelsCanvas
+                        targetSegmentIndex={pendingSpin.targetIndex}
+                        onAnimationComplete={() => {
+                          void handleMainSpinAnimationComplete();
+                        }}
+                      />
+                    );
+                  }
+                  if (pendingSpin.driftIndex !== null) {
+                    return (
+                      <WheelCanvas
+                        targetSegmentIndex={pendingSpin.targetIndex}
+                        nearMissDriftIndex={pendingSpin.driftIndex}
+                        onAnimationComplete={() => {
+                          void handleMainSpinAnimationComplete();
+                        }}
+                      />
+                    );
+                  }
+                  return (
+                    <WheelCanvas
+                      targetSegmentIndex={pendingSpin.targetIndex}
+                      onAnimationComplete={() => {
+                        void handleMainSpinAnimationComplete();
+                      }}
+                    />
+                  );
+                })()}
               </div>
             </WheelCabinet>
           ) : null}

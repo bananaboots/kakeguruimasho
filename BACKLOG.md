@@ -3,6 +3,14 @@
 Future work earmarked but not yet built. Add new items at the top of the
 relevant section.
 
+## Test coverage gaps
+
+- [ ] Integration test for kowloon spin dispatch: confirm `PostSpinFlow`
+      renders `MahjongReelsCanvas` when `theme=kowloon`. The unit test
+      at `src/features/wheel/__tests__/MahjongReelsCanvas.test.tsx`
+      covers the canvas in isolation but the dispatcher's branch
+      ordering is unverified.
+
 ## Desktop polish (2026-04-26 punch list)
 
 - [x] ~~**Home activity feed scrollable.**~~ Shipped 2026-04-26 — cap

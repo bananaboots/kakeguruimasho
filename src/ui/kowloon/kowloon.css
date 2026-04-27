@@ -179,3 +179,32 @@
   font-family: var(--font-hk, 'Noto Serif HK', serif);
   font-size: 14px;
 }
+
+/* Mahjong reels canvas */
+.kowloon-mahjong-reels {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+}
+
+.kowloon-mahjong-reel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kowloon-mahjong-reels__payline {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 50%;
+  height: 2px;
+  background: var(--color-accent, #ff2e88);
+  box-shadow: 0 0 8px var(--color-accent, #ff2e88);
+  transform: translateY(-1px);
+  pointer-events: none;
+}
