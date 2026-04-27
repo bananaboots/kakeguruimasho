@@ -25,6 +25,7 @@ import {
 } from '../../types/ids.ts';
 import type { JarId, MilestoneId } from '../../types/ids.ts';
 import { Engraved, Koi, Label } from '../../ui/parlour/index.ts';
+import { pickNextMilestoneId } from './pickNextMilestone.ts';
 
 export interface PachinkoPotMiniProps {
   jarId?: JarId;
@@ -38,25 +39,6 @@ const TIER_NAME: Record<string, string> = {
 
 function tierLabel(id: MilestoneId): string {
   return TIER_NAME[id] ?? 'Custom Tier';
-}
-
-/** Pick the next-up milestone id deterministically: smallest target whose
- * target is still ahead of `total`; if all targets passed, the highest. */
-function pickNextMilestoneId(
-  jar: { milestones: Record<MilestoneId, { target: number } | undefined>; claimed: Record<MilestoneId, unknown> } | undefined,
-  total: number,
-): MilestoneId | null {
-  if (!jar) return null;
-  const ids = Object.keys(jar.milestones) as MilestoneId[];
-  const unclaimed = ids
-    .filter((id) => {
-      const m = jar.milestones[id];
-      return !!m && m.target > 0 && jar.claimed[id] == null;
-    })
-    .sort((a, b) => jar.milestones[a]!.target - jar.milestones[b]!.target);
-  if (unclaimed.length === 0) return null;
-  const ahead = unclaimed.find((id) => jar.milestones[id]!.target > total);
-  return ahead ?? unclaimed[unclaimed.length - 1] ?? null;
 }
 
 export function PachinkoPotMini({
@@ -78,7 +60,7 @@ export function PachinkoPotMini({
 
   if (!next) {
     return (
-      <Link to="/jar" className="pot-mini" data-testid="pot-mini">
+      <Link to="/jar" className="pot-mini" data-testid="pachinko-pot-mini">
         <div className="pot-mini__row">
           <div className="pot-mini__heading">
             <Label size={9}>壺 · The Pot</Label>
@@ -101,7 +83,7 @@ export function PachinkoPotMini({
     <Link
       to="/jar"
       className="pot-mini"
-      data-testid="pot-mini"
+      data-testid="pachinko-pot-mini"
       aria-label={`Pot ${total} of ${next.target} dollars toward ${next.label}`}
     >
       <div className="pot-mini__row">
@@ -129,5 +111,3 @@ export function PachinkoPotMini({
     </Link>
   );
 }
-
-export default PachinkoPotMini;

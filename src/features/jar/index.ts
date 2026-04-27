@@ -31,4 +31,7 @@ export type { StreakProps } from './Streak.tsx';
 export { PachinkoPotMini } from './PachinkoPotMini.tsx';
 export type { PachinkoPotMiniProps } from './PachinkoPotMini.tsx';
 
+export { PotMini } from './PotMini.tsx';
+export type { PotMiniProps } from './PotMini.tsx';
+
 export { StreakMilestoneCelebration } from './StreakMilestoneCelebration.tsx';

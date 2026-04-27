@@ -20,7 +20,7 @@ import { useAppStore } from './state/store.ts';
 import { DesktopShell } from './ui/parlour/index.ts';
 import { RecentPulls } from './ui/parlour/RecentPulls.tsx';
 import { useIsDesktop } from './lib/useIsDesktop.ts';
-import { PachinkoPotMini, StreakMilestoneCelebration } from './features/jar/index.ts';
+import { PotMini, StreakMilestoneCelebration } from './features/jar/index.ts';
 import { RailBonusWidget } from './features/bonus/RailBonusWidget.tsx';
 import { SpinRailProvider } from './features/spin/SpinRailContext.tsx';
 import { RailStakeAndOdds } from './features/spin/RailStakeAndOdds.tsx';
@@ -118,7 +118,7 @@ export default function App() {
           ? {
               rail: {
                 bonus: <RailBonusWidget />,
-                pot: <PachinkoPotMini />,
+                pot: <PotMini />,
                 // On the spin flow, swap "recent pulls" for the live
                 // stake summary + odds strip. Other routes show the
                 // recent-pulls list as before.
