@@ -29,6 +29,13 @@
   }
 }
 
+/* At desktop the chassis fills the viewport at any width — the rails stay
+ * fixed (280 left, 320 right) and the center column grows. Earlier we
+ * capped at 1280 with margin-inline auto for "salon centering"; in
+ * practice that left big felt voids on wide screens and squeezed the
+ * center column (the wheel looked cramped on /spin/pull). Per-route
+ * content caps (e.g. .spin-flow max-width 720) keep line lengths
+ * readable inside the now-wider center pane. */
 @media (min-width: 1024px) {
   .desktop-shell {
     display: grid;
@@ -37,13 +44,6 @@
   }
   .desktop-shell__main {
     min-width: 0;
-  }
-}
-
-@media (min-width: 1440px) {
-  .desktop-shell {
-    max-width: 1280px;
-    margin-inline: auto;
   }
 }
 
