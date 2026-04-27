@@ -3649,3 +3649,63 @@ If any anomalies, file an inline followup task; do not amend earlier commits.
 ## Done
 
 After Task 13, the PR is ready for review. The 13-commit sequence preserves bisectability: any subsequent regression can be located by `git bisect` between commits.
+
+---
+
+## Merge order plan (reference)
+
+This PR is intentionally **one branch, one PR, 13 sequential commits** —
+no per-task PRs, no parallel branches. Tasks execute in plan order
+(1 → 13). The order is locked by the dependency DAG below, so even if
+you split this into multiple PRs later (for review checkpoints), the
+merge order must follow:
+
+```
+Task 1  (theme registration + Triad Neon tokens)
+   ↓ blocks every subsequent task
+   ├─ Task 2 (overlay primitives: NeonSign, CRTBezel, Scanlines)
+   └─ Task 3 (physical primitives: MahjongTile, ArcadeToken, Stamp,
+              WireBundle, MosaicFloor, PixelSprite)
+              ↓ both can merge in parallel after Task 1
+              ↓
+   ┌────────────────────────────────────────────────────────────┐
+   │ The following all need Task 1 + (some subset of T2/T3):    │
+   │                                                            │
+   │ Task 4  (Streak)         needs T1                          │
+   │ Task 5  (PotMini)        needs T1 + T3 (ArcadeToken)       │
+   │ Task 6  (Masthead)       needs T1 + T2 (NeonSign)          │
+   │ Task 7  (MahjongReels)   needs T1 + T2 (CRTBezel) +        │
+   │                               T3 (MahjongTile)             │
+   │ Task 8  (Chip dispatch)  needs T1 + T3 (ArcadeToken)       │
+   │ Task 9  (Reveal CRT)     needs T1 + T2 (CRTBezel) +        │
+   │                               T3 (PixelSprite)             │
+   │ Task 10 (Bonus CRT)      needs T1 + T2 (CRTBezel)          │
+   │ Task 11 (Cover)          needs T1 + T2 (NeonSign) +        │
+   │                               T3 (Wires/Mosaic/Stamp)      │
+   └────────────────────────────────────────────────────────────┘
+              ↓ all gated on T1 + T2 + T3
+              ↓
+   Task 12 (status flip + e2e spec)  needs every variant landed
+              ↓
+   Task 13 (BACKLOG + CHANGELOG)     needs T12
+```
+
+### File-overlap zones (only relevant if you ever split into parallel PRs)
+
+These files are appended to by multiple tasks. Sequential execution
+encounters zero conflicts. Parallel execution would need careful
+rebases on these:
+
+| File | Touched by | Type |
+|---|---|---|
+| `src/features/kowloon/kowloon-screens.css` | T4, T5, T6, T9, T10, T11 | append-only |
+| `src/ui/kowloon/kowloon.css` | T2, T3, T7 | append-only |
+| `src/ui/kowloon/index.ts` | T2, T3 | append-only |
+| `src/features/kowloon/index.ts` | T4, T5, T6, T11 | append-only |
+| `src/features/jar/index.ts` | T4, T5 | append-only |
+| `src/routes/Home.tsx` | T4, T6 | **real overlap** — T4 swaps the streak import; T6 wraps the masthead. Sequential execution lets T6 land on top of T4's import shape cleanly. |
+| `src/styles/themes.ts` | T1, T12 | T1 adds `kowloon` entry with `status: 'stub'`; T12 flips that single field to `'ready'`. No real conflict. |
+
+### Recommended sequential execution
+
+This PR uses sequential execution. No further coordination needed.
