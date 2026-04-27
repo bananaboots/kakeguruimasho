@@ -54,3 +54,8 @@ export { RightRail } from './RightRail.tsx';
 export type { RightRailProps } from './RightRail.tsx';
 
 export { CinematicShell } from './CinematicShell.tsx';
+
+export { PachinkoMasthead } from './PachinkoMasthead.tsx';
+export type { PachinkoMastheadProps } from './PachinkoMasthead.tsx';
+export { Masthead } from './Masthead.tsx';
+export type { MastheadProps } from './Masthead.tsx';

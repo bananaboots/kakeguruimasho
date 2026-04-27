@@ -22,7 +22,7 @@ import { Button } from '../ui/button.tsx';
 import { useAppStore } from '../state/store.ts';
 import { DEFAULT_MILESTONE_IDS } from '../types/ids.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
 
 export default function Jar() {
   const activeJarId = useAppStore((s) => s.activeJarId);
@@ -61,7 +61,7 @@ export default function Jar() {
       className="route route--jar parlour-grain parlour-halftone"
       aria-labelledby="jar-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="jar-title" className="parlour-masthead__title">
           The Pot
@@ -78,7 +78,7 @@ export default function Jar() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 

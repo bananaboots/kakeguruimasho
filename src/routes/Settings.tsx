@@ -15,7 +15,7 @@ import {
 } from '../features/settings/index.ts';
 import { useAppStore } from '../state/store.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
 
 export default function Settings() {
   const activeJarId = useAppStore((s) => s.activeJarId);
@@ -25,7 +25,7 @@ export default function Settings() {
       className="route route--settings parlour-grain parlour-halftone"
       aria-labelledby="settings-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="settings-title" className="parlour-masthead__title">
           The Parlour
@@ -42,7 +42,7 @@ export default function Settings() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 

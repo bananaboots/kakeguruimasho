@@ -9,7 +9,7 @@ import { useAppStore } from '../state/store.ts';
 import { HabitList, HygieneBundle } from '../features/habits/index.ts';
 import { DEFAULT_HABIT_IDS } from '../data/defaults.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
 
 export default function Habits() {
   const allHabits = useAppStore((s) => s.habits);
@@ -23,7 +23,7 @@ export default function Habits() {
       className="route route--habits parlour-grain parlour-halftone"
       aria-labelledby="habits-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
         <h1 id="habits-title" className="parlour-masthead__title">
           Rituals
@@ -40,7 +40,7 @@ export default function Habits() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 

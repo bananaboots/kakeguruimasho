@@ -79,3 +79,28 @@
   color: var(--color-ink-muted);
   letter-spacing: 0.4em;
 }
+
+.parlour-masthead--neon {
+  background: var(--color-bg-grad);
+  position: relative;
+  padding: 1.5rem;
+}
+
+.parlour-masthead--neon .parlour-masthead__title {
+  color: var(--color-gold);
+  text-shadow: 0 0 14px var(--color-gold-glow);
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+}
+
+.parlour-masthead--neon .parlour-masthead__kicker {
+  font-family: var(--font-hk, 'Noto Serif HK', serif);
+  color: var(--color-accent);
+  text-shadow: 0 0 8px var(--color-accent);
+  letter-spacing: 0.2em;
+}
+
+.parlour-masthead--neon .parlour-masthead__tagline {
+  font-family: var(--font-body);
+  color: var(--color-ink-muted);
+}

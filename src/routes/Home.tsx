@@ -20,7 +20,7 @@ import {
 } from '../features/jar/index.ts';
 import { HandTrayCard } from '../features/spin/index.ts';
 import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Motif, SectionTitle } from '../ui/parlour/index.ts';
+import { DecoDivider, Masthead, Motif, SectionTitle } from '../ui/parlour/index.ts';
 import { DEFAULT_HABIT_IDS } from '../data/defaults.ts';
 
 export default function Home() {
@@ -39,7 +39,7 @@ export default function Home() {
       className="route route--home parlour-grain parlour-halftone"
       aria-labelledby="home-title"
     >
-      <header className="parlour-masthead">
+      <Masthead>
         <Link
           to="/settings"
           className="parlour-masthead__cog"
@@ -63,7 +63,7 @@ export default function Home() {
         >
           <Motif size={36} />
         </div>
-      </header>
+      </Masthead>
 
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
