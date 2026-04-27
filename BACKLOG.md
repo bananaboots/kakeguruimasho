@@ -3,6 +3,32 @@
 Future work earmarked but not yet built. Add new items at the top of the
 relevant section.
 
+## Desktop polish (2026-04-26 punch list)
+
+Surfaced after the desktop chassis shipped. Each item is small-to-medium
+on its own; bundling for a follow-up PR.
+
+- [ ] **Home activity feed scrollable.** The chronological feed on the
+      Home / Salon route grows tall as the history accumulates and pushes
+      the rest of the page down. Cap `<ActivityFeed>` at a max-height
+      (~480px) at all viewports with `overflow-y: auto` so the feed
+      scrolls inside its own card. Source:
+      [src/features/jar/ActivityFeed.tsx](src/features/jar/ActivityFeed.tsx).
+- [ ] **CashInPicker — let the user pick chip colors.** Today the picker
+      auto-selects the user's most-abundant matching color when they tap
+      T2 / T3. This silently consumed clips the user wanted to keep
+      (e.g. spent 2 blues toward T2 when they intended to save them for
+      a 3-blue T3 cash-in). Restore manual picking: when a tier is
+      tapped, surface a tier-eligible color choice (radio chips) before
+      committing the stake. Auto-pick stays as a default but is
+      overridable. Source:
+      [src/features/spin/CashInPicker.tsx](src/features/spin/CashInPicker.tsx).
+- [ ] **Bonus chain pill.** Decide whether to remove the chip or attach
+      a payout. Today it counts consecutive bonus-timer completions and
+      breaks when any active timer expires unclaimed, but there's no
+      reward tied to the streak. Either drop it from `<StreakDisplay>`
+      or design a payoff (e.g. a free bonus spin every N chain).
+
 ## Design audit follow-ups (2026-04-25)
 
 A second-pass audit against `/tmp/design1/kakeguruimasho/project/` flagged

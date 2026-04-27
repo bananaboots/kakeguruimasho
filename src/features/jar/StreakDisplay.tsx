@@ -1,5 +1,9 @@
 /**
- * StreakDisplay — three chips: daily, hygiene, active bonus chain.
+ * StreakDisplay — daily + bonus-chain chips.
+ *
+ * Self-care streak removed 2026-04-26 as redundant with the daily streak
+ * (the self-care bundle is one of the habits the daily streak tracks).
+ *
  * Shows current + longest. Horizontally scrolls when the row overflows.
  *
  * "Complete today" visual emphasis (daily chip) is driven by
@@ -7,7 +11,7 @@
  */
 
 import { type ReactElement } from 'react';
-import { Flame, Sparkles, Droplets } from 'lucide-react';
+import { Flame, Sparkles } from 'lucide-react';
 import { useAppStore } from '../../state/store.ts';
 import {
   selectDailyStreakCompleteToday,
@@ -19,7 +23,7 @@ type IconCmp = React.ComponentType<
 >;
 
 interface ChipSpec {
-  id: 'daily' | 'hygiene' | 'bonus-chain';
+  id: 'daily' | 'bonus-chain';
   label: string;
   icon: IconCmp;
   current: number;
@@ -49,13 +53,6 @@ export function StreakDisplay({ jarId }: StreakDisplayProps): ReactElement {
           current: streakState.daily.current,
           longest: streakState.daily.longest,
           activeToday: dailyComplete,
-        },
-        {
-          id: 'hygiene',
-          label: 'Self care streak',
-          icon: Droplets as unknown as IconCmp,
-          current: streakState.hygiene.current,
-          longest: streakState.hygiene.longest,
         },
         {
           id: 'bonus-chain',

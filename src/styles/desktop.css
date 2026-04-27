@@ -76,6 +76,29 @@
     gap: var(--space-4);
     align-items: start;
   }
+  /* Tier columns are narrow (~280px each at 1440 desktop). Stack the
+   * label above the Edit/Archive actions inside each reward row so the
+   * row is readable instead of crammed onto one line. */
+  .reward-menu__item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+  .reward-menu__item::before {
+    /* The vertical gold bar reads better on the left edge as a stripe. */
+    position: absolute;
+    left: 0;
+    top: var(--space-2);
+    bottom: var(--space-2);
+    height: auto;
+    margin-right: 0;
+  }
+  .reward-menu__label {
+    padding-left: var(--space-3);
+  }
+  .reward-menu__actions {
+    margin-left: auto;
+  }
 
   /* History: cap width and breathe */
   .route--history {

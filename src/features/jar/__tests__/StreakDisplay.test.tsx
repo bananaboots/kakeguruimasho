@@ -24,11 +24,12 @@ describe('<StreakDisplay />', () => {
     setPersistenceEnabled(true);
   });
 
-  it('renders the three streak chips with initial zero values', () => {
+  it('renders the streak chips with initial zero values', () => {
     render(<StreakDisplay jarId={DEFAULT_JAR_ID} />);
     expect(screen.getByTestId('streak-chip-daily')).toBeInTheDocument();
-    expect(screen.getByTestId('streak-chip-hygiene')).toBeInTheDocument();
     expect(screen.getByTestId('streak-chip-bonus-chain')).toBeInTheDocument();
+    // Self-care streak chip removed 2026-04-26 as redundant with the daily streak.
+    expect(screen.queryByTestId('streak-chip-hygiene')).not.toBeInTheDocument();
   });
 
   it('re-renders when the store updates the streak', () => {
