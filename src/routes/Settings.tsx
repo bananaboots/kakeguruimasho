@@ -9,6 +9,7 @@ import {
   HygieneCutoffEditor,
   SfxHapticsToggles,
   SpinStyleToggle,
+  ThemeToggle,
   ExportImportPanel,
   ResetAllDanger,
   HelpScreen,
@@ -47,6 +48,7 @@ export default function Settings() {
       <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
 
       <div className="settings">
+        <ThemeToggle />
         <SpinStyleToggle />
         <WheelConfigEditor jarId={activeJarId} />
         <BagCompositionEditor />
