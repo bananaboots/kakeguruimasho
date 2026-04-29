@@ -5,8 +5,11 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
-// Base path. Served from the site root.
-const BASE = '/';
+// GitHub Pages project sites are served at https://<user>.github.io/<repo>/,
+// so the Vite `base` must match the repo path. The app's internal routes
+// (HashRouter) are independent: the user-facing URLs still read
+// `/<base>/#/spin`, `/<base>/#/jar`, etc.
+const BASE = '/kakeguruimasho/';
 
 export default defineConfig({
   base: BASE,
