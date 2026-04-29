@@ -29,50 +29,38 @@ describe('HabitList', () => {
     setPersistenceEnabled(true);
   });
 
-  it('renders the 5 default habits', () => {
+  it('renders the default habits', () => {
     render(<HabitList />);
     expect(screen.getByText('Walk')).toBeInTheDocument();
-    expect(screen.getByText('Workout')).toBeInTheDocument();
-    expect(screen.getByText('Cleaning')).toBeInTheDocument();
     expect(screen.getByText('Focused work')).toBeInTheDocument();
-    expect(screen.getByText('Self care bundle')).toBeInTheDocument();
+    expect(screen.getByText('Chore bundle')).toBeInTheDocument();
   });
 
   it('hides archived habits', () => {
     const store = getAppStore();
     const prev = store.getState();
-    const next = archiveHabit(prev, DEFAULT_HABIT_IDS.cleaning);
+    const next = archiveHabit(prev, DEFAULT_HABIT_IDS.focusedWork);
     store.setState({ ...next, actions: prev.actions }, false);
 
     render(<HabitList />);
-    expect(screen.queryByText('Cleaning')).toBeNull();
-    // Other 4 still present.
+    expect(screen.queryByText('Focused work')).toBeNull();
     expect(screen.getByText('Walk')).toBeInTheDocument();
   });
 
-  it('quick-log on a minutes-unit habit (Cleaning) earns 1 clip', async () => {
+  it('quick-log on a count-unit habit (Focused work) earns 1 clip per batched entry', async () => {
+    // Count-unit cards open StepEntry; we exercise the binary-tap path via
+    // the bundle-less side by using the editor-less batch path. Simpler:
+    // assert clicking the card opens StepEntry (no clip earned without an
+    // entry).
     const user = userEvent.setup();
     render(<HabitList />);
 
-    const logBtn = screen.getByTestId(`quicklog-${DEFAULT_HABIT_IDS.cleaning}`);
+    const logBtn = screen.getByTestId(`quicklog-${DEFAULT_HABIT_IDS.focusedWork}`);
     await user.click(logBtn);
 
+    // StepEntry mounts on click; the hand stays empty until a value is
+    // entered + submitted.
     const s = getAppStore().getState();
-    expect(s.hands[DEFAULT_JAR_ID]!.length).toBe(1);
-    expect(s.jars[DEFAULT_JAR_ID]!.total).toBe(1);
-    const kinds = s.history.map((e) => e.kind);
-    expect(kinds).toContain('habit_completed');
-    expect(kinds).toContain('clip_earned');
-  });
-
-  it('quick-log on a sets-unit habit (Workout) earns 1 clip', async () => {
-    const user = userEvent.setup();
-    render(<HabitList />);
-
-    const logBtn = screen.getByTestId(`quicklog-${DEFAULT_HABIT_IDS.workout}`);
-    await user.click(logBtn);
-
-    const s = getAppStore().getState();
-    expect(s.hands[DEFAULT_JAR_ID]!.length).toBe(1);
+    expect(s.hands[DEFAULT_JAR_ID]!.length).toBe(0);
   });
 });

@@ -32,7 +32,7 @@
 
 .jar-visual__svg {
   width: 100%;
-  max-width: 280px;
+  max-width: 220px;
   height: auto;
   display: block;
   flex: 0 0 auto;
@@ -397,12 +397,17 @@
 .pot-mini {
   display: block;
   padding: 16px;
-  background: linear-gradient(
-    180deg,
-    var(--color-surface-2),
-    var(--color-surface)
-  );
-  border: 1px solid var(--color-border);
+  /* Pot stands apart from rituals: deeper felt + a soft radial gold glow
+   * suggesting jar contents catching light. */
+  background:
+    radial-gradient(
+      ellipse 70% 60% at 50% 30%,
+      rgba(232, 198, 130, 0.08) 0%,
+      transparent 70%
+    ),
+    linear-gradient(180deg, var(--color-felt-deep) 0%, #1a0403 100%);
+  border: 1px solid color-mix(in srgb, var(--color-gold) 30%, var(--color-border));
+  box-shadow: inset 0 1px 0 rgba(232, 198, 130, 0.12);
   color: inherit;
   text-decoration: none;
   position: relative;

@@ -26,9 +26,18 @@ export interface HabitListProps {
   onBundleTap?: (habit: Habit) => void;
   /** Expose the Add button? Default: true. */
   showAdd?: boolean;
+  /** Render each card in single-line compact mode. */
+  compact?: boolean;
+  /** Show the leading habit icon. Default true. */
+  showIcon?: boolean;
 }
 
-export function HabitList({ onBundleTap, showAdd = true }: HabitListProps) {
+export function HabitList({
+  onBundleTap,
+  showAdd = true,
+  compact = false,
+  showIcon = true,
+}: HabitListProps) {
   const allHabits = useAppStore((s) => s.habits);
   const habits = allHabits.filter((h) => !h.archived);
 
@@ -60,15 +69,10 @@ export function HabitList({ onBundleTap, showAdd = true }: HabitListProps) {
             <RitualCard
               habit={habit}
               {...(onBundleTap ? { onBundleTap } : {})}
+              onEdit={setEditing}
+              compact={compact}
+              showIcon={showIcon}
             />
-            <button
-              type="button"
-              className="habit-list__edit"
-              onClick={() => setEditing(habit)}
-              aria-label={`Edit ${habit.name}`}
-            >
-              Edit
-            </button>
           </li>
         ))}
       </ul>

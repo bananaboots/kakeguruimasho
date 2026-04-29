@@ -1,21 +1,16 @@
 /**
- * HabitEditor — add/edit/archive-delete modal for any HabitUnit kind (3D).
+ * HabitEditor — add/edit/archive-delete modal for habits.
  *
- * Uses 3J's <Dialog>. Supports all HabitUnit variants:
- *  - count   → {target, unit label}
- *  - minutes → {target}
- *  - sets    → {target}
- *  - bundle  → {subItems[], cutoffLocal}
+ * Unit kinds offered in the picker:
+ *  - count  → {target, unit label} (covers steps, minutes, sets, reps, …)
+ *  - bundle → {subItems[], cutoffLocal}
+ *  - binary → no fields; tap once = 1 clip
  *
- * Persistence: applies the pure `habitsSlice` reducer then triggers an
- * `appendHistory` so the persist layer flushes (see store.ts
- * `commitWithHistory`). We do NOT add a new action to 3A's surface —
- * instead this file requests that 3A expose `addHabit / updateHabit /
- * archiveHabit` actions in WAVE2_3D_NOTES.md; until then, setState +
- * appendHistory is the agreed temporary path.
+ * Legacy `minutes` and `sets` kinds are migrated to `count` at boot
+ * (see main.tsx :: patchLegacyUnitKinds), so they never reach this UI.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { Button } from '../../ui/button.tsx';
 import {
   Drawer,
@@ -29,8 +24,10 @@ import type { Habit, HabitUnit } from '../../types/habit.ts';
 import { newHabitId } from '../../lib/id.ts';
 import { nowISO } from '../../lib/time.ts';
 import { DEFAULT_HABIT_IDS } from '../../data/defaults.ts';
+import { RitualIcon } from './icon-bank.tsx';
+import { ICON_KEYS, isIconKey } from './icon-keys.ts';
 
-type UnitKind = HabitUnit['kind'];
+type UnitKind = 'count' | 'bundle' | 'binary';
 
 export interface HabitEditorProps {
   /** null ⇒ create mode. */
@@ -43,16 +40,28 @@ function defaultUnitFor(kind: UnitKind): HabitUnit {
   switch (kind) {
     case 'count':
       return { kind: 'count', target: 2500, unit: 'steps' };
-    case 'minutes':
-      return { kind: 'minutes', target: 20 };
-    case 'sets':
-      return { kind: 'sets', target: 4 };
     case 'bundle':
       return {
         kind: 'bundle',
-        subItems: ['shower', 'brush teeth', 'wash face', 'in bed by cutoff'],
-        cutoffLocal: '01:00',
+        subItems: ['', '', ''],
+        cutoffLocal: '23:59',
       };
+    case 'binary':
+      return { kind: 'binary' };
+  }
+}
+
+function uiKindFor(unit: HabitUnit): UnitKind {
+  // Legacy minutes / sets render the count editor (boot migration converts).
+  switch (unit.kind) {
+    case 'minutes':
+    case 'sets':
+    case 'count':
+      return 'count';
+    case 'bundle':
+      return 'bundle';
+    case 'binary':
+      return 'binary';
   }
 }
 
@@ -60,7 +69,8 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
   const isEdit = habit !== null;
 
   const [name, setName] = useState(habit?.name ?? '');
-  const [unit, setUnit] = useState<HabitUnit>(habit?.unit ?? defaultUnitFor('count'));
+  const [unit, setUnit] = useState<HabitUnit>(habit?.unit ?? defaultUnitFor('binary'));
+  const [iconKey, setIconKey] = useState<string | undefined>(habit?.iconKey);
 
   // Reset local state when the dialog opens for a different habit.
   // React pattern: "adjust state while rendering" using a previous-key marker,
@@ -72,11 +82,13 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
     setLastHabitId(habit?.id ?? null);
     setLastOpen(open);
     setName(habit?.name ?? '');
-    setUnit(habit?.unit ?? defaultUnitFor('count'));
+    setUnit(habit?.unit ?? defaultUnitFor('binary'));
+    setIconKey(habit?.iconKey);
   } else if (open && !lastOpen) {
     setLastOpen(true);
     setName(habit?.name ?? '');
-    setUnit(habit?.unit ?? defaultUnitFor('count'));
+    setUnit(habit?.unit ?? defaultUnitFor('binary'));
+    setIconKey(habit?.iconKey);
   } else if (!open && lastOpen) {
     setLastOpen(false);
   }
@@ -86,8 +98,13 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
   const handleSave = useCallback(() => {
     if (!canSave) return;
     const { actions } = getAppStore().getState();
+    const patch: Partial<Habit> = {
+      name: name.trim(),
+      unit,
+      ...(isIconKey(iconKey) ? { iconKey } : {}),
+    };
     if (isEdit) {
-      actions.updateHabit(habit.id, { name: name.trim(), unit });
+      actions.updateHabit(habit.id, patch);
     } else {
       const newHabit: Habit = {
         id: newHabitId(),
@@ -95,11 +112,20 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
         unit,
         createdAt: nowISO(),
         archived: false,
+        ...(isIconKey(iconKey) ? { iconKey } : {}),
       };
       actions.addHabit(newHabit);
     }
     onClose();
-  }, [canSave, habit, isEdit, name, unit, onClose]);
+  }, [canSave, habit, isEdit, name, unit, iconKey, onClose]);
+
+  const handleSubmit = useCallback(
+    (e: FormEvent): void => {
+      e.preventDefault();
+      handleSave();
+    },
+    [handleSave],
+  );
 
   const handleArchive = useCallback(() => {
     if (!habit) return;
@@ -122,6 +148,7 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
           friction feels right for.
         </DrawerDescription>
 
+        <form onSubmit={handleSubmit}>
         <div className="habit-editor__field">
           <label htmlFor="habit-editor-name" className="habit-editor__label">
             Name
@@ -137,23 +164,23 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
 
         <div className="habit-editor__field">
           <span className="habit-editor__label" id="habit-editor-unit-label">
-            Unit type
+            Unit type <span className="habit-editor__hint">(optional — leave on Yes/No for binary habits)</span>
           </span>
           <div
             className="habit-editor__kind-group"
             role="radiogroup"
             aria-labelledby="habit-editor-unit-label"
           >
-            {(['count', 'minutes', 'sets', 'bundle'] as UnitKind[]).map((k) => (
+            {(['binary', 'count', 'bundle'] as UnitKind[]).map((k) => (
               <Button
                 key={k}
-                variant={unit.kind === k ? 'primary' : 'secondary'}
+                variant={uiKindFor(unit) === k ? 'primary' : 'secondary'}
                 size="sm"
                 role="radio"
-                aria-checked={unit.kind === k}
+                aria-checked={uiKindFor(unit) === k}
                 onClick={() => setUnit(defaultUnitFor(k))}
               >
-                {k}
+                {k === 'binary' ? 'Yes / No' : k === 'count' ? 'Count' : 'Bundle'}
               </Button>
             ))}
           </div>
@@ -161,19 +188,61 @@ export function HabitEditor({ habit, open, onClose }: HabitEditorProps) {
 
         <UnitEditor unit={unit} onChange={setUnit} />
 
+        <div className="habit-editor__field">
+          <span className="habit-editor__label" id="habit-editor-icon-label">
+            Icon <span className="habit-editor__hint">(optional)</span>
+          </span>
+          <div
+            className="habit-editor__icon-grid"
+            role="radiogroup"
+            aria-labelledby="habit-editor-icon-label"
+          >
+            <button
+              type="button"
+              className="habit-editor__icon-option habit-editor__icon-option--clear"
+              role="radio"
+              aria-checked={!iconKey}
+              aria-label="No icon"
+              data-selected={!iconKey}
+              onClick={() => setIconKey(undefined)}
+            >
+              —
+            </button>
+            {ICON_KEYS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                className="habit-editor__icon-option"
+                role="radio"
+                aria-checked={iconKey === k}
+                aria-label={k}
+                data-selected={iconKey === k}
+                onClick={() => setIconKey(k)}
+              >
+                <RitualIcon
+                  iconKey={k}
+                  size={20}
+                  color={iconKey === k ? 'var(--color-gold)' : 'var(--color-ink-muted)'}
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="habit-editor__actions">
           {isEdit && !isHygieneDefault ? (
-            <Button variant="danger" onClick={handleArchive}>
+            <Button variant="danger" type="button" onClick={handleArchive}>
               Archive
             </Button>
           ) : null}
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" type="button" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave} disabled={!canSave}>
+          <Button variant="primary" type="submit" disabled={!canSave}>
             Save
           </Button>
         </div>
+        </form>
       </DrawerContent>
     </Drawer>
   );
@@ -185,6 +254,8 @@ function isUnitValid(unit: HabitUnit): boolean {
       return unit.target > 0 && unit.unit.trim().length > 0;
     case 'minutes':
     case 'sets':
+      // Legacy kinds — the boot migration converts these, but if a stale
+      // editor session sees one, it's still valid (positive target).
       return unit.target > 0;
     case 'bundle':
       return (
@@ -192,6 +263,8 @@ function isUnitValid(unit: HabitUnit): boolean {
         unit.subItems.every((s) => s.trim().length > 0) &&
         /^\d{1,2}:\d{2}$/.test(unit.cutoffLocal)
       );
+    case 'binary':
+      return true;
   }
 }
 
@@ -231,25 +304,14 @@ function UnitEditor({
     );
   }
 
+  if (unit.kind === 'binary') {
+    return null;
+  }
+
   if (unit.kind === 'minutes' || unit.kind === 'sets') {
-    const suffix = unit.kind === 'minutes' ? 'minutes' : 'sets';
-    return (
-      <div className="habit-editor__unit-fields">
-        <label className="habit-editor__label" htmlFor="habit-editor-target">
-          {suffix === 'minutes' ? 'Minutes per clip' : 'Sets per clip'}
-        </label>
-        <Input
-          id="habit-editor-target"
-          type="number"
-          inputMode="numeric"
-          min={1}
-          value={unit.target}
-          onChange={(e) =>
-            onChange({ ...unit, target: Math.max(1, Number(e.target.value) || 0) })
-          }
-        />
-      </div>
-    );
+    // Legacy in-memory only; the boot migration converts these. Render
+    // nothing so they don't surface a removed editor branch.
+    return null;
   }
 
   // bundle

@@ -103,6 +103,21 @@
   }
 }
 
+/*
+ * Standardize vertical rhythm on route-level direct children.
+ * `--route-stack-gap` is the canonical inter-block spacing; individual
+ * components can override locally if they need tighter or looser spacing.
+ * The `:not(...)` carves out invisible/utility nodes and elements that
+ * already manage their own top spacing (route-header, section titles).
+ */
+:root {
+  --route-stack-gap: var(--space-4);
+}
+
+.route > * + *:not(.sr-only):not(.parlour-section-title):not(.route-header) {
+  margin-top: var(--route-stack-gap);
+}
+
 .route__header {
   display: flex;
   align-items: center;
@@ -183,6 +198,50 @@
   position: relative;
   text-align: center;
   margin-bottom: var(--space-6);
+}
+
+/* Cog-only masthead — used on Home now that the kicker/title/tagline/motif
+ * have been removed to reclaim mobile vertical real estate. The cog button
+ * is absolutely positioned, so we just need enough height for the tap
+ * target and a small bottom margin before the next block. */
+.parlour-masthead--cog-only {
+  min-height: 44px;
+  margin-bottom: var(--space-3);
+}
+
+/* ---------- Compact RouteHeader (title + small motif) ---------- */
+
+.route-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin: 4px 0 var(--space-3);
+  text-align: center;
+}
+
+.route-header__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: linear-gradient(
+    180deg,
+    var(--color-gold) 0%,
+    var(--color-gold-deep) 55%,
+    var(--color-gold) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.32);
+  line-height: 1.05;
+}
+
+.route-header__motif {
+  display: inline-flex;
+  opacity: 0.85;
 }
 
 .parlour-masthead__cog {

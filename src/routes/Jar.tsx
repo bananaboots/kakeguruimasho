@@ -21,13 +21,11 @@ import {
 import { Button } from '../ui/button.tsx';
 import { useAppStore } from '../state/store.ts';
 import { DEFAULT_MILESTONE_IDS } from '../types/ids.ts';
-import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
+import { RouteHeader } from '../ui/parlour/index.ts';
 
 export default function Jar() {
   const activeJarId = useAppStore((s) => s.activeJarId);
   const milestones = useAppStore((s) => s.jars[activeJarId]?.milestones);
-  const { themeMeta } = useTheme();
 
   const firstRun = useMemo(() => {
     if (!milestones) return false;
@@ -61,26 +59,7 @@ export default function Jar() {
       className="route route--jar parlour-grain parlour-halftone"
       aria-labelledby="jar-title"
     >
-      <Masthead>
-        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
-        <h1 id="jar-title" className="parlour-masthead__title">
-          The Pot
-        </h1>
-        <p className="parlour-masthead__tagline">
-          Long-game progress toward your milestones.
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            margin: 'var(--space-3) auto 0',
-          }}
-        >
-          <Motif size={36} />
-        </div>
-      </Masthead>
-
-      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
+      <RouteHeader title="Pot" titleId="jar-title" />
 
       <div className="jar-layout">
         <div className="jar-layout__visual">

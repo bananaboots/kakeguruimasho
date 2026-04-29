@@ -190,6 +190,7 @@ export function JarVisual({
           </Suspense>
         </g>
 
+
         {/* Jar outline (after fill so it's on top). */}
         <rect
           x={WALL_X - 2}
@@ -231,7 +232,7 @@ export function JarVisual({
           fill="var(--color-gold)"
         />
 
-        {/* "LE JAR" label sticker, centered on the jar body. */}
+        {/* "LE POT" label sticker, centered on the jar body. */}
         <g className="jar-visual__label" aria-hidden="true">
           <rect
             x={50}
@@ -264,7 +265,7 @@ export function JarVisual({
             fontSize={13}
             letterSpacing="0.04em"
           >
-            JAR
+            POT
           </text>
           <text
             x={80}

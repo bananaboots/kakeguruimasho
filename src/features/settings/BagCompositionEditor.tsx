@@ -5,7 +5,7 @@
  * `regularPerColor` range 1–30. Shows derived total = colors × regular + gold.
  */
 
-import { useMemo, useState, type ReactElement } from 'react';
+import { useMemo, useState, type FormEvent, type ReactElement } from 'react';
 import { Button } from '../../ui/button.tsx';
 import { Input } from '../../ui/input.tsx';
 import { useAppStore, getAppStore } from '../../state/store.ts';
@@ -61,6 +61,11 @@ export function BagCompositionEditor(): ReactElement {
     window.setTimeout(() => setSaved(false), 1600);
   };
 
+  const handleSubmit = (e: FormEvent): void => {
+    e.preventDefault();
+    handleSave();
+  };
+
   return (
     <section
       className="settings__card"
@@ -77,55 +82,57 @@ export function BagCompositionEditor(): ReactElement {
         </p>
       </header>
 
-      <label className="settings__field-label">
-        <span>Regular per color ({REG_MIN}–{REG_MAX})</span>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={REG_MIN}
-          max={REG_MAX}
-          step={1}
-          value={regular}
-          onChange={(e) => setRegular(e.target.value)}
-          aria-label="Regular clips per color"
-        />
-      </label>
+      <form onSubmit={handleSubmit} noValidate>
+        <label className="settings__field-label">
+          <span>Regular per color ({REG_MIN}–{REG_MAX})</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={REG_MIN}
+            max={REG_MAX}
+            step={1}
+            value={regular}
+            onChange={(e) => setRegular(e.target.value)}
+            aria-label="Regular clips per color"
+          />
+        </label>
 
-      <label className="settings__field-label">
-        <span>Gold clips ({GOLD_MIN}–{GOLD_MAX})</span>
-        <Input
-          type="number"
-          inputMode="numeric"
-          min={GOLD_MIN}
-          max={GOLD_MAX}
-          step={1}
-          value={gold}
-          onChange={(e) => setGold(e.target.value)}
-          aria-label="Gold clip count"
-        />
-      </label>
+        <label className="settings__field-label">
+          <span>Gold clips ({GOLD_MIN}–{GOLD_MAX})</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            min={GOLD_MIN}
+            max={GOLD_MAX}
+            step={1}
+            value={gold}
+            onChange={(e) => setGold(e.target.value)}
+            aria-label="Gold clip count"
+          />
+        </label>
 
-      <p className="settings__hint">
-        Colors: <strong>{comp.colors.length}</strong> · Total clips:{' '}
-        <strong data-testid="bag-total">{derived ?? '—'}</strong>
-      </p>
-
-      {error ? (
-        <p className="settings__error" role="alert">
-          {error}
+        <p className="settings__hint">
+          Colors: <strong>{comp.colors.length}</strong> · Total clips:{' '}
+          <strong data-testid="bag-total">{derived ?? '—'}</strong>
         </p>
-      ) : null}
-      {saved ? (
-        <p className="settings__hint" role="status">
-          Saved.
-        </p>
-      ) : null}
 
-      <div className="settings__actions">
-        <Button variant="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </div>
+        {error ? (
+          <p className="settings__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {saved ? (
+          <p className="settings__hint" role="status">
+            Saved.
+          </p>
+        ) : null}
+
+        <div className="settings__actions">
+          <Button variant="primary" type="submit">
+            Save
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }

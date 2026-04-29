@@ -37,6 +37,9 @@ export type { VelvetProps } from './Velvet.tsx';
 export { RitualGlyph } from './RitualGlyph.tsx';
 export type { RitualGlyphKind, RitualGlyphProps } from './RitualGlyph.tsx';
 
+export { RouteHeader } from './RouteHeader.tsx';
+export type { RouteHeaderProps } from './RouteHeader.tsx';
+
 export { SectionTitle } from './SectionTitle.tsx';
 export type { SectionTitleProps } from './SectionTitle.tsx';
 

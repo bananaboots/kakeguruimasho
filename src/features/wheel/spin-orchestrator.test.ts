@@ -12,27 +12,31 @@ import { spinBonusWheel, spinMainWheel } from './spin-orchestrator.ts';
 import { resolveBonusSpin, resolveMainSpin } from './wheel.engine.ts';
 
 describe('spinMainWheel', () => {
-  it('emits near_miss_theater when the spin is losing', async () => {
-    // Find a seed producing a losing T1 result with 0-cash-in.
+  it('floors a 0-cash-in spin to T1 (with rare 1% T3) and emits theater', async () => {
+    // The orchestrator caps free spins at T1 except for a 1% T3 free win.
+    // Find a seed where the engine's raw roll lands BONUS/JACKPOT/T2/T3 —
+    // any of those would near-miss under the old contract — and confirm
+    // the floor pulls the displayed tier down to T1 (the common case)
+    // and that the drift theater still fires past a locked tier.
     const cfg = defaultWheelConfig();
     let seed = 0;
-    while (seed < 100) {
-      seed++;
-      if (resolveMainSpin(cfg, seededRng(seed)).tier === 'T1') break;
-    }
+    let outcome;
     const appendHistory = vi.fn();
     const spawnBonusTimer = vi.fn();
-    const outcome = await spinMainWheel({
-      cfg,
-      highestUnlockedTier: null, // 0-cash-in → T2/T3 locked → drift required
-      rng: seededRng(seed),
-      actions: { appendHistory, spawnBonusTimer },
-      jarId: DEFAULT_JAR_ID,
-    });
-
-    expect(outcome.result.tier).toBe('T1');
-    expect(outcome.driftIndex).not.toBeNull();
-    expect(appendHistory).toHaveBeenCalledTimes(1);
+    while (seed < 500) {
+      seed++;
+      appendHistory.mockClear();
+      outcome = await spinMainWheel({
+        cfg,
+        highestUnlockedTier: null,
+        rng: seededRng(seed),
+        actions: { appendHistory, spawnBonusTimer },
+        jarId: DEFAULT_JAR_ID,
+      });
+      if (outcome.result.tier === 'T1') break;
+    }
+    expect(outcome!.result.tier).toBe('T1');
+    expect(outcome!.driftIndex).not.toBeNull();
     expect(appendHistory).toHaveBeenCalledWith(
       expect.objectContaining({
         kind: 'near_miss_theater',
@@ -63,7 +67,9 @@ describe('spinMainWheel', () => {
     expect(appendHistory).not.toHaveBeenCalled();
   });
 
-  it('never emits near_miss_theater for BONUS / JACKPOT results', async () => {
+  it('three-match keeps the BONUS / JACKPOT distribution', async () => {
+    // Tier-floor only applies when highestUnlockedTier !== 'T3', so a
+    // 3-match user can still hit BONUS / JACKPOT.
     const cfg = defaultWheelConfig();
     let seed = 0;
     while (seed < 2000) {
@@ -75,7 +81,7 @@ describe('spinMainWheel', () => {
     const spawnBonusTimer = vi.fn();
     const outcome = await spinMainWheel({
       cfg,
-      highestUnlockedTier: null,
+      highestUnlockedTier: 'T3',
       rng: seededRng(seed),
       actions: { appendHistory, spawnBonusTimer },
       jarId: DEFAULT_JAR_ID,

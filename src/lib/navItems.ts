@@ -6,10 +6,10 @@
  */
 import {
   Home as HomeIcon,
-  ListChecks,
+  Coins,
   Dice5,
-  Sparkles,
   Vault as VaultIcon,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import type { ComponentType, SVGProps } from 'react';
 
@@ -23,8 +23,8 @@ export interface NavItem {
 
 export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/', label: 'Salon', icon: HomeIcon as unknown as NavIcon },
-  { to: '/habits', label: 'Rituals', icon: ListChecks as unknown as NavIcon },
-  { to: '/spin', label: 'Spin', icon: Dice5 as unknown as NavIcon },
-  { to: '/jar', label: 'Jar', icon: Sparkles as unknown as NavIcon },
+  { to: '/jar', label: 'Pot', icon: Coins as unknown as NavIcon },
+  { to: '/spin', label: 'Play', icon: Dice5 as unknown as NavIcon },
   { to: '/rewards', label: 'Vault', icon: VaultIcon as unknown as NavIcon },
+  { to: '/settings', label: 'Settings', icon: SettingsIcon as unknown as NavIcon },
 ];

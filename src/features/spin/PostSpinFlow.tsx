@@ -62,9 +62,9 @@ import { rng as getRng } from '../../lib/rng.ts';
 import { useToast } from '../../ui/toast-context.ts';
 import { useTheme } from '../../styles/theme-context.ts';
 
-import { CashInPicker } from './CashInPicker.tsx';
 import { HandView } from './HandView.tsx';
 import { SpinButton } from './SpinButton.tsx';
+import { TierToggle } from './TierToggle.tsx';
 import { GoldInstantT3Button } from './GoldInstantT3Button.tsx';
 import { WheelCabinet, ParlourCrest } from './WheelCabinet.tsx';
 import { WheelOddsStrip } from './WheelOddsStrip.tsx';
@@ -223,7 +223,11 @@ export function PostSpinFlow({
 
   // Route guard — if the user lands on /spin/pull or /spin/reveal without
   // an active spin (e.g. cold-load, manual URL, browser back-forward), bounce
-  // back to /spin so they can't see a half-rendered flow.
+  // back to /spin so they can't see a half-rendered flow. Only fires on
+  // initial mount: during the running flow PostSpinFlow drives its own
+  // navigation, and a reactive guard would race with the post-claim
+  // navigate('/') because Router's location update can lag a render behind
+  // the flow's own state cleanup.
   useEffect(() => {
     if (subStep === 'pull' && pendingSpin === null && pendingBonus === null) {
       navigate('/spin', { replace: true });
@@ -232,17 +236,76 @@ export function PostSpinFlow({
     if (subStep === 'reveal' && revealRequest === null) {
       navigate('/spin', { replace: true });
     }
-  }, [subStep, pendingSpin, pendingBonus, revealRequest, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // ---- Selection ----
+  // ---- Selection (color + tier) ----
+  //
+  // The user picks a color in HandView and a tier in TierToggle. We
+  // derive the canonical SpinSelection from those two locally-tracked
+  // values and dispatch SELECT_CLIPS whenever they change. Tier auto-
+  // downgrades if the chosen color doesn't have enough chips for the
+  // current tier (e.g. switching from a 4-chip color at T3 to a 2-chip
+  // color demotes to T2).
+  const [selectedColor, setSelectedColor] = useState<ClipColor | null>(null);
+  const [selectedTier, setSelectedTier] = useState<Tier>('T1');
 
-  const handleSelectionChange = useCallback(
-    (next: SpinSelection) => {
-      if (frozen) return;
-      dispatch({ type: 'SELECT_CLIPS', selection: next });
-    },
-    [frozen],
-  );
+  const colorAvailable = useMemo(() => {
+    if (!selectedColor) return 0;
+    return hand.filter(
+      (c) => c.kind === 'regular' && c.color === selectedColor,
+    ).length;
+  }, [hand, selectedColor]);
+
+  // Effective tier — auto-downgrade derived from `colorAvailable`. The
+  // raw `selectedTier` may be temporarily out of range when the user
+  // switches color; we compute the actual unlocked tier on each render
+  // rather than syncing via setState-in-effect.
+  const effectiveTier: Tier =
+    selectedTier === 'T3' && colorAvailable < 3
+      ? colorAvailable >= 2
+        ? 'T2'
+        : 'T1'
+      : selectedTier === 'T2' && colorAvailable < 2
+        ? 'T1'
+        : selectedTier;
+
+  // Sync (color, effectiveTier) → FSM SpinSelection.
+  useEffect(() => {
+    if (frozen) return;
+    let next: SpinSelection;
+    if (effectiveTier === 'T1' || !selectedColor) {
+      next = { selectedIds: [], matchKind: 'none', unlockedTier: 'T1' };
+    } else {
+      const n = effectiveTier === 'T3' ? 3 : 2;
+      const ids = hand
+        .filter((c) => c.kind === 'regular' && c.color === selectedColor)
+        .slice(0, n)
+        .map((c) => c.id);
+      if (ids.length < n) {
+        next = { selectedIds: [], matchKind: 'none', unlockedTier: 'T1' };
+      } else {
+        next = {
+          selectedIds: ids,
+          matchKind: n === 3 ? 'three-match' : 'two-match',
+          unlockedTier: effectiveTier,
+        };
+      }
+    }
+    dispatch({ type: 'SELECT_CLIPS', selection: next });
+  }, [selectedColor, effectiveTier, hand, frozen]);
+
+  // Reset color + tier when the FSM returns to idle after a spin (so the
+  // next spin starts blank). Doesn't fire on initial mount because the
+  // ref starts as 'idle' too.
+  const prevPhaseRef = useRef(state.phase);
+  useEffect(() => {
+    if (prevPhaseRef.current !== 'idle' && state.phase === 'idle') {
+      setSelectedColor(null);
+      setSelectedTier('T1');
+    }
+    prevPhaseRef.current = state.phase;
+  }, [state.phase]);
 
   // ---- GOLD short-circuit (A6, A7) ----
 
@@ -331,6 +394,11 @@ export function PostSpinFlow({
 
   const handleStartSpin = useCallback(() => {
     if (frozen) return;
+    // Reset the per-spin idempotency gates before kicking off a new spin
+    // — both refs are stale from the previous spin's MainSpinResult and
+    // would falsely block the new run.
+    handledSpinRef.current = null;
+    claimedSpinRef.current = null;
     dispatch({ type: 'START_SPIN' });
     setAnnouncement('Spinning the main wheel.');
     navigate('/spin/pull');
@@ -393,11 +461,34 @@ export function PostSpinFlow({
 
   // ---- onAnimationComplete — post-main-wheel orchestration ----
 
+  // Idempotency guards. Two layers of defense against the "modal reopens
+  // with the same tier" bug:
+  //
+  //   1. `handledSpinRef` — the handler entry gate. WheelCanvas's effect
+  //      can re-run on every parent render and start fresh animation loops
+  //      whose tails call onAnimationComplete a second time. The first call
+  //      claims the spin's MainSpinResult; subsequent calls bail out.
+  //
+  //   2. `claimedSpinRef` — a redundant check directly around the
+  //      reward_claimed history append + dispatch chain. Even if a stale
+  //      callback survives canvas-level guards (e.g. HMR, future refactors),
+  //      we never emit two reward_claimed events for one spin.
+  const handledSpinRef = useRef<MainSpinResult | null>(null);
+  const claimedSpinRef = useRef<MainSpinResult | null>(null);
+
   const handleMainSpinAnimationComplete = useCallback(async () => {
     const ps = pendingSpin;
     if (!ps) return;
-
     const { result, unlockedTier } = ps;
+    if (handledSpinRef.current === result) return;
+    // Refs are mutable by design; this is the canonical idempotency
+    // pattern. The compiler-aware lint flags any property write on a
+    // ref captured by a useCallback, but useEffect-only mutation isn't
+    // an option here — we must claim the spin synchronously inside an
+    // event handler before any await yields.
+    // eslint-disable-next-line react-hooks/immutability
+    handledSpinRef.current = result;
+
     const tier = result.tier;
 
     // Move FSM forward: mainResolved. We'll branch on tier below.
@@ -414,6 +505,11 @@ export function PostSpinFlow({
       dispatch({ type: 'SET_BONUS_PENDING', pending: true });
       dispatch({ type: 'START_REWARD_PICKER', tier: 'T3', source: 'jackpot' });
       const rewardId = await awaitReveal('T3');
+      if (claimedSpinRef.current === result) {
+        return;
+      }
+      // eslint-disable-next-line react-hooks/immutability
+      claimedSpinRef.current = result;
       actions.logMainSpin(
         jarId,
         result,
@@ -454,6 +550,10 @@ export function PostSpinFlow({
         source: 'bonus-auto',
       });
       const rewardId = await awaitReveal(autoTier);
+      if (claimedSpinRef.current === result) {
+        return;
+      }
+      claimedSpinRef.current = result;
       actions.logMainSpin(
         jarId,
         result,
@@ -490,6 +590,11 @@ export function PostSpinFlow({
       setAnnouncement(`${t} won — pick a reward.`);
       dispatch({ type: 'START_REWARD_PICKER', tier: t, source: 'wheel' });
       const rewardId = await awaitReveal(t);
+      // Last-line idempotency guard — see `claimedSpinRef` declaration.
+      if (claimedSpinRef.current === result) {
+        return;
+      }
+      claimedSpinRef.current = result;
       actions.logMainSpin(jarId, result, unlockedTier, rewardId as RewardId | null);
       actions.appendHistory({
         kind: 'reward_claimed',
@@ -661,12 +766,10 @@ export function PostSpinFlow({
       {/* ---- Step I · Cash In ---- */}
       {subStep === 'cash' ? (
         <>
-          <HandView jarId={jarId} />
-
-          <CashInPicker
-            hand={hand}
-            selection={state.selection}
-            onChange={handleSelectionChange}
+          <HandView
+            jarId={jarId}
+            selectedColor={selectedColor}
+            onColorChange={setSelectedColor}
             disabled={frozen}
           />
 
@@ -679,6 +782,13 @@ export function PostSpinFlow({
           ) : null}
 
           <WheelOddsStrip jarId={jarId} />
+
+          <TierToggle
+            value={effectiveTier}
+            onChange={setSelectedTier}
+            availableForSelectedColor={colorAvailable}
+            disabled={frozen}
+          />
 
           <div className="spin-flow__actions">
             {spinButtonLabel !== undefined ? (

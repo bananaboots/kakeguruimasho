@@ -92,36 +92,34 @@ describe('JustALittleBitMore copy (A18)', () => {
   });
 
   it('renders the A18 delta framing when the habit was recently completed', () => {
-    // Simulate a "just did 15 burpees" history event on the Workout habit.
-    // Workout unit is 4 sets → 50% = 2. Using unitsCompleted=15 puts us in
-    // the A18 flavor, even though sets ≠ burpees — the test is structural.
-    const workoutId = DEFAULT_HABIT_IDS.workout;
+    // Walk: 2500 steps target → 50% = 1250.
+    const walkId = DEFAULT_HABIT_IDS.walk;
     getAppStore().getState().actions.appendHistory({
       kind: 'habit_completed',
       jarId: DEFAULT_JAR_ID,
-      habitId: workoutId,
-      unitsCompleted: 15,
-      clipsEarned: 15,
+      habitId: walkId,
+      unitsCompleted: 1500,
+      clipsEarned: 0,
     });
     const timer = spawnTimer(50);
-    render(<JustALittleBitMore timer={timer} habit={getHabit(workoutId)} />);
-    // 4 × 50% = 2. Copy = "2 more sets — you just did 15"
-    expect(screen.getByText(/2 more sets/i)).toBeInTheDocument();
-    expect(screen.getByText(/you just did 15/i)).toBeInTheDocument();
+    render(<JustALittleBitMore timer={timer} habit={getHabit(walkId)} />);
+    // 2500 × 50% = 1250. "1250 more steps — you just did 1500"
+    expect(screen.getByText(/1250 more steps/i)).toBeInTheDocument();
+    expect(screen.getByText(/you just did 1500/i)).toBeInTheDocument();
   });
 
   it('falls back to "Do {delta} {unit}" with no prior completion', () => {
-    const workoutId = DEFAULT_HABIT_IDS.workout;
+    const walkId = DEFAULT_HABIT_IDS.walk;
     const timer = spawnTimer(50);
-    render(<JustALittleBitMore timer={timer} habit={getHabit(workoutId)} />);
-    // History is empty for this habit — expect fallback.
-    expect(screen.getByText(/^Do 2 sets$/i)).toBeInTheDocument();
+    render(<JustALittleBitMore timer={timer} habit={getHabit(walkId)} />);
+    // 2500 × 50% = 1250. Fallback copy without prior history.
+    expect(screen.getByText(/^Do 1250 steps$/i)).toBeInTheDocument();
   });
 
   it('"I did it" fires completeBonusTimer with the picked habit', () => {
-    const workoutId = DEFAULT_HABIT_IDS.workout;
+    const walkId = DEFAULT_HABIT_IDS.walk;
     const timer = spawnTimer(75);
-    render(<JustALittleBitMore timer={timer} habit={getHabit(workoutId)} />);
+    render(<JustALittleBitMore timer={timer} habit={getHabit(walkId)} />);
 
     fireEvent.click(screen.getByTestId('bonus-complete-button'));
 
@@ -130,6 +128,6 @@ describe('JustALittleBitMore copy (A18)', () => {
       (t) => t.id === timer.id,
     )!;
     expect(stored.status).toBe('completed');
-    expect(stored.originHabitId).toBe(workoutId);
+    expect(stored.originHabitId).toBe(walkId);
   });
 });

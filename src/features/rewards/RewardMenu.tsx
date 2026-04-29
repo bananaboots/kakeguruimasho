@@ -10,6 +10,7 @@
  */
 
 import { useMemo, useState } from 'react';
+import { Pencil, Archive, ArchiveRestore } from 'lucide-react';
 import './rewards.css';
 import { Button } from '../../ui/button.tsx';
 import type { Reward } from '../../types/reward.ts';
@@ -99,29 +100,29 @@ export function RewardMenu({
               <span className="reward-menu__actions">
                 <Button
                   variant="ghost"
-                  size="sm"
+                  size="icon"
                   onClick={() => openEdit(r)}
                   aria-label={`Edit ${r.label}`}
                 >
-                  Edit
+                  <Pencil size={14} aria-hidden="true" />
                 </Button>
                 {r.archived ? (
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={() => onUnarchive(r.id)}
                     aria-label={`Unarchive ${r.label}`}
                   >
-                    Unarchive
+                    <ArchiveRestore size={14} aria-hidden="true" />
                   </Button>
                 ) : (
                   <Button
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={() => onArchive(r.id)}
                     aria-label={`Archive ${r.label}`}
                   >
-                    Archive
+                    <Archive size={14} aria-hidden="true" />
                   </Button>
                 )}
               </span>

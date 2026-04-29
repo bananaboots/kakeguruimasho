@@ -5,8 +5,8 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'node:path';
 
-// GitHub Pages base path. Must match repo name. (ARCHITECTURE §9.1)
-const BASE = '/kakeguruimasho/';
+// Base path. Served from the site root.
+const BASE = '/';
 
 export default defineConfig({
   base: BASE,
