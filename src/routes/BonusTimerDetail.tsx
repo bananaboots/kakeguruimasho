@@ -20,15 +20,7 @@ import {
   BonusTimerCountdown,
   DiscountHabitPicker,
 } from '../features/bonus/index.ts';
-import { useTheme } from '../styles/theme-context.ts';
-import {
-  DecoDivider,
-  Engraved,
-  Label,
-  Masthead,
-  Motif,
-  RitualGlyph,
-} from '../ui/parlour/index.ts';
+import { Engraved, Label, RitualGlyph } from '../ui/parlour/index.ts';
 import type { BonusTimer } from '../types/bonus.ts';
 
 function ratioRemaining(timer: BonusTimer): number {
@@ -100,7 +92,6 @@ function TimerCard({ timer }: { timer: BonusTimer }) {
 
 export default function BonusTimerDetail() {
   const navigate = useNavigate();
-  const { themeMeta } = useTheme();
   const rawTimers = useAppStore(
     (s) => s.bonusTimerState[s.activeJarId]?.timers,
   );
@@ -114,26 +105,9 @@ export default function BonusTimerDetail() {
       className="route route--bonus parlour-grain parlour-halftone"
       aria-labelledby="bonus-title"
     >
-      <Masthead>
-        <div className="parlour-masthead__kicker">
-          Side Wheel · Time Pressure
-        </div>
-        <h1 id="bonus-title" className="parlour-masthead__title">
-          The Second Chance
-        </h1>
-        <p className="parlour-masthead__tagline">{themeMeta.tagline}</p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            margin: 'var(--space-3) auto 0',
-          }}
-        >
-          <Motif size={36} />
-        </div>
-      </Masthead>
-
-      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
+      <h1 id="bonus-title" className="sr-only">
+        The Second Chance
+      </h1>
 
       {timers.length === 0 ? (
         <div className="bonus-detail__empty" data-testid="bonus-detail-empty">

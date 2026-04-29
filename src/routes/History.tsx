@@ -21,11 +21,9 @@ export default function History() {
 
   return (
     <section className="route route--history" aria-labelledby="history-title">
-      <header className="route__header">
-        <h1 id="history-title" className="route__title">
-          History
-        </h1>
-      </header>
+      <h1 id="history-title" className="sr-only">
+        History
+      </h1>
 
       <div
         role="group"

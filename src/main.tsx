@@ -79,6 +79,27 @@ function patchOptionalSettings(): void {
   }
 }
 
+/**
+ * Migrate legacy `minutes` / `sets` habit unit kinds to `count` with a
+ * matching unit label. Both behaved identically at the engine level
+ * (single-tap = 1 clip), so the conversion is loss-free. Idempotent: only
+ * touches habits whose `unit.kind` is still legacy.
+ */
+function patchLegacyUnitKinds(): void {
+  const { habits, actions } = getAppStore().getState();
+  for (const h of habits) {
+    if (h.unit.kind === 'minutes') {
+      actions.updateHabit(h.id, {
+        unit: { kind: 'count', target: h.unit.target, unit: 'minutes' },
+      });
+    } else if (h.unit.kind === 'sets') {
+      actions.updateHabit(h.id, {
+        unit: { kind: 'count', target: h.unit.target, unit: 'sets' },
+      });
+    }
+  }
+}
+
 async function bootRehydrate(): Promise<void> {
   try {
     const persisted = await loadPersistedAppState();
@@ -90,6 +111,7 @@ async function bootRehydrate(): Promise<void> {
   }
   patchLegacyHygieneName();
   patchOptionalSettings();
+  patchLegacyUnitKinds();
 }
 
 function mount(): void {

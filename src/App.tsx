@@ -29,7 +29,6 @@ import { RailStakeAndOdds } from './features/spin/RailStakeAndOdds.tsx';
 // its own chunk. The home chunk is small enough that eager is fine, but we
 // lazy the rest for now — easy to un-lazy per route if it hurts Lighthouse.
 const Home = lazy(() => import('./routes/Home.tsx'));
-const Habits = lazy(() => import('./routes/Habits.tsx'));
 const Rewards = lazy(() => import('./routes/Rewards.tsx'));
 const Jar = lazy(() => import('./routes/Jar.tsx'));
 const History = lazy(() => import('./routes/History.tsx'));
@@ -138,14 +137,7 @@ export default function App() {
                 </FirstRunGate>
               }
             />
-            <Route
-              path="/habits"
-              element={
-                <FirstRunGate>
-                  <Habits />
-                </FirstRunGate>
-              }
-            />
+            <Route path="/habits" element={<Navigate to="/rewards" replace />} />
             <Route
               path="/rewards"
               element={

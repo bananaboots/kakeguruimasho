@@ -36,17 +36,14 @@ describe('DiscountHabitPicker', () => {
     setPersistenceEnabled(true);
   });
 
-  it('lists numeric habits (count/minutes/sets) but not the hygiene bundle (A4)', () => {
+  it('lists numeric habits (count) but not bundle habits (A4)', () => {
     const timer = activeTimer();
     render(<DiscountHabitPicker timer={timer} />);
-    // 4 numeric habits: Walk (count), Workout (sets), Cleaning (minutes),
-    // Focused work (minutes).
+    // Numeric (count) habits in the new default seed.
     expect(screen.getByText('Walk')).toBeInTheDocument();
-    expect(screen.getByText('Workout')).toBeInTheDocument();
-    expect(screen.getByText('Cleaning')).toBeInTheDocument();
     expect(screen.getByText('Focused work')).toBeInTheDocument();
-    // Self care bundle excluded.
-    expect(screen.queryByText('Self care bundle')).toBeNull();
+    // Bundle habit excluded.
+    expect(screen.queryByText('Chore bundle')).toBeNull();
   });
 
   it('hides archived habits', () => {
@@ -54,12 +51,12 @@ describe('DiscountHabitPicker', () => {
     const store = getAppStore();
     const prev = store.getState();
     const habits = prev.habits.map((h) =>
-      h.id === DEFAULT_HABIT_IDS.cleaning ? { ...h, archived: true } : h,
+      h.id === DEFAULT_HABIT_IDS.focusedWork ? { ...h, archived: true } : h,
     );
     store.setState({ ...prev, habits, actions: prev.actions }, false);
 
     render(<DiscountHabitPicker timer={timer} />);
-    expect(screen.queryByText('Cleaning')).toBeNull();
+    expect(screen.queryByText('Focused work')).toBeNull();
   });
 
   it('picking a habit sets originHabitId and swaps to the just-a-little-bit-more UI', () => {

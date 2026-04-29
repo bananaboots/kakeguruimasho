@@ -2,15 +2,15 @@
  * Playwright config (Phase 4).
  *
  * Runs a single smoke test against the production build served via
- * `vite preview`. Vite's `base` is `/kakeguruimasho/` so the baseURL
- * includes that prefix; routing is HashRouter, so everything after
- * the base is expressed with `#` in test navigation.
+ * `vite preview`. Vite's `base` is `/` so the baseURL is the root;
+ * routing is HashRouter, so everything after the base is expressed
+ * with `#` in test navigation.
  */
 
 import { defineConfig } from '@playwright/test';
 
 const PORT = 4174;
-const BASE = '/kakeguruimasho/';
+const BASE = '/';
 
 export default defineConfig({
   testDir: './e2e',

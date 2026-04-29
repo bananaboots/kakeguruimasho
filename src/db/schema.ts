@@ -175,6 +175,7 @@ const habitUnitSchema = z.union([
     subItems: z.array(z.string()),
     cutoffLocal: z.string(),
   }),
+  z.object({ kind: z.literal('binary') }),
 ]);
 
 const habitSchema = z.object({
@@ -183,6 +184,7 @@ const habitSchema = z.object({
   unit: habitUnitSchema,
   createdAt: brandedString,
   archived: z.boolean(),
+  iconKey: z.string().optional(),
 });
 
 const hygieneBundleStateSchema = z.object({

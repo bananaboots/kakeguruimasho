@@ -31,32 +31,137 @@
   gap: 0;
 }
 
-.habit-list__edit {
-  align-self: flex-end;
-  min-height: var(--tap-target-min);
-  padding: 6px 12px;
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-top: none;
-  color: var(--color-ink-muted);
-  font-family: var(--font-mono);
-  font-size: calc(8px * var(--mono-scale));
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition:
-    color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out);
+.ritual-card-wrap {
+  position: relative;
+  width: 100%;
 }
 
-.habit-list__edit:hover,
-.habit-list__edit:focus-visible {
-  color: var(--color-ink);
-  border-color: var(--color-border-strong);
+.ritual-card__edit {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 0;
+  color: var(--color-ink-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out);
+  z-index: 1;
+}
+
+.ritual-card__edit:hover,
+.ritual-card__edit:focus-visible {
+  color: var(--color-gold);
   outline: none;
 }
 
-.habit-list__edit:focus-visible {
+.ritual-card__edit:focus-visible {
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}
+
+/* Shift the streak chip left so it doesn't sit under the absolute-positioned
+ * edit affordance. Only applies when the card has an edit button. */
+.ritual-card-wrap:has(> .ritual-card__edit) .ritual-card__streak {
+  margin-right: 28px;
+}
+
+/* -------- Compact RitualCard (Vault) -------- */
+
+.ritual-card-wrap--compact {
+  width: 100%;
+}
+
+.ritual-card.ritual-card--compact {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  /* right padding reserves room for the absolute edit + plus affordances. */
+  padding: 4px 60px 4px 10px;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  flex: 0 0 24px;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 1px;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__name-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  color: var(--color-ink);
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__name-row .ritual-card__streak {
+  flex: 0 0 auto;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__summary {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  line-height: 1;
+}
+
+.ritual-card.ritual-card--compact .ritual-card__plus {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  bottom: auto;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+}
+
+.ritual-card-wrap--compact .ritual-card__edit {
+  top: 50%;
+  right: 38px;
+  transform: translateY(-50%);
+}
+
+.ritual-card-wrap--compact:has(> .ritual-card__edit) .ritual-card__streak {
+  margin-right: 0; /* affordances are absolute; flow shift unnecessary. */
+}
+
+.ritual-card__edit:hover,
+.ritual-card__edit:focus-visible {
+  color: var(--color-gold);
+  border-color: var(--color-gold);
+  background-color: color-mix(in srgb, var(--color-gold) 8%, transparent);
+  outline: none;
+}
+
+.ritual-card__edit:focus-visible {
   box-shadow: var(--focus-ring);
 }
 
@@ -74,6 +179,15 @@
   gap: var(--space-2);
 }
 
+/* Stack of full-width bundle cards above the 2-col grid. The bottom
+ * margin matches the grid's gap so the spacing reads as one rhythm. */
+.home__bundle-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
 .quicklog {
   width: 100%;
 }
@@ -88,21 +202,55 @@
   width: 100%;
   min-height: 96px;
   padding: 12px;
-  background: linear-gradient(
-    180deg,
-    var(--color-surface-2),
-    var(--color-surface)
-  );
+  /* '60s Art-Nouveau revival: a 4-petal daisy + concentric ring tile
+   * subtly overlaid on the lacquered ritual surface. Pattern is gold at
+   * very low opacity so it reads as a flourish, not as content. */
+  background:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='%23e8c682' stroke-width='0.45' opacity='0.18'><circle cx='40' cy='40' r='20'/><circle cx='40' cy='40' r='13'/><path d='M40 20 Q 50 30 40 40 Q 30 30 40 20Z'/><path d='M40 60 Q 50 50 40 40 Q 30 50 40 60Z'/><path d='M20 40 Q 30 50 40 40 Q 30 30 20 40Z'/><path d='M60 40 Q 50 50 40 40 Q 50 30 60 40Z'/></g></svg>"),
+    linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
+  background-repeat: repeat;
+  background-size: 80px 80px, auto;
   border: 1px solid var(--color-border);
   border-radius: 0;
   color: inherit;
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(232, 198, 130, 0.08);
+  /* Layered inset rings for a fancy art-nouveau frame: thin gold tracer,
+   * dark inner, plus the original top highlight. */
+  box-shadow:
+    inset 0 0 0 1px rgba(232, 198, 130, 0.22),
+    inset 0 0 0 2px var(--color-bg),
+    inset 0 1px 0 rgba(232, 198, 130, 0.08);
   transition:
     border-color var(--duration-fast) var(--ease-out),
     background var(--duration-fast) var(--ease-out);
+}
+
+/* Art-nouveau corner flourishes — only on the non-compact (Salon) cards
+ * where there's room for the visual flourish. */
+.ritual-card-wrap:not(.ritual-card-wrap--compact) .ritual-card::before,
+.ritual-card-wrap:not(.ritual-card-wrap--compact) .ritual-card::after {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%23e8c682' stroke-width='1' stroke-linecap='round'><path d='M1 13 Q 1 6 7 6 M7 6 Q 13 6 13 1' opacity='0.8'/><circle cx='7' cy='6' r='0.9' fill='%23e8c682' opacity='0.9'/></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+}
+
+.ritual-card-wrap:not(.ritual-card-wrap--compact) .ritual-card::before {
+  top: 4px;
+  right: 4px;
+  transform: scaleX(-1);
+}
+
+.ritual-card-wrap:not(.ritual-card-wrap--compact) .ritual-card::after {
+  bottom: 4px;
+  left: 4px;
+  transform: scaleY(-1);
 }
 
 .ritual-card:not(:disabled):hover,
@@ -148,26 +296,13 @@
   position: absolute;
   bottom: 8px;
   right: 8px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    var(--color-gold),
-    var(--color-gold-deep) 70%
-  );
-  display: flex;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--color-bg);
-  line-height: 1;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
-    0 2px 0 rgba(0, 0, 0, 0.5);
+  color: var(--color-gold);
+  pointer-events: none;
 }
 
 /* -------- StepEntry -------- */
@@ -295,15 +430,70 @@
   flex-wrap: wrap;
 }
 
+.habit-editor__hint {
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.habit-editor__icon-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+
+.habit-editor__icon-option {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.habit-editor__icon-option:hover {
+  border-color: var(--color-border-strong);
+}
+
+.habit-editor__icon-option[data-selected='true'] {
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 10%, transparent);
+  color: var(--color-gold);
+}
+
+.habit-editor__icon-option--clear {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-ink-muted);
+}
+
 /* -------- Self care bundle (Pachinko 夜 · Evening Rite) -------- */
 
 .self-care {
   padding: 14px;
-  background: linear-gradient(180deg, var(--color-felt-deep), #1a0403);
+  /* Match the ritual-card surface so bundle and non-bundle habits read as
+   * the same family on Salon. Subtle vertical-stripe texture differentiates
+   * bundles from single-tap rituals without breaking the palette. */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 6px,
+      rgba(232, 198, 130, 0.025) 6px,
+      rgba(232, 198, 130, 0.025) 7px
+    ),
+    linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
   border: 1px solid var(--color-border);
-  box-shadow:
-    inset 0 0 0 1px var(--color-bg),
-    inset 0 0 0 2px rgba(232, 198, 130, 0.3);
+  box-shadow: inset 0 1px 0 rgba(232, 198, 130, 0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;

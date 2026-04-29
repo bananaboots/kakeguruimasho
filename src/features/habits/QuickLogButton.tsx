@@ -49,6 +49,7 @@ export function QuickLogButton({ habit, onBundleTap }: QuickLogButtonProps) {
         return;
       case 'minutes':
       case 'sets':
+      case 'binary':
         logOne();
         return;
       case 'bundle':
@@ -67,6 +68,8 @@ export function QuickLogButton({ habit, onBundleTap }: QuickLogButtonProps) {
         return `Log ${habit.unit.target} sets — ${habit.name}`;
       case 'bundle':
         return `Open ${habit.name}`;
+      case 'binary':
+        return `Log ${habit.name}`;
     }
   })();
 

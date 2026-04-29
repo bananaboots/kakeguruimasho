@@ -62,9 +62,6 @@ test.describe('Kowloon Electric theme', () => {
     // data-theme attribute reflects the theme.
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'kowloon');
 
-    // Confirm Kowloon masthead is mounted on Home.
-    await expect(page.locator('[data-testid="kowloon-masthead"]').first()).toBeVisible();
-
     // Confirm Kowloon streak is mounted.
     await expect(page.locator('[data-testid="kowloon-streak"]').first()).toBeVisible();
 
@@ -95,9 +92,6 @@ test.describe('Kowloon Electric theme', () => {
     await page.reload();
 
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'pachinko');
-
-    // Pachinko masthead present.
-    await expect(page.locator('[data-testid="pachinko-masthead"]').first()).toBeVisible();
 
     // No Kowloon-only elements.
     await expect(page.locator('[data-testid="kowloon-masthead"]')).toHaveCount(0);

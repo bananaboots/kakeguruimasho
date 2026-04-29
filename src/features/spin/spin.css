@@ -10,11 +10,27 @@
   position: relative;
   display: block;
   padding: 16px;
+  /* Velour-tray texture: faint vertical pile lines + soft cross-pile sheen
+   * over the felt base. Reads as fabric, not lacquer. */
   background:
     radial-gradient(
-      ellipse at 30% 20%,
-      rgba(232, 198, 130, 0.05) 0%,
-      transparent 40%
+      ellipse 60% 40% at 30% 20%,
+      rgba(232, 198, 130, 0.07) 0%,
+      transparent 60%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.06) 0px,
+      rgba(0, 0, 0, 0.06) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(232, 198, 130, 0.018) 0px,
+      rgba(232, 198, 130, 0.018) 2px,
+      transparent 2px,
+      transparent 5px
     ),
     linear-gradient(135deg, var(--color-felt-deep), #1a0403);
   border: 1px solid var(--color-border);
@@ -23,7 +39,7 @@
   box-shadow:
     inset 0 0 0 3px var(--color-bg),
     inset 0 0 0 4px var(--color-gold),
-    inset 0 4px 20px rgba(0, 0, 0, 0.5);
+    inset 0 4px 20px rgba(0, 0, 0, 0.55);
   transition: border-color var(--duration-fast) var(--ease-out);
 }
 
@@ -42,23 +58,38 @@
     0 0 0 4px var(--color-gold);
 }
 
+/* Replace the brass nails with small art-nouveau corner flourishes:
+ * a curling tendril + bead. ::data attr-driven mirroring keeps a single
+ * SVG source. */
 .hand-tray__nail {
   position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    var(--color-gold),
-    var(--color-gold-deep)
-  );
-  z-index: 5;
+  width: 18px;
+  height: 18px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18' fill='none' stroke='%23e8c682' stroke-width='1.1' stroke-linecap='round'><path d='M1 17 Q 1 7 9 7 Q 17 7 17 1' opacity='0.85'/><circle cx='9' cy='7' r='1.1' fill='%23e8c682'/><circle cx='17' cy='1' r='0.9' fill='%23e8c682'/></svg>");
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
 }
 
-.hand-tray__nail[data-pos='tl'] { top: 4px; left: 4px; }
-.hand-tray__nail[data-pos='tr'] { top: 4px; right: 4px; }
-.hand-tray__nail[data-pos='bl'] { bottom: 4px; left: 4px; }
-.hand-tray__nail[data-pos='br'] { bottom: 4px; right: 4px; }
+.hand-tray__nail[data-pos='tl'] {
+  top: 6px;
+  left: 6px;
+}
+.hand-tray__nail[data-pos='tr'] {
+  top: 6px;
+  right: 6px;
+  transform: scaleX(-1);
+}
+.hand-tray__nail[data-pos='bl'] {
+  bottom: 6px;
+  left: 6px;
+  transform: scaleY(-1);
+}
+.hand-tray__nail[data-pos='br'] {
+  bottom: 6px;
+  right: 6px;
+  transform: scale(-1, -1);
+}
 
 .hand-tray__header {
   display: flex;
@@ -349,6 +380,74 @@
   padding: var(--space-2) 0 0;
 }
 
+/* ---------- TierToggle (above Pull the Lever) ---------- */
+
+.tier-toggle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
+.tier-toggle__option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.tier-toggle__option:hover:not(:disabled),
+.tier-toggle__option:focus-visible {
+  background: var(--color-surface-3);
+  outline: none;
+}
+
+.tier-toggle__option:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.tier-toggle__option--selected {
+  background: color-mix(in srgb, var(--color-gold) 14%, var(--color-surface-2));
+  border-color: var(--color-gold);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 40%, transparent);
+}
+
+.tier-toggle__option:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tier-toggle__label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.tier-toggle__sub {
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.tier-toggle__option--selected .tier-toggle__sub {
+  color: var(--color-gold);
+}
+
 /* ---------- Desktop spin layout (>=1024px) ---------- */
 
 @media (min-width: 1024px) {
@@ -521,6 +620,45 @@
 .hand-view__group--expanded {
   border-color: var(--color-accent);
   background: var(--color-surface-3);
+}
+
+/* Staked state — gold ring + slight emphasis. */
+.hand-view__group--staked {
+  position: relative;
+  border-color: var(--color-gold);
+  background: color-mix(in srgb, var(--color-gold) 12%, var(--color-surface-2));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gold) 35%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-gold) 25%, transparent);
+}
+
+.hand-view__group:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.hand-view__stake-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-family: var(--font-mono);
+  font-size: calc(8px * var(--mono-scale));
+  letter-spacing: 0.06em;
+  color: var(--color-bg);
+  background: var(--color-gold);
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
+.hand-view__hint {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: calc(9px * var(--mono-scale));
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  text-align: center;
 }
 
 .hand-view__group--gold {

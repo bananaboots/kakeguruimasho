@@ -88,6 +88,10 @@ export function SlotReelsCanvas({
   const reel0 = useRef<HTMLDivElement | null>(null);
   const reel1 = useRef<HTMLDivElement | null>(null);
   const reel2 = useRef<HTMLDivElement | null>(null);
+  // See WheelCanvas — same fire-once gate so a re-running effect doesn't
+  // call onAnimationComplete a second time and re-open the reveal modal
+  // after the user has already claimed.
+  const firedRef = useRef(false);
 
   const tier = MAIN_WHEEL_SEGMENT_ORDER[targetSegmentIndex] ?? 'T1';
   const targetIdx = SYMBOLS_PER_TIER.indexOf(tier);
@@ -116,6 +120,12 @@ export function SlotReelsCanvas({
     const wait = (sec: number) =>
       new Promise<void>((r) => window.setTimeout(r, sec * 1000));
 
+    const fire = (): void => {
+      if (firedRef.current) return;
+      firedRef.current = true;
+      onAnimationComplete?.();
+    };
+
     const run = async (): Promise<void> => {
       if (reduceMotion) {
         for (const el of reels) {
@@ -126,7 +136,7 @@ export function SlotReelsCanvas({
           );
         }
         await wait(0.3);
-        onAnimationComplete?.();
+        fire();
         return;
       }
       const total = MAIN_WHEEL_SPIN_DURATION_SEC;
@@ -153,10 +163,15 @@ export function SlotReelsCanvas({
         );
       }
       await wait(WIN_PULSE_DURATION_SEC);
-      onAnimationComplete?.();
+      fire();
     };
     void run();
   }, [idle, targetSegmentIndex, reduceMotion, landingY, onAnimationComplete]);
+
+  // Reset the fire-once gate on a fresh spin (target change) or idle return.
+  useEffect(() => {
+    firedRef.current = false;
+  }, [targetSegmentIndex, idle]);
 
   const renderReel = (reelRef: React.RefObject<HTMLDivElement | null>) => (
     <div className="slot-reels__window">

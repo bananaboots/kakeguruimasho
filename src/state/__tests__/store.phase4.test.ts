@@ -63,9 +63,11 @@ describe('store — Phase 4 action surface', () => {
 
   it('archiveHabit flips archived=true', () => {
     const store = createAppStore(seedInitialAppState());
-    store.getState().actions.archiveHabit(DEFAULT_HABIT_IDS.cleaning);
+    store.getState().actions.archiveHabit(DEFAULT_HABIT_IDS.focusedWork);
     const s = store.getState();
-    expect(s.habits.find((h) => h.id === DEFAULT_HABIT_IDS.cleaning)?.archived).toBe(true);
+    expect(
+      s.habits.find((h) => h.id === DEFAULT_HABIT_IDS.focusedWork)?.archived,
+    ).toBe(true);
   });
 
   it('resetHygieneBundle creates a fresh bundle for the given date', () => {

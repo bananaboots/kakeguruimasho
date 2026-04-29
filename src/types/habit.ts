@@ -4,10 +4,11 @@
 import type { HabitId, ISOTimestamp, JarId, LocalDate } from './ids.ts';
 
 export type HabitUnit =
-  | { kind: 'count'; target: number; unit: string } // e.g. steps: 2500 / "steps"
-  | { kind: 'minutes'; target: number } // cleaning 20 min, work 30 min
-  | { kind: 'sets'; target: number } // workout 4 sets
-  | { kind: 'bundle'; subItems: string[]; cutoffLocal: string }; // hygiene bundle
+  | { kind: 'count'; target: number; unit: string } // e.g. 2500/"steps", 30/"minutes", 4/"sets"
+  | { kind: 'minutes'; target: number } // legacy — boot migration converts to count
+  | { kind: 'sets'; target: number } // legacy — boot migration converts to count
+  | { kind: 'bundle'; subItems: string[]; cutoffLocal: string } // multi-step compound habit
+  | { kind: 'binary' }; // binary yes/no habit — single tap = 1 clip
 
 export type Habit = {
   id: HabitId;
@@ -15,6 +16,9 @@ export type Habit = {
   unit: HabitUnit;
   createdAt: ISOTimestamp;
   archived: boolean;
+  /** Optional Lucide icon key used by the ritual card; falls back to a
+   *  unit-derived glyph when unset. */
+  iconKey?: string;
   // OR-1: no jarId in v1; v2 migration will add with DEFAULT_JAR_ID.
 };
 

@@ -17,7 +17,7 @@
  * the "hand" summary — CSS keyframes, no Framer Motion (brief §5).
  */
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type FormEvent } from 'react';
 import { Button } from '../../ui/button.tsx';
 import {
   Drawer,
@@ -73,6 +73,14 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
     }, 800);
   }, [canLog, clips, habit.id, onClose]);
 
+  const handleSubmit = useCallback(
+    (e: FormEvent): void => {
+      e.preventDefault();
+      handleLog();
+    },
+    [handleLog],
+  );
+
   const handleCancel = useCallback(() => {
     setRawValue('');
     setAwarded(null);
@@ -87,6 +95,7 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
           {target.toLocaleString()} steps per clip. Enter today&apos;s step count.
         </DrawerDescription>
 
+        <form onSubmit={handleSubmit}>
         <div className="step-entry__field">
           <label htmlFor="step-entry-input" className="step-entry__label">
             Steps today
@@ -148,12 +157,17 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
         ) : null}
 
         <div className="step-entry__actions">
-          <Button variant="ghost" onClick={handleCancel} disabled={awarded !== null}>
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={handleCancel}
+            disabled={awarded !== null}
+          >
             Cancel
           </Button>
           <Button
             variant="primary"
-            onClick={handleLog}
+            type="submit"
             disabled={!canLog || awarded !== null}
           >
             {awarded !== null
@@ -161,6 +175,7 @@ export function StepEntry({ habit, open, onClose }: StepEntryProps) {
               : `Log ${clips || 0} clip${clips === 1 ? '' : 's'}`}
           </Button>
         </div>
+        </form>
       </DrawerContent>
     </Drawer>
   );

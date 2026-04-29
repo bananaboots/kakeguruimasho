@@ -118,6 +118,13 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
   const { targetSegmentIndex, nearMissDriftIndex, onAnimationComplete, idle } = props;
   const reduceMotion = useReducedMotion();
   const svgRef = useRef<SVGSVGElement | null>(null);
+  // Effect re-runs whenever the parent passes a new `onAnimationComplete`
+  // (which can happen on every parent render). Without this gate, each
+  // re-run starts a fresh `run()` that eventually calls onAnimationComplete
+  // a second (or third) time — the parent's claim flow would re-open the
+  // reveal modal after the user has already picked. Reset on a new spin
+  // (targetSegmentIndex change) or when the canvas returns to idle.
+  const firedRef = useRef(false);
 
   const targetTier = MAIN_WHEEL_SEGMENT_ORDER[targetSegmentIndex];
   const driftTier =
@@ -149,12 +156,18 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
     // can't trust the Promise. Instead, fire-and-forget the animate calls
     // and use a timeout matched to the planned duration to drive the
     // post-spin handler. The DOM end-state (transform) is correct either way.
+    const fire = (): void => {
+      if (firedRef.current) return;
+      firedRef.current = true;
+      onAnimationComplete?.();
+    };
+
     const run = async (): Promise<void> => {
       const wait = (sec: number) => new Promise<void>((r) => window.setTimeout(r, sec * 1000));
       if (reduceMotion) {
         animate(el, { rotate: finalRot }, { duration: 0.3, ease: 'easeOut' });
         await wait(0.3);
-        onAnimationComplete?.();
+        fire();
         return;
       }
       if (driftVisualIdx !== undefined) {
@@ -186,7 +199,7 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
         ease: 'easeInOut',
       });
       await wait(WIN_PULSE_DURATION_SEC);
-      onAnimationComplete?.();
+      fire();
     };
     void run();
   }, [
@@ -198,6 +211,13 @@ export function WheelCanvas(props: WheelCanvasProps): React.ReactElement {
     reduceMotion,
     onAnimationComplete,
   ]);
+
+  // Reset the fire-once gate when the canvas starts a fresh spin
+  // (different target) or returns to idle. Re-mount also resets via the
+  // useRef default, so this covers both same-mount and new-mount cases.
+  useEffect(() => {
+    firedRef.current = false;
+  }, [targetSegmentIndex, idle]);
 
   // Geometry — 50 slices fan from a 165-radius circle to the 60-radius hub.
   // We keep VIEWBOX/CENTER from the existing module-level constants.

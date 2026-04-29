@@ -5,7 +5,7 @@
  * that the input parses to a valid 24-hour time.
  */
 
-import { useState, type ReactElement } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 import { Button } from '../../ui/button.tsx';
 import { Input } from '../../ui/input.tsx';
 import { useAppStore, getAppStore } from '../../state/store.ts';
@@ -29,6 +29,11 @@ export function HygieneCutoffEditor(): ReactElement {
     window.setTimeout(() => setSaved(false), 1600);
   };
 
+  const handleSubmit = (e: FormEvent): void => {
+    e.preventDefault();
+    handleSave();
+  };
+
   return (
     <section
       className="settings__card"
@@ -45,32 +50,34 @@ export function HygieneCutoffEditor(): ReactElement {
         </p>
       </header>
 
-      <label className="settings__field-label">
-        <span>Cutoff time (24-hour)</span>
-        <Input
-          type="time"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          aria-label="Self care cutoff time"
-        />
-      </label>
+      <form onSubmit={handleSubmit} noValidate>
+        <label className="settings__field-label">
+          <span>Cutoff time (24-hour)</span>
+          <Input
+            type="time"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            aria-label="Self care cutoff time"
+          />
+        </label>
 
-      {error ? (
-        <p className="settings__error" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {saved ? (
-        <p className="settings__hint" role="status">
-          Saved.
-        </p>
-      ) : null}
+        {error ? (
+          <p className="settings__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {saved ? (
+          <p className="settings__hint" role="status">
+            Saved.
+          </p>
+        ) : null}
 
-      <div className="settings__actions">
-        <Button variant="primary" onClick={handleSave}>
-          Save
-        </Button>
-      </div>
+        <div className="settings__actions">
+          <Button variant="primary" type="submit">
+            Save
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }

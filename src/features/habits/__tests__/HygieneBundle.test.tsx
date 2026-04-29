@@ -23,11 +23,36 @@ function hygieneHabit(): Habit {
     .habits.find((h) => h.id === DEFAULT_HABIT_IDS.hygiene)!;
 }
 
+/**
+ * Force the bundle habit back to the legacy hygiene shape so cutoff /
+ * retroactive-award assertions stay deterministic regardless of the
+ * default seed's current bundle name + cutoff.
+ */
+function ensureLegacyHygieneSeed(): void {
+  const store = getAppStore();
+  const prev = store.getState();
+  const habits = prev.habits.map((h) =>
+    h.id === DEFAULT_HABIT_IDS.hygiene
+      ? {
+          ...h,
+          name: 'Hygiene bundle',
+          unit: {
+            kind: 'bundle' as const,
+            subItems: ['shower', 'brush teeth', 'wash face', 'in bed by cutoff'],
+            cutoffLocal: '01:00',
+          },
+        }
+      : h,
+  );
+  store.setState({ ...prev, habits }, false);
+}
+
 describe('HygieneBundle', () => {
   beforeEach(() => {
     setPersistenceEnabled(false);
     setStoreRng(seededRng(42));
     __resetAppStoreForTests(seedInitialAppState());
+    ensureLegacyHygieneSeed();
   });
   afterEach(() => {
     cleanup();

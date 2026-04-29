@@ -29,6 +29,13 @@ import { nowISO } from './../lib/time.ts';
 import { newClipId } from '../lib/id.ts';
 
 // Stable habit IDs so tests and onboarding can reference them.
+//
+// `hygiene` is the legacy ID slot used for the default bundle; existing
+// users have it persisted, and the retroactive-bundle award flow keys off
+// the same string. New installs seed a "Chore bundle" against this same ID
+// so we keep the bundle infrastructure without a schema migration.
+// `workout` and `cleaning` are no longer seeded but kept here so legacy
+// persisted state still has a canonical reference.
 export const DEFAULT_HABIT_IDS = {
   walk: asHabitId('habit_walk'),
   workout: asHabitId('habit_workout'),
@@ -78,38 +85,30 @@ export function defaultHabits(): Habit[] {
       unit: { kind: 'count', target: 2500, unit: 'steps' },
       createdAt,
       archived: false,
-    },
-    {
-      id: DEFAULT_HABIT_IDS.workout,
-      name: 'Workout',
-      unit: { kind: 'sets', target: 4 },
-      createdAt,
-      archived: false,
-    },
-    {
-      id: DEFAULT_HABIT_IDS.cleaning,
-      name: 'Cleaning',
-      unit: { kind: 'minutes', target: 20 },
-      createdAt,
-      archived: false,
+      iconKey: 'Footprints',
     },
     {
       id: DEFAULT_HABIT_IDS.focusedWork,
       name: 'Focused work',
-      unit: { kind: 'minutes', target: 30 },
+      unit: { kind: 'count', target: 30, unit: 'minutes' },
       createdAt,
       archived: false,
+      iconKey: 'BrainCircuit',
     },
     {
+      // Re-uses the legacy hygiene bundle ID slot so the bundle
+      // infrastructure (pendingHygieneBundle slice, retroactive-award flow)
+      // works without a schema migration. Display copy is the new chore set.
       id: DEFAULT_HABIT_IDS.hygiene,
-      name: 'Self care bundle',
+      name: 'Chore bundle',
       unit: {
         kind: 'bundle',
-        subItems: ['shower', 'brush teeth', 'wash face', 'in bed by cutoff'],
-        cutoffLocal: '01:00', // Q5 default
+        subItems: ['Make bed', 'Trash', 'Laundry', 'Dishes'],
+        cutoffLocal: '23:59',
       },
       createdAt,
       archived: false,
+      iconKey: 'ListChecks',
     },
   ];
 }

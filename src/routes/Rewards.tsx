@@ -1,17 +1,16 @@
 /**
- * Rewards route — "The Vault".
+ * Vault route — Rituals (input) + Rewards (output) on one screen.
  *
- * All three tiers are visible at once, stacked. Each tier gets a badge +
- * title + trailing gold rule, mirroring the design source's
- * "Menu · Treat Yourself" screen.
- *
- * Source: `/tmp/design1/kakeguruimasho/project/screens-misc.jsx:147`.
+ * Rituals on top, Rewards beneath; both groups are stacked vertically
+ * with section titles. Each reward tier still gets a badge + title +
+ * trailing gold rule, mirroring the original "Menu · Treat Yourself"
+ * design source.
  */
 
+import { HabitList } from '../features/habits/index.ts';
 import { RewardMenu } from '../features/rewards/RewardMenu.tsx';
 import { RewardRulesSidebar } from '../features/rewards/reward-rules-sidebar.tsx';
-import { useTheme } from '../styles/theme-context.ts';
-import { DecoDivider, Masthead, Motif } from '../ui/parlour/index.ts';
+import { SectionTitle } from '../ui/parlour/index.ts';
 import type { Tier } from '../types/wheel.ts';
 import { cn } from '../ui/utils.ts';
 
@@ -22,33 +21,23 @@ const TIERS: { tier: Tier; n: string; title: string }[] = [
 ];
 
 export default function Rewards() {
-  const { themeMeta } = useTheme();
   return (
     <section
       className="route route--rewards parlour-grain parlour-halftone"
       aria-labelledby="rewards-title"
     >
-      <Masthead>
-        <div className="parlour-masthead__kicker">{themeMeta.tagline}</div>
-        <h1 id="rewards-title" className="parlour-masthead__title">
-          The Vault
-        </h1>
-        <p className="parlour-masthead__tagline">
-          What the house owes you when the wheel lands true.
-        </p>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            margin: 'var(--space-3) auto 0',
-          }}
-        >
-          <Motif size={36} />
-        </div>
-      </Masthead>
+      <h1 id="rewards-title" className="sr-only">
+        The Vault
+      </h1>
 
-      <DecoDivider style={{ marginBottom: 'var(--space-5)' }} />
+      <SectionTitle jp="行" en="Rituals" />
+      <HabitList compact showIcon={false} />
 
+      <SectionTitle
+        jp="褒"
+        en="Rewards"
+        style={{ marginTop: 'var(--space-4)' }}
+      />
       <RewardRulesSidebar />
 
       <div className="reward-tiers">

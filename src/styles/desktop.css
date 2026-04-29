@@ -142,6 +142,17 @@
   .jar-layout__side {
     display: contents;
   }
+  /* Despite `display: contents`, the wrapper divs are still in the DOM —
+   * `.route > * + *` doesn't reach their children. Re-apply the route
+   * vertical rhythm to grandchildren so siblings of the streak / jar /
+   * milestone editor / activity feed are spaced like other routes. */
+  .jar-layout__visual > * + *,
+  .jar-layout__side > * + * {
+    margin-top: var(--route-stack-gap);
+  }
+  .jar-layout__side > *:first-child {
+    margin-top: var(--route-stack-gap);
+  }
 }
 
 /* Bonus detail at desktop: cap the cabinet width and let multiple active

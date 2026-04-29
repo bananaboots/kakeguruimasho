@@ -64,6 +64,27 @@ export type SpinMainWheelOutcome = {
 };
 
 /**
+ * Free / 2-match spins: 1% chance of a free Tier 3, else floor to the
+ * unlocked tier. Three-match keeps the full distribution (T1/T2/T3/BONUS/
+ * JACKPOT). The 1% chance is rolled with the same RNG so seed-based tests
+ * stay deterministic.
+ */
+const FREE_TIER_3_CHANCE = 0.01;
+
+function applyTierFloor(
+  result: MainSpinResult,
+  highestUnlockedTier: Tier | null,
+  rng: Rng,
+): MainSpinResult {
+  if (highestUnlockedTier === 'T3') return result;
+  const floor: Tier = highestUnlockedTier ?? 'T1';
+  if (rng.next() < FREE_TIER_3_CHANCE) {
+    return { tier: 'T3' };
+  }
+  return { tier: floor };
+}
+
+/**
  * Imperative main-wheel spin: resolves RNG, decides D3 drift theater,
  * emits the `near_miss_theater` history event if applicable.
  *
@@ -75,7 +96,8 @@ export async function spinMainWheel(
 ): Promise<SpinMainWheelOutcome> {
   const { cfg, highestUnlockedTier, rng, actions, jarId } = opts;
 
-  const result = resolveMainSpin(cfg, rng);
+  const rawResult = resolveMainSpin(cfg, rng);
+  const result = applyTierFloor(rawResult, highestUnlockedTier, rng);
   const drift = chooseNearMissDrift({ resolved: result, highestUnlockedTier });
 
   if (drift !== null) {
