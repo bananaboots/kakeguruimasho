@@ -524,6 +524,9 @@ export function createAppStore(initial?: AppState): UseBoundStore<StoreApi<Store
             events: [stampEvent({ kind: 'bonus_completed', jarId, timerId, habitId })],
           };
         });
+        // A17: bonus completion earns a token (draw + earn).
+        const clip = actions.drawClipFromBag(jarId);
+        actions.earnClipToHand(jarId, clip, 'bonus-discount', habitId);
       },
 
       expireBonusTimer(jarId, timerId) {

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Bonus discount completion now awards a token.** `completeBonusTimer` was emitting the `bonus_completed` history event but never calling `drawClipFromBag` / `earnClipToHand`. Completing a discounted habit within the timer now correctly draws a clip with source `bonus-discount` (A17).
+
 ### Added
 
 - **Kowloon Electric** — second bespoke theme. Triad Neon palette (hot magenta + ice cyan + acid jade + sodium yellow) over ink-black backgrounds; vertical Cantonese signage; CRT-bezel spin cabinet with three-reel mahjong tiles; magenta digital bonus countdown; LED-bar streak; arcade-token chips. Pickable via localStorage `kakegurui:theme` (theme picker UI deferred to a future cycle); `status: 'ready'` in `THEMES`.
