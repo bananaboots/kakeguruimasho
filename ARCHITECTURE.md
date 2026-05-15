@@ -605,7 +605,7 @@ It stamps `id` + `at`, inserts into slice, writes to `history_events` store. **E
 
 To prevent overlap:
 - **`jars/bags/hands` writes** go through named action creators on `jarsSlice`: `drawClipFromBag`, `returnClipsToBag`, `earnClipToHand`, `cashInClips`, `claimMilestone`, `resetJar`. 3B consumes `drawClipFromBag`. 3E consumes `cashInClips`. 3G consumes `claimMilestone`/`resetJar`. No agent does raw array splicing on state.
-- **`bonusTimerState` mutations** go through `spawnTimer`, `completeTimer`, `expireTimer`, `queueExtraSpins`, `dequeueExtraSpin`. 3C calls `spawnTimer` via `resolveBonusSpin`'s effect callback. 3H owns complete/expire.
+- **`bonusTimerState` mutations** go through `spawnTimer`, `completeTimer`, `expireTimer`, `queueExtraSpins`, `dequeueExtraSpin`. 3C calls `spawnTimer` via `resolveBonusSpin`'s effect callback. 3H owns complete/expire. `completeBonusTimer` also chains `drawClipFromBag` + `earnClipToHand(source: 'bonus-discount')` so that the user receives a token on successful bonus completion (A17).
 - **`streaks` mutations** go through `tickDailyStreak(date: LocalDate)`, `tickHabitStreak(habitId, date)`, `tickHygieneStreak(date)`, `breakStreak(kind)`. Callers never read-modify-write.
 
 ---

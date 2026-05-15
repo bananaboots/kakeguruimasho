@@ -65,7 +65,7 @@ Totals: 40 new tests, 245 passing project-wide. `npm run build` clean.
 
 - `BonusTimerCountdown` expire-fire was moved from inside the rAF `tick()` to a reactive `useEffect` on `remainingMs` so it still works under `vi.useFakeTimers` where rAF may not tick synchronously. Authority is still `endTimestamp - Date.now()`; the effect is purely a dispatch trigger.
 - Banner subscribes to the underlying `timers` array reference rather than calling `selectActiveBonusTimers` inside `useAppStore(...)`. Selectors that return fresh arrays cause Zustand to loop — both banner and detail route use `useMemo` to filter locally instead.
-- `A17` is already handled by 3A's `completeBonusTimer` composite path: it emits `bonus_completed`, and `earnClipToHand` / main-wheel re-spin is chained by the existing flow. 3H does not special-case bonus-origin clips.
+- `A17` is now fully wired: `completeBonusTimer` marks the timer complete, emits `bonus_completed`, then calls `drawClipFromBag` + `earnClipToHand(source: 'bonus-discount')` — the same canonical earn path used by `completeHabit`. Previously only the history event was emitted with no actual clip drawn. 3H does not special-case bonus-origin clips.
 - FREE and EXTRA segments do not reach `DiscountHabitPicker` — 3C's `spawnBonusTimer` is typed to only accept `PCT_75 | PCT_50 | PCT_25`, and 3A only creates `BonusTimer` records for those.
 - `src/BonusTimerBannerStub.tsx` is now unused; left in place because it's 3J-owned (per the MUST-NOT-TOUCH list). Safe to remove in a future 3J cleanup.
 
