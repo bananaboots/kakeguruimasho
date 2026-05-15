@@ -60,6 +60,7 @@ export default defineConfig({
   },
   server: {
     host: true,
+    port: 42069,
   },
   test: {
     globals: true,
